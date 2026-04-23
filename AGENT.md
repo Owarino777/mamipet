@@ -1,14 +1,14 @@
-# AGENT.md - Regles de contribution IA/dev pour MamiPet
+# AGENT.md - Règles de contribution IA/dev pour MamiPet
 
-Ce fichier cadre le travail de toute IA ou developpeur intervenant sur MamiPet. Il doit etre lu avant toute implementation.
+Ce fichier cadre le travail de toute IA ou développeur intervenant sur MamiPet. Il doit être lu avant toute implémentation.
 
 ## 1. Mission du projet
 
-MamiPet est une marketplace de confiance pour la garde d'animaux, specialement orientee vers les animaux sensibles : ages, sous traitement, handicapes, anxieux ou avec besoins particuliers.
+MamiPet est une marketplace de confiance pour la garde d'animaux, spécialement orientée vers les animaux sensibles : âgés, sous traitement, handicapés, anxieux ou avec besoins particuliers.
 
-Le MVP applicatif reel n'est pas le prototype Adalo. Le prototype a servi a valider les parcours, mais le produit final repose sur une architecture backend-first propre.
+Le MVP applicatif réel n'est pas le prototype Adalo. Le prototype a servi à valider les parcours, mais le produit final repose sur une architecture backend-first propre.
 
-## 2. Source de verite
+## 2. Source de vérité
 
 Avant de coder, lire :
 
@@ -26,12 +26,20 @@ Avant de coder, lire :
 - `doc/tech/BACKEND_IMPLEMENTATION_PLAN.md`
 - `doc/tech/ENGINEERING_PRINCIPLES.md`
 
-Les schemas sont dans :
+Les schémas sont dans :
 
 - `doc/merise/`
 - `doc/UML/`
 
-## 3. Architecture obligatoire
+## 3. Règle de langue et d'accents
+
+La documentation métier, les documents techniques rédigés en français et tous les textes affichés au front doivent utiliser un français correct avec les accents nécessaires à la compréhension.
+
+Les accents peuvent être absents uniquement dans les identifiants techniques : noms de fichiers, routes API, noms de fonctions, noms de classes, DTO, tables, colonnes, statuts techniques, clés JSON, variables, schémas PlantUML/Mermaid et blocs de code.
+
+Règle pratique : prose française accentuée, identifiants techniques stables.
+
+## 4. Architecture obligatoire
 
 Stack retenue :
 
@@ -43,7 +51,7 @@ Stack retenue :
 - Supabase PostgreSQL ;
 - Supabase Storage ;
 - RLS ;
-- Stripe Connect prepare mais paiement MVP simule/test ;
+- Stripe Connect préparé mais paiement MVP simulé/test ;
 - Google Maps API ;
 - Vercel.
 
@@ -68,69 +76,69 @@ src/
   shared/
 ```
 
-Chaque module doit separer :
+Chaque module doit séparer :
 
-- `domain` : regles, entites, value objects, invariants ;
+- `domain` : règles, entités, value objects, invariants ;
 - `application` : use cases, ports, orchestration ;
 - `infrastructure` : Supabase, Stripe, Storage, Maps ;
-- `presentation` : DTO, mappers, schemas HTTP.
+- `presentation` : DTO, mappers, schémas HTTP.
 
-## 4. Regles produit non negociables
+## 5. Règles produit non négociables
 
-- Compte utilisateur, role et profil metier sont distincts.
-- Un compte peut avoir un profil proprietaire et/ou un profil pet-sitter.
-- Le mot de passe n'est jamais stocke dans le schema applicatif.
+- Compte utilisateur, rôle et profil métier sont distincts.
+- Un compte peut avoir un profil propriétaire et/ou un profil pet-sitter.
+- Le mot de passe n'est jamais stocké dans le schéma applicatif.
 - Supabase Auth est la source pour l'authentification.
-- Les donnees medicales ne sont jamais publiques.
-- Les documents animaux et documents professionnels sont prives.
-- Les profils publics n'exposent jamais email, telephone brut, adresse complete ou coordonnees exactes.
-- Le statut de verification du pet-sitter n'est pas un badge.
+- Les données médicales ne sont jamais publiques.
+- Les documents animaux et documents professionnels sont privés.
+- Les profils publics n'exposent jamais email, téléphone brut, adresse complète ou coordonnées exactes.
+- Le statut de vérification du pet-sitter n'est pas un badge.
 - Expert est un badge ou une qualification, pas un statut.
-- Une reservation concerne un ou plusieurs animaux du meme proprietaire.
-- Une reservation acceptee doit bloquer un creneau.
-- Une reservation ne peut pas etre payee si elle n'est pas en attente de paiement.
-- Le paiement est distinct de la reservation.
-- Les statuts de paiement ne remplacent jamais les statuts de reservation.
-- Un avis est possible seulement apres reservation terminee.
-- Un avis depend de la reservation, pas directement du paiement.
-- Un signalement ouvre un ticket tracable.
+- Une réservation concerne un ou plusieurs animaux du même propriétaire.
+- Une réservation acceptée doit bloquer un créneau.
+- Une réservation ne peut pas être payée si elle n'est pas en attente de paiement.
+- Le paiement est distinct de la réservation.
+- Les statuts de paiement ne remplacent jamais les statuts de réservation.
+- Un avis est possible seulement après réservation terminée.
+- Un avis dépend de la réservation, pas directement du paiement.
+- Un signalement ouvre un ticket traçable.
 - La commission MVP est de 15 %.
 
-## 5. Fondamentaux de conception
+## 6. Fondamentaux de conception
 
-### POO - Programmation orientee objet
+### POO - Programmation orientée objet
 
-La POO organise le code autour d'objets representant des entites metier ou techniques, avec leurs donnees et leurs comportements.
+La POO organise le code autour d'objets représentant des entités métier ou techniques, avec leurs données et leurs comportements.
 
-Le but n'est pas de mettre des classes partout. Le but est de modeliser correctement le domaine, limiter les effets de bord, encapsuler les responsabilites et rendre le code maintenable.
+Le but n'est pas de mettre des classes partout. Le but est de modéliser correctement le domaine, limiter les effets de bord, encapsuler les responsabilités et rendre le code maintenable.
 
 Piliers :
 
-- Encapsulation : cacher l'etat interne et exposer seulement ce qui est utile.
-- Abstraction : montrer ce qui est important et masquer le detail inutile.
-- Heritage : reutiliser une structure existante uniquement quand la relation metier "est un" est vraie.
-- Polymorphisme : manipuler plusieurs implementations via un meme contrat.
+- Encapsulation : cacher l'état interne et exposer seulement ce qui est utile.
+- Abstraction : montrer ce qui est important et masquer le détail inutile.
+- Héritage : réutiliser une structure existante uniquement quand la relation métier "est un" est vraie.
+- Polymorphisme : manipuler plusieurs implémentations via un même contrat.
 
 Bonne pratique MamiPet :
 
-- preferer une POO simple, claire et metier ;
-- eviter la POO sur-ingenieree ;
-- preferer la composition a l'heritage.
+- préférer une POO simple, claire et métier ;
+- éviter la POO sur-ingéniérée ;
+- préférer la composition à l'héritage.
 
 ### Encapsulation
 
-Un objet doit rester valide par construction. Il ne faut pas exposer directement des donnees si cela permet de casser ses invariants.
+Un objet doit rester valide par construction. Il ne faut pas exposer directement des données si cela permet de casser ses invariants.
 
 Exemples :
 
-- `Reservation` protege ses transitions ;
-- `Payment` protege ses statuts ;
-- `ValidationTest` protege la contrainte espece XOR capacite ;
-- `Review` protege la regle "reservation terminee uniquement".
+- `Reservation` protège ses transitions ;
+- `Payment` protège ses statuts ;
+- `ValidationTest` protège la contrainte espèce XOR capacité ;
+- `Review` protège la règle "réservation terminée uniquement".
 
 ### Abstraction
 
-Une bonne abstraction simplifie l'usage. Une mauvaise abstraction masque mal la complexite ou introduit du flou.
+Une bonne abstraction simplifie l'usage. Une mauvaise abstraction masque mal la complexité ou introduit du flou.
 
 Abstractions attendues :
 
@@ -140,76 +148,76 @@ Abstractions attendues :
 - geocoding provider ;
 - contract generator.
 
-### Heritage
+### Héritage
 
-L'heritage doit etre rare. L'utiliser uniquement quand la relation est stable et logique.
+L'héritage doit être rare. L'utiliser uniquement quand la relation est stable et logique.
 
 Interdit :
 
-- creer une hierarchie `User -> Owner -> PetSitter`, car un meme compte peut etre les deux.
+- créer une hiérarchie `User -> Owner -> PetSitter`, car un même compte peut être les deux.
 
 ### Composition over inheritance
 
-Assembler des composants specialises est le choix par defaut.
+Assembler des composants spécialisés est le choix par défaut.
 
 Exemple :
 
 - `Account` compose `OwnerProfile` et/ou `PetSitterProfile` ;
-- `Reservation` compose animaux reserves, services, paiement et contrat ;
-- les use cases recoivent des ports/adapters injectes.
+- `Reservation` compose animaux réservés, services, paiement et contrat ;
+- les use cases reçoivent des ports/adapters injectés.
 
 ### Polymorphisme
 
-Utiliser plusieurs implementations derriere un contrat.
+Utiliser plusieurs implémentations derrière un contrat.
 
 Exemples :
 
-- `PaymentGateway` : simulation MVP puis Stripe Connect reel ;
+- `PaymentGateway` : simulation MVP puis Stripe Connect réel ;
 - `StorageService` : Supabase Storage ;
 - `GeocodingProvider` : Google Maps.
 
-## 6. Principes de qualite et simplicite
+## 7. Principes de qualité et simplicité
 
 ### SOLID
 
 #### S - Single Responsibility Principle
 
-Une classe, un module ou une fonction ne doit avoir qu'une responsabilite reelle.
+Une classe, un module ou une fonction ne doit avoir qu'une responsabilité réelle.
 
 #### O - Open/Closed Principle
 
-Un composant doit etre ouvert a l'extension mais ferme a la modification.
+Un composant doit être ouvert à l'extension mais fermé à la modification.
 
 #### L - Liskov Substitution Principle
 
-Une classe derivee ou implementation doit pouvoir remplacer son contrat sans comportement incoherent.
+Une classe dérivée ou implémentation doit pouvoir remplacer son contrat sans comportement incohérent.
 
 #### I - Interface Segregation Principle
 
-Preferer plusieurs petites interfaces coherentes a une grosse interface fourre-tout.
+Préférer plusieurs petites interfaces cohérentes à une grosse interface fourre-tout.
 
 #### D - Dependency Inversion Principle
 
-Le code metier depend d'abstractions, pas d'implementations concretes.
+Le code métier dépend d'abstractions, pas d'implémentations concrètes.
 
 ### DRY - Don't Repeat Yourself
 
-Ne pas dupliquer la meme connaissance metier ou technique. Ne pas factoriser trop tot.
+Ne pas dupliquer la même connaissance métier ou technique. Ne pas factoriser trop tôt.
 
 ### KISS - Keep It Simple
 
-Toujours choisir la solution la plus simple qui repond correctement au besoin.
+Toujours choisir la solution la plus simple qui répond correctement au besoin.
 
 ### YAGNI - You Aren't Gonna Need It
 
-Ne pas developper maintenant ce qui n'est pas necessaire maintenant.
+Ne pas développer maintenant ce qui n'est pas nécessaire maintenant.
 
 Modules hors MVP critique :
 
-- messagerie complete ;
-- notifications avancees ;
+- messagerie complète ;
+- notifications avancées ;
 - demandes publiques de garde ;
-- dashboards avances ;
+- dashboards avancés ;
 - mobile natif ;
 - moteur assureur complexe.
 
@@ -218,18 +226,18 @@ Modules hors MVP critique :
 Un code propre :
 
 - a des noms clairs ;
-- separe les responsabilites ;
-- evite les effets de bord inutiles ;
-- reste comprehensible vite ;
+- sépare les responsabilités ;
+- évite les effets de bord inutiles ;
+- reste compréhensible vite ;
 - ne surprend pas inutilement.
 
-### Separation of Concerns
+### Séparation of Concerns
 
-Separations obligatoires :
+Séparations obligatoires :
 
 - interface ;
-- logique metier ;
-- acces donnees ;
+- logique métier ;
+- accès données ;
 - infrastructure ;
 - orchestration.
 
@@ -240,36 +248,36 @@ Une information ne doit avoir qu'une source fiable.
 Exemples :
 
 - Supabase Auth pour l'authentification ;
-- paiement pour les montants reels de commission ;
-- reservation pour le taux de commission applique ;
+- paiement pour les montants réels de commission ;
+- réservation pour le taux de commission appliqué ;
 - attribution de badge pour les badges actifs.
 
 ### High Cohesion / Low Coupling
 
-Chaque composant doit faire un ensemble de choses liees, avec le moins de dependances possible.
+Chaque composant doit faire un ensemble de choses liées, avec le moins de dépendances possible.
 
-## 7. Surete, robustesse et invariants
+## 8. Sûreté, robustesse et invariants
 
 ### RAII
 
-RAII est central en C++ : une ressource est acquise dans le constructeur et liberee dans le destructeur.
+RAII est central en C++ : une ressource est acquise dans le constructeur et libérée dans le destructeur.
 
-MamiPet est en TypeScript, donc l'equivalent pratique est :
+MamiPet est en TypeScript, donc l'équivalent pratique est :
 
-- gerer explicitement les ressources asynchrones ;
+- gérer explicitement les ressources asynchrones ;
 - ne pas laisser de promesses non attendues ;
 - isoler les clients techniques ;
-- gerer les erreurs de storage, paiement, base et reseau.
+- gérer les erreurs de storage, paiement, base et réseau.
 
 ### Immutability
 
-Quand une donnee n'a pas besoin de changer, elle ne doit pas changer.
+Quand une donnée n'a pas besoin de changer, elle ne doit pas changer.
 
-Commandes, DTO, value objects et resultats doivent etre traites comme immuables autant que possible.
+Commandes, DTO, value objects et résultats doivent être traités comme immuables autant que possible.
 
 ### Defensive Programming
 
-Toute entree externe est non fiable :
+Toute entrée externe est non fiable :
 
 - payload API ;
 - params ;
@@ -277,28 +285,28 @@ Toute entree externe est non fiable :
 - session ;
 - fichier ;
 - webhook Stripe ;
-- donnees geographiques.
+- données géographiques.
 
 ### Fail Fast
 
-Echouer tot quand l'etat est invalide :
+Échouer tôt quand l'état est invalide :
 
-- dates incoherentes ;
-- animal d'un autre proprietaire ;
-- reservation non payable ;
-- role insuffisant ;
+- dates incohérentes ;
+- animal d'un autre propriétaire ;
+- réservation non payable ;
+- rôle insuffisant ;
 - statut invalide ;
-- fichier non autorise.
+- fichier non autorisé.
 
 ### Design by Contract
 
-Chaque use case doit preciser :
+Chaque use case doit préciser :
 
-- preconditions ;
+- préconditions ;
 - postconditions ;
 - invariants.
 
-## 8. Architecture et modelisation
+## 9. Architecture et modélisation
 
 ### Domain-Driven Design
 
@@ -307,9 +315,9 @@ Le domaine MamiPet doit guider le code.
 Concepts utiles :
 
 - langage ubiquitaire ;
-- entites ;
+- entités ;
 - value objects ;
-- agregats ;
+- agrégats ;
 - services de domaine ;
 - bounded contexts.
 
@@ -321,7 +329,7 @@ Bounded contexts :
 - pet-sitters ;
 - qualification ;
 - search ;
-- reservations ;
+- réservations ;
 - payments ;
 - contracts ;
 - trust-moderation ;
@@ -329,7 +337,7 @@ Bounded contexts :
 
 ### Hexagonal Architecture / Ports & Adapters
 
-Le coeur metier ne depend pas directement de la base, du framework, du web ou d'un provider externe.
+Le cœur métier ne dépend pas directement de la base, du framework, du web ou d'un provider externe.
 
 Ports :
 
@@ -360,7 +368,7 @@ Les couches doivent rester utiles, pas bureaucratiques.
 
 ### CQRS
 
-CQRS leger :
+CQRS léger :
 
 - commandes pour modifier ;
 - queries pour lire ;
@@ -368,27 +376,27 @@ CQRS leger :
 
 ### Event-based thinking
 
-Penser les evenements importants :
+Penser les événements importants :
 
-- reservation created ;
-- reservation accepted ;
+- réservation created ;
+- réservation accepted ;
 - payment succeeded ;
 - contract generated ;
 - document validated ;
 - badge assigned ;
 - report opened.
 
-Ne pas installer une architecture evenementielle lourde sans besoin prouve.
+Ne pas installer une architecture événementielle lourde sans besoin prouvé.
 
-## 9. Tests et validation
+## 10. Tests et validation
 
 ### TDD pragmatique
 
-Ecrire les tests avant ou pendant les regles critiques.
+Écrire les tests avant ou pendant les règles critiques.
 
 Cycle :
 
-1. test qui echoue ;
+1. test qui échoue ;
 2. code minimal ;
 3. refactorisation.
 
@@ -396,17 +404,17 @@ Cycle :
 
 Couvrent :
 
-- regles metier ;
+- règles métier ;
 - calculs ;
 - validations ;
 - transformations ;
-- transitions d'etats.
+- transitions d'états.
 
-### Tests d'integration
+### Tests d'intégration
 
 Couvrent :
 
-- base de donnees ;
+- base de données ;
 - RLS ;
 - repositories ;
 - API ;
@@ -415,114 +423,114 @@ Couvrent :
 
 ### Tests fonctionnels / E2E
 
-Couvrent les parcours utilisateurs et systeme complets.
+Couvrent les parcours utilisateurs et système complets.
 
 ### Regression Testing
 
-Tout bug important corrige doit produire un test empechant sa reapparition.
+Tout bug important corrigé doit produire un test empêchant sa réapparition.
 
 ### Testability
 
-Si un composant est impossible a tester proprement, il est probablement trop couple, trop gros ou mal decoupe.
+Si un composant est impossible à tester proprement, il est probablement trop couplé, trop gros ou mal découpé.
 
-## 10. Performance et efficacite
+## 11. Performance et efficacité
 
 ### Performance
 
-Ne pas optimiser a l'aveugle. Mesurer, identifier les vrais goulots, optimiser apres preuve.
+Ne pas optimiser à l'aveugle. Mesurer, identifier les vrais goulots, optimiser après preuve.
 
 ### Complexity Awareness
 
 Raisonner sur :
 
-- complexite algorithmique ;
-- cout memoire ;
-- cout reseau ;
-- cout I/O ;
-- cout SQL ;
-- cout de maintenance.
+- complexité algorithmique ;
+- coût mémoire ;
+- coût réseau ;
+- coût I/O ;
+- coût SQL ;
+- coût de maintenance.
 
 ### Caching
 
-Autorise avec strategie claire d'invalidation.
+Autorisé avec stratégie claire d'invalidation.
 
 Ne pas cacher :
 
-- donnees medicales ;
+- données médicales ;
 - paiements ;
 - autorisations ;
 - secrets.
 
 ### Lazy Loading
 
-Charger seulement ce qui est necessaire.
+Charger seulement ce qui est nécessaire.
 
-## 11. Lisibilite et maintenance
+## 12. Lisibilité et maintenance
 
 ### Naming
 
 Le code, les routes API et les DTO sont en anglais.
 
-Les noms doivent exprimer l'intention metier ou technique sans ambiguite.
+Les noms doivent exprimer l'intention métier ou technique sans ambiguïté.
 
 ### Self-documenting code
 
-Le code doit etre comprehensible par sa structure, ses noms et ses types.
+Le code doit être compréhensible par sa structure, ses noms et ses types.
 
 ### Refactoring
 
-Ameliorer la structure sans changer le comportement observable.
+Améliorer la structure sans changer le comportement observable.
 
 ### Code Review
 
-Toute modification importante doit etre relue, surtout :
+Toute modification importante doit être relue, surtout :
 
 - auth ;
 - RLS ;
 - paiement ;
-- reservation ;
-- donnees medicales ;
+- réservation ;
+- données médicales ;
 - documents ;
 - admin.
 
-## 12. Securite
+## 13. Sécurité
 
 ### Security by Design
 
-La securite est pensee des la conception.
+La sécurité est pensée dès la conception.
 
 Obligatoire :
 
-- moindre privilege ;
+- moindre privilège ;
 - validation stricte ;
 - secrets en variables d'environnement ;
-- separation des roles ;
+- séparation des rôles ;
 - journalisation utile ;
-- protection donnees sensibles ;
+- protection données sensibles ;
 - RLS Supabase.
 
 ### Principle of Least Privilege
 
-Chaque utilisateur, service ou composant a uniquement les permissions necessaires.
+Chaque utilisateur, service ou composant a uniquement les permissions nécessaires.
 
 ### Input Validation
 
-Toute donnee externe est non fiable par defaut.
+Toute donnée externe est non fiable par défaut.
 
 ### Secure Defaults
 
-Par defaut :
+Par défaut :
 
-- acces refuse ;
-- donnees privees cachees ;
+- accès refusé ;
+- données privées cachées ;
 - documents non publics ;
-- service role jamais cote client.
+- service rôle jamais côté client.
 
-## 13. Accessibilite et qualite produit
+## 14. Accessibilité et qualité produit
 
 ### Accessibility
 
-Le front doit etre utilisable au clavier, avec structure semantique, focus visible, contrastes, labels, messages d'erreur comprehensibles et compatibilite lecteurs d'ecran.
+Le front doit être utilisable au clavier, avec structure sémantique, focus visible, contrastes, labels, messages d'erreur compréhensibles et compatibilité lecteurs d'écran.
 
 ### RGAA
 
@@ -530,22 +538,22 @@ L'objectif n'est pas seulement de passer un audit, mais de rendre l'interface ex
 
 ### UX Consistency
 
-Les termes, actions et comportements doivent rester coherents.
+Les termes, actions et comportements doivent rester cohérents.
 
-## 14. Produit, scope et execution
+## 15. Produit, scope et exécution
 
 ### MVP
 
-Un MVP n'est pas un produit bacle. C'est un produit reduit au coeur de valeur.
+Un MVP n'est pas un produit bâclé. C'est un produit réduit au cœur de valeur.
 
-Coeur MVP :
+Cœur MVP :
 
 - comptes ;
 - profils ;
 - animaux ;
 - qualification pet-sitter ;
 - recherche ;
-- reservation directe ;
+- réservation directe ;
 - paiement test ;
 - contrat ;
 - avis ;
@@ -556,20 +564,20 @@ Coeur MVP :
 
 Stabiliser d'abord :
 
-- modele metier ;
+- modèle métier ;
 - contrats API ;
-- donnees ;
-- regles ;
-- securite ;
+- données ;
+- règles ;
+- sécurité ;
 - flux critiques.
 
 ### Incremental Delivery
 
-Livrer par increments coherents, testables et demonstrables.
+Livrer par incréments cohérents, testables et démontrables.
 
-## 15. Noyau dur permanent
+## 16. Noyau dur permanent
 
-A respecter sur chaque contribution :
+À respecter sur chaque contribution :
 
 - POO ;
 - SOLID ;
@@ -577,7 +585,7 @@ A respecter sur chaque contribution :
 - KISS ;
 - YAGNI ;
 - Clean Code ;
-- Separation of Concerns ;
+- Séparation of Concerns ;
 - High Cohesion / Low Coupling ;
 - Single Source of Truth ;
 - Composition over Inheritance ;
@@ -590,25 +598,24 @@ A respecter sur chaque contribution :
 - Backend-First ;
 - Refactoring continu ;
 - Code review obligatoire ;
-- optimisation apres mesure.
+- optimisation après mesure.
 
-## 16. Documentation obligatoire
+## 17. Documentation obligatoire
 
-Apres chaque changement important :
+Après chaque changement important :
 
-1. verifier si `doc/tech/*` doit etre mis a jour ;
-2. verifier si `doc/merise/*` ou `doc/UML/*` doivent etre mis a jour ;
-3. verifier si `doc/audits/*` est impacte ;
-4. indiquer explicitement dans le compte rendu si aucune documentation n'a ete modifiee.
+1. vérifier si `doc/tech/*` doit être mis à jour ;
+2. vérifier si `doc/merise/*` ou `doc/UML/*` doivent être mis à jour ;
+3. vérifier si `doc/audits/*` est impacté ;
+4. indiquer explicitement dans le compte rendu si aucune documentation n'a été modifiée.
 
-## 17. Interdictions
+## 18. Interdictions
 
-- Ne pas utiliser Adalo comme modele technique final.
-- Ne pas exposer la cle service role.
-- Ne pas stocker de mot de passe dans le schema applicatif.
-- Ne pas exposer les donnees medicales publiquement.
+- Ne pas utiliser Adalo comme modèle technique final.
+- Ne pas exposer la clé service rôle.
+- Ne pas stocker de mot de passe dans le schéma applicatif.
+- Ne pas exposer les données médicales publiquement.
 - Ne pas faire consommer les tables brutes par le front.
-- Ne pas melanger paiement et reservation.
-- Ne pas coder les modules hors MVP critique sans decision explicite.
+- Ne pas mélanger paiement et réservation.
+- Ne pas coder les modules hors MVP critique sans décision explicite.
 - Ne pas introduire une abstraction sans besoin clair.
-

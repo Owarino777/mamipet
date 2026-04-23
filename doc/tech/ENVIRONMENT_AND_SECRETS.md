@@ -1,20 +1,20 @@
 # Environnement et secrets
 
-Ce document liste les variables et regles de gestion des secrets pour le MVP MamiPet.
+Ce document liste les variables et règles de gestion des secrets pour le MVP MamiPet.
 
 ## 1. Environnements
 
-Environnements cibles :
+Environnements ciblés :
 
-- `local` : developpement ;
+- `local` : développement ;
 - `preview` : demonstration/preproduction Vercel ;
 - `production` : cible future.
 
 Chaque environnement doit avoir :
 
-- projet Supabase ou configuration separee ;
-- cles API dediees ;
-- buckets Storage separes ;
+- projet Supabase ou configuration séparée ;
+- clés API dediees ;
+- buckets Storage séparés ;
 - webhooks Stripe dedies ;
 - variables Vercel dediees.
 
@@ -54,14 +54,14 @@ SUPABASE_BUCKET_CONTRACTS=contracts
 ADMIN_BOOTSTRAP_EMAIL=
 ```
 
-## 3. Regles de secrets
+## 3. Règles de secrets
 
 - Ne jamais committer `.env.local`.
 - Ne jamais exposer `SUPABASE_SERVICE_ROLE_KEY` au client.
 - Ne jamais exposer `STRIPE_SECRET_KEY`.
 - Utiliser uniquement les variables `NEXT_PUBLIC_*` pour ce qui est volontairement public.
-- Les webhooks Stripe doivent verifier leur signature.
-- Les logs ne doivent pas contenir de documents, donnees medicales ou secrets.
+- Les webhooks Stripe doivent vérifier leur signature.
+- Les logs ne doivent pas contenir de documents, données médicales ou secrets.
 
 ## 4. Supabase
 
@@ -78,7 +78,7 @@ MVP :
 Obligatoire :
 
 - RLS activee sur les tables sensibles ;
-- policies par role et ownership ;
+- policies par rôle et ownership ;
 - vues ou RPC publiques pour la recherche si utile ;
 - index sur les champs de recherche.
 
@@ -86,20 +86,20 @@ Obligatoire :
 
 Buckets :
 
-- `animal-documents` : documents medicaux ou animaux, prive ;
-- `professional-documents` : justificatifs pet-sitters, prive ;
-- `contracts` : recapitulatif contractuel, prive.
+- `animal-documents` : documents médicaux ou animaux, privé ;
+- `professional-documents` : justificatifs pet-sitters, privé ;
+- `contracts` : récapitulatif contractuel, privé.
 
-Acces public interdit par defaut.
+Accès public interdit par défaut.
 
 ## 5. Stripe
 
 MVP :
 
 - paiement test ;
-- Stripe Connect prepare ;
+- Stripe Connect préparé ;
 - onboarding Connect complet non prioritaire ;
-- les references Stripe sont stockees mais le flux peut etre simule.
+- les références Stripe sont stockees mais le flux peut être simulé.
 
 Statuts paiement :
 
@@ -120,8 +120,8 @@ Utilisation :
 
 Regle de confidentialite :
 
-- coordonnees exactes stockees privees ;
-- affichage public limite a ville/zone approximative.
+- coordonnées exactes stockees privées ;
+- affichage public limité a ville/zone approximative.
 
 ## 7. Vercel
 

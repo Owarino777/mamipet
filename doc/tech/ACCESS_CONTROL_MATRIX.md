@@ -1,108 +1,108 @@
-# Matrice de controle d'acces
+# Matrice de contrôle d'accès
 
-Roles :
+Rôles :
 
 - `visitor` : non connecte ;
 - `authenticated` : compte connecte ;
-- `owner` : compte avec profil proprietaire ;
+- `owner` : compte avec profil propriétaire ;
 - `pet_sitter` : compte avec profil pet-sitter ;
 - `admin` : compte avec `is_admin = true`.
 
 Principes :
 
-- le front ne fait jamais foi pour la securite ;
-- les Route Handlers verifient session et role ;
-- Supabase RLS protege les tables ;
-- les documents et donnees medicales sont prives par defaut.
+- le front ne fait jamais foi pour la sécurité ;
+- les Route Handlers verifient session et rôle ;
+- Supabase RLS protégé les tables ;
+- les documents et données médicales sont privés par défaut.
 
 ## 1. Matrice principale
 
 | Ressource | Visitor | Authenticated | Owner | Pet-sitter | Admin |
 |---|---:|---:|---:|---:|---:|
-| Reference data | Read | Read | Read | Read | Manage |
+| Référence data | Read | Read | Read | Read | Manage |
 | Public pet-sitter search | Read | Read | Read | Read | Read |
 | Public pet-sitter profile | Read | Read | Read | Read | Read |
 | Account current user | No | Own read | Own read | Own read | Read admin |
 | Owner profile | No | Create own | Own read/write | No sauf si aussi owner | Read/manage |
 | Pet-sitter profile | No | Create own | No sauf si aussi pet-sitter | Own read/write | Read/manage |
-| Animal | No | No | Own CRUD | Read only in authorized reservation context | Read/manage |
-| Medical record | No | No | Own CRUD | Read only in authorized reservation context | Read/manage |
-| Animal document | No | No | Own CRUD | Read only in authorized reservation context | Read/manage |
+| Animal | No | No | Own CRUD | Read only in authorized réservation context | Read/manage |
+| Médical record | No | No | Own CRUD | Read only in authorized réservation context | Read/manage |
+| Animal document | No | No | Own CRUD | Read only in authorized réservation context | Read/manage |
 | Pet-sitter offer | Public partial read | Public partial read | Public partial read | Own write | Manage |
 | Availability | Public summary | Public summary | Public summary | Own CRUD if not blocked | Manage |
 | Professional document | No | No | No | Own create/read | Validate/reject |
 | Validation test | No | No | No | Own create/read | Manage |
 | Badge assignment | Public active read | Public active read | Public active read | Own read | Assign/remove |
 | Subscription | No | No | No | Own read | Manage |
-| Reservation | No | No | Own sent read/create/cancel | Own received read/accept/refuse | Read/manage |
-| Payment | No | No | Own reservation read/pay | Own reservation read summary | Read/manage |
-| Contract | No | No | Own reservation read | Own reservation read | Read/manage |
-| Review | Public read moderated | Public read moderated | Create on own completed reservation | Reply if concerned | Moderate |
+| Réservation | No | No | Own sent read/create/cancel | Own received read/accept/refuse | Read/manage |
+| Payment | No | No | Own réservation read/pay | Own réservation read summary | Read/manage |
+| Contract | No | No | Own réservation read | Own réservation read | Read/manage |
+| Review | Public read moderated | Public read moderated | Create on own completed réservation | Reply if concerned | Moderate |
 | Report | No | Create/read own | Create/read own | Create/read own | Process/manage |
 | Admin audit | No | No | No | No | Read |
 
-## 2. Regles speciales
+## 2. Règles speciales
 
 ### Public profile
 
-Un profil pet-sitter public expose seulement :
+Un profil pet-sitter public exposé seulement :
 
 - display name ;
 - photo ;
 - ville/zone ;
 - tarif de depart ;
 - badges publics actifs ;
-- verification visible ;
-- especes ;
-- capacites ;
+- vérification visible ;
+- espèces ;
+- capacités ;
 - lieux/formats ;
 - services ;
-- resume disponibilite ;
+- resume disponibilité ;
 - notes publiques.
 
-### Medical data
+### Médical data
 
-Un pet-sitter ne peut voir les informations medicales detaillees que si :
+Un pet-sitter ne peut voir les informations médicales détaillées que si :
 
-- il est le pet-sitter concerne ;
-- une reservation existe avec cet animal ;
-- la reservation est dans un etat autorisant la consultation.
+- il est le pet-sitter concerné ;
+- une réservation existe avec cet animal ;
+- la réservation est dans un état autorisant la consultation.
 
-Etats autorisant la consultation MVP :
+États autorisant la consultation MVP :
 
 - `awaiting_response` : lecture minimale pour evaluer la faisabilite ;
 - `accepted` ;
 - `awaiting_payment` ;
 - `paid` ;
 - `incident_reported` ;
-- `completed` avec acces limite si besoin de suivi.
+- `completed` avec accès limité si besoin de suivi.
 
 ### Availability
 
-Un pet-sitter peut modifier une disponibilite libre.
+Un pet-sitter peut modifier une disponibilité libre.
 
-Il ne peut pas supprimer librement une disponibilite liee a une reservation bloquee. Une action de reservation doit liberer ou annuler le creneau.
+Il ne peut pas supprimer librement une disponibilité liee a une réservation bloquée. Une action de réservation doit liberer ou annuler le créneau.
 
-### Reservation
+### Réservation
 
-Creation :
+Création :
 
-- uniquement par le proprietaire ;
-- avec animaux appartenant au proprietaire ;
+- uniquement par le propriétaire ;
+- avec animaux appartenant au propriétaire ;
 - avec pet-sitter visible et compatible.
 
 Acceptation/refus :
 
-- uniquement par le pet-sitter concerne.
+- uniquement par le pet-sitter concerné.
 
 Paiement :
 
-- uniquement par le proprietaire concerne ;
-- seulement si reservation en `awaiting_payment`.
+- uniquement par le propriétaire concerné ;
+- seulement si réservation en `awaiting_payment`.
 
 Completion MVP :
 
-- admin ou action systeme pendant la demo.
+- admin ou action système pendant la demo.
 
 ### Admin
 
@@ -111,10 +111,10 @@ Admin via `account.is_admin = true`.
 Actions admin a tracer :
 
 - validation/rejet document ;
-- changement statut verification ;
+- changement statut vérification ;
 - attribution/retrait badge ;
 - traitement signalement ;
-- intervention sur reservation ;
+- intervention sur réservation ;
 - intervention sur paiement.
 
 ## 3. Policies RLS attendues
@@ -139,16 +139,16 @@ RLS a prevoir sur :
 - `review` ;
 - `report`.
 
-Les tables de referentiel peuvent etre lisibles publiquement.
+Les tables de référentiel peuvent être lisibles publiquement.
 
-## 4. Service role
+## 4. Service rôle
 
-La cle service role est reservee aux operations serveur strictement necessaires.
+La clé service rôle est reservee aux operations serveur strictement nécessaires.
 
 Interdit :
 
 - exposition client ;
 - usage dans des composants React client ;
 - logs ;
-- usage pour contourner les regles metier.
+- usage pour contourner les règles métier.
 

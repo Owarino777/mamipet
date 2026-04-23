@@ -9,7 +9,7 @@ Conventions :
 - dates ISO 8601 ;
 - montants en centimes ;
 - champs optionnels explicites avec `null` si pertinent ;
-- aucun secret, document prive ou donnee medicale dans les DTO publics.
+- aucun secret, document privé ou donnée médicale dans les DTO publics.
 
 ## 1. CurrentUserDto
 
@@ -65,7 +65,7 @@ type OwnerProfileDto = {
 };
 ```
 
-Expose uniquement au proprietaire concerne et aux admins.
+Expose uniquement au propriétaire concerné et aux admins.
 
 ## 4. AnimalDto
 
@@ -102,10 +102,10 @@ type MedicalRecordDto = {
 };
 ```
 
-Acces limite :
+Accès limité :
 
-- proprietaire de l'animal ;
-- pet-sitter concerne par une reservation autorisee ;
+- propriétaire de l'animal ;
+- pet-sitter concerné par une réservation autorisée ;
 - admin.
 
 ## 6. PublicPetSitterCardDto
@@ -139,9 +139,9 @@ type PublicPetSitterCardDto = {
 Interdit :
 
 - email ;
-- telephone ;
-- adresse complete ;
-- coordonnees exactes ;
+- téléphone ;
+- adresse complète ;
+- coordonnées exactes ;
 - documents ;
 - commentaires admin.
 
@@ -296,7 +296,7 @@ Les DTO admin peuvent exposer plus d'informations, mais jamais :
 
 - secrets ;
 - mots de passe ;
-- cles Stripe ;
-- chemins Storage bruts si URL signee necessaire ;
-- donnees inutiles au traitement.
+- clés Stripe ;
+- chemins Storage bruts si URL signee nécessaire ;
+- données inutiles au traitement.
 

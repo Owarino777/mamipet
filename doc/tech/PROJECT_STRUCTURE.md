@@ -1,6 +1,6 @@
 # Structure cible du projet
 
-Le projet doit rester un monorepo Next.js + Supabase, avec une separation nette entre interface, API, application, domaine et infrastructure.
+Le projet doit rester un monorepo Next.js + Supabase, avec une séparation nette entre interface, API, application, domaine et infrastructure.
 
 ## 1. Arborescence cible
 
@@ -67,7 +67,7 @@ mamipet/
 
 ## 2. Regle par module
 
-Chaque module metier peut suivre cette structure :
+Chaque module métier peut suivre cette structure :
 
 ```txt
 modules/reservations/
@@ -92,16 +92,16 @@ modules/reservations/
     reservation.schemas.ts
 ```
 
-## 3. Responsabilites
+## 3. Responsabilités
 
 ### `src/app/api`
 
 Contient les Route Handlers REST.
 
-Responsabilites :
+Responsabilités :
 
 - lire params/query/body ;
-- verifier la session ;
+- vérifier la session ;
 - valider les payloads ;
 - appeler un use case ;
 - retourner un DTO ;
@@ -109,7 +109,7 @@ Responsabilites :
 
 Interdit :
 
-- logique metier lourde ;
+- logique métier lourde ;
 - requetes SQL complexes directement dans les handlers ;
 - appels Stripe ou Storage directs hors use case/adapter.
 
@@ -117,14 +117,14 @@ Interdit :
 
 Contient :
 
-- entites ;
+- entités ;
 - value objects ;
 - statuts ;
 - invariants ;
-- erreurs metier ;
-- policies metier pures.
+- erreurs métier ;
+- policies métier pures.
 
-Ne depend pas de Next.js, Supabase, Stripe ou Google Maps.
+Ne dépend pas de Next.js, Supabase, Stripe ou Google Maps.
 
 ### `modules/*/application`
 
@@ -134,9 +134,9 @@ Contient :
 - commandes ;
 - queries ;
 - ports ;
-- orchestration metier.
+- orchestration métier.
 
-Peut dependre du domaine et des ports, pas des implementations concretes.
+Peut dépendre du domaine et des ports, pas des implémentations concrètes.
 
 ### `modules/*/infrastructure`
 
@@ -146,7 +146,7 @@ Contient :
 - adapters Stripe ;
 - adapters Storage ;
 - adapters Maps ;
-- implementations techniques.
+- implémentations techniques.
 
 ### `modules/*/presentation`
 
@@ -154,8 +154,8 @@ Contient :
 
 - DTO ;
 - mappers ;
-- schemas de validation ;
-- formats de reponse.
+- schémas de validation ;
+- formats de réponse.
 
 ### `shared`
 
@@ -182,7 +182,7 @@ Contient uniquement ce qui est vraiment transversal :
 
 ## 5. Validation
 
-Chaque endpoint doit avoir un schema de validation.
+Chaque endpoint doit avoir un schéma de validation.
 
 Validation attendue :
 
@@ -191,11 +191,11 @@ Validation attendue :
 - query ;
 - fichiers ;
 - session ;
-- role.
+- rôle.
 
 ## 6. Gestion d'erreurs
 
-Creer des erreurs metier explicites :
+Créer des erreurs métier explicites :
 
 - `UnauthorizedError` ;
 - `ForbiddenError` ;
@@ -211,8 +211,8 @@ Mapper ensuite :
 - 401 : non connecte ;
 - 403 : droit insuffisant ;
 - 404 : ressource absente ;
-- 409 : conflit metier ;
-- 422 : regle metier violee ;
+- 409 : conflit métier ;
+- 422 : règle métier violee ;
 - 500 : erreur inattendue.
 
 ## 7. Migrations et SQL
@@ -225,8 +225,8 @@ Elles doivent contenir :
 - contraintes ;
 - index ;
 - policies RLS ;
-- fonctions SQL necessaires ;
-- seeds separes si possible.
+- fonctions SQL nécessaires ;
+- seeds séparés si possible.
 
 ## 8. Front-ready
 
@@ -235,10 +235,10 @@ Le front ne doit pas consommer les tables brutes. Les endpoints renvoient des DT
 Chaque DTO public doit exclure :
 
 - email ;
-- telephone brut ;
-- adresse complete ;
+- téléphone brut ;
+- adresse complète ;
 - documents ;
-- dossier medical ;
+- dossier médical ;
 - paiement detaille ;
 - commentaire admin ;
 - signalement.

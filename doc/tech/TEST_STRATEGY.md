@@ -1,15 +1,15 @@
-# Strategie de tests
+# Stratégie de tests
 
-La strategie de tests MamiPet est progressive, centree sur les regles metier critiques et le flux de reservation directe.
+La stratégie de tests MamiPet est progressive, centree sur les règles métier critiques et le flux de réservation directe.
 
 ## 1. Objectifs
 
 Les tests doivent :
 
-- proteger les invariants metier ;
-- securiser le flux proprietaire -> pet-sitter -> paiement -> contrat ;
-- verifier les permissions ;
-- proteger les donnees sensibles ;
+- protéger les invariants métier ;
+- sécuriser le flux propriétaire -> pet-sitter -> paiement -> contrat ;
+- vérifier les permissions ;
+- protéger les données sensibles ;
 - produire une base de non-regression ;
 - rendre le backend integrable par le front.
 
@@ -19,23 +19,23 @@ Les tests doivent :
 
 Ciblent :
 
-- entites domaine ;
+- entités domaine ;
 - value objects ;
-- policies metier ;
+- policies métier ;
 - calculs ;
-- transitions d'etats ;
+- transitions d'états ;
 - use cases avec ports mockes.
 
-Priorite :
+Priorité :
 
-- reservation ;
+- réservation ;
 - paiement ;
 - avis ;
 - test de validation ;
 - badge ;
-- disponibilite.
+- disponibilité.
 
-### Tests d'integration
+### Tests d'intégration
 
 Ciblent :
 
@@ -45,17 +45,17 @@ Ciblent :
 - repositories Supabase ;
 - Route Handlers ;
 - Storage ;
-- paiement simule.
+- paiement simulé.
 
 ### Tests fonctionnels
 
 Ciblent les parcours :
 
-- creation compte/profils ;
-- creation animal ;
+- création compte/profils ;
+- création animal ;
 - configuration pet-sitter ;
 - recherche ;
-- reservation directe ;
+- réservation directe ;
 - acceptation ;
 - paiement test ;
 - contrat ;
@@ -69,145 +69,145 @@ A ajouter quand le front minimal existe.
 
 Parcours E2E prioritaire :
 
-1. owner cree animal ;
+1. owner créé animal ;
 2. pet-sitter configure profil ;
 3. owner recherche pet-sitter ;
-4. owner cree reservation ;
+4. owner créé réservation ;
 5. pet-sitter accepte ;
 6. owner paie ;
-7. contrat genere ;
-8. reservation terminee ;
+7. contrat généré ;
+8. réservation terminée ;
 9. owner depose avis.
 
-## 3. Scenarios critiques
+## 3. Scénarios critiques
 
-### Identite
+### Identité
 
-- creer compte Supabase ;
+- créer compte Supabase ;
 - synchroniser compte applicatif ;
 - activer profil owner ;
 - activer profil pet-sitter ;
-- refuser deux profils owner pour le meme compte ;
-- refuser deux profils pet-sitter pour le meme compte.
+- refuser deux profils owner pour le même compte ;
+- refuser deux profils pet-sitter pour le même compte.
 
 ### Animaux
 
-- creer animal pour owner ;
+- créer animal pour owner ;
 - refuser lecture animal par autre owner ;
-- creer dossier medical ;
-- proteger documents animaux ;
-- refuser exposition publique dossier medical.
+- créer dossier médical ;
+- protéger documents animaux ;
+- refuser exposition publique dossier médical.
 
 ### Pet-sitter
 
-- creer profil pet-sitter ;
-- configurer especes ;
-- configurer capacites ;
-- declarer disponibilite valide ;
-- refuser disponibilite avec date fin avant date debut ;
-- deposer document professionnel ;
+- créer profil pet-sitter ;
+- configurer espèces ;
+- configurer capacités ;
+- déclarer disponibilité validé ;
+- refuser disponibilité avec date fin avant date debut ;
+- déposer document professionnel ;
 - valider document par admin ;
 - attribuer badge sans doublon actif.
 
-### Reservation
+### Réservation
 
-- creer reservation avec animaux du proprietaire ;
-- refuser reservation avec animal d'un autre proprietaire ;
-- refuser reservation sans animal ;
-- refuser reservation avec dates incoherentes ;
-- accepter par pet-sitter concerne ;
+- créer réservation avec animaux du propriétaire ;
+- refuser réservation avec animal d'un autre propriétaire ;
+- refuser réservation sans animal ;
+- refuser réservation avec dates incoherentes ;
+- accepter par pet-sitter concerné ;
 - refuser acceptation par autre pet-sitter ;
-- bloquer creneau apres acceptation ;
+- bloquer créneau après acceptation ;
 - passer en attente paiement ;
-- refuser paiement si reservation non payable ;
-- marquer payee apres paiement test ;
-- generer contrat ;
-- passer terminee ;
-- declarer incident.
+- refuser paiement si réservation non payable ;
+- marquer payée après paiement test ;
+- générer contrat ;
+- passer terminée ;
+- déclarer incident.
 
 ### Paiement
 
 - calculer commission 15 % ;
 - calculer montant prestataire ;
-- creer paiement pending ;
+- créer paiement pending ;
 - confirmer paiement succeeded ;
 - expirer paiement ;
-- verifier separation statut paiement/statut reservation.
+- vérifier séparation statut paiement/statut réservation.
 
 ### Avis
 
-- refuser avis avant reservation terminee ;
-- creer avis apres reservation terminee ;
-- refuser deuxieme avis sur meme reservation ;
-- permettre reponse pet-sitter concerne ;
-- refuser reponse autre pet-sitter.
+- refuser avis avant réservation terminée ;
+- créer avis après réservation terminée ;
+- refuser deuxième avis sur même réservation ;
+- permettre réponse pet-sitter concerné ;
+- refuser réponse autre pet-sitter.
 
 ### Signalement
 
-- creer signalement general ;
-- creer signalement cible reservation ;
-- creer signalement cible profil ;
-- creer signalement cible avis ;
+- créer signalement général ;
+- créer signalement ciblé réservation ;
+- créer signalement ciblé profil ;
+- créer signalement ciblé avis ;
 - refuser signalement avec plusieurs cibles ;
 - traiter signalement admin.
 
-### Securite et RLS
+### Sécurité et RLS
 
-- visiteur peut lire referentiels ;
+- visiteur peut lire référentiels ;
 - visiteur peut lire profils publics ;
-- visiteur ne peut pas lire donnees privees ;
+- visiteur ne peut pas lire données privées ;
 - owner ne peut lire que ses animaux ;
-- pet-sitter ne peut lire donnees medicales qu'en contexte autorise ;
+- pet-sitter ne peut lire données médicales qu'en contexte autorisé ;
 - admin peut traiter documents et signalements ;
-- service role jamais utilise cote client.
+- service rôle jamais utilisé côté client.
 
-## 4. Definition of Done test
+## 4. Définition of Done test
 
 Un module est considere stable si :
 
 - ses use cases critiques ont des tests unitaires ;
-- ses endpoints principaux ont des tests d'integration ;
+- ses endpoints principaux ont des tests d'intégration ;
 - les erreurs principales sont testees ;
 - les permissions importantes sont testees ;
-- les DTO publics n'exposent pas de donnees interdites.
+- les DTO publics n'exposent pas de données interdites.
 
-## 5. Priorite de couverture
+## 5. Priorité de couverture
 
-Priorite 1 :
+Priorité 1 :
 
-- reservations ;
+- réservations ;
 - paiements ;
 - RLS ;
-- donnees medicales ;
+- données médicales ;
 - avis ;
 - admin documents/badges.
 
-Priorite 2 :
+Priorité 2 :
 
 - recherche ;
-- disponibilites ;
+- disponibilités ;
 - contrats ;
 - signalements.
 
-Priorite 3 :
+Priorité 3 :
 
 - abonnements ;
-- tests de validation avances ;
+- tests de validation avancés ;
 - reporting admin.
 
-## 6. Donnees de test
+## 6. Données de test
 
 Seeds de test minimaux :
 
 - 1 owner ;
-- 1 pet-sitter non verifie ;
-- 1 pet-sitter identite verifiee ;
-- 1 pet-sitter professionnel verifie ;
+- 1 pet-sitter non vérifié ;
+- 1 pet-sitter identité vérifiée ;
+- 1 pet-sitter professionnel vérifié ;
 - 1 admin ;
-- especes MVP ;
-- capacites MVP ;
+- espèces MVP ;
+- capacités MVP ;
 - lieux/formats/services ;
 - badges Verified Identity, Pro, Expert ;
-- animaux standard et animal avec dossier medical ;
-- disponibilites libres.
+- animaux standard et animal avec dossier médical ;
+- disponibilités libres.
 

@@ -1,15 +1,15 @@
-# Audit de conformite MamiPet
+# Audit de conformité MamiPet
 
 Date : 2026-04-23
 Version : 2.0 - Audit complet base sur le dossier de synthese final (partie dev sections 6 a 8)
 
-Perimetre audite :
+Périmètre audite :
 
 - dossier de synthese final sections 6 (MVP prototype), 7 (etude technique et cadrage) et 8 (projection startup) ;
-- dossier produit hors partie developpement pour coherence produit ;
+- dossier produit hors partie développement pour cohérence produit ;
 - documentation actuelle du repository.
 
-Documents de reference :
+Documents de référence :
 
 - Dossier de synthese Groupe 6 (version finale avec section 7 technique)
 
@@ -33,97 +33,97 @@ Documents audites dans le repository :
 
 ## 1. Synthese executive
 
-Le repository est conforme a l'intention projet et a la partie developpement cible sur le cadrage, la modelisation, l'architecture et la preparation backend.
+Le repository est conforme à l'intention projet et à la partie développement ciblée sur le cadrage, la modélisation, l'architecture et la préparation backend.
 
 La documentation actuelle couvre correctement :
 
 - la distinction prototype Adalo / landing page / MVP applicatif ;
 - la vision marketplace de confiance ;
-- le flux critique proprietaire -> pet-sitter -> reservation -> paiement test -> contrat ;
-- la separation compte / profils metier ;
-- les roles et droits ;
-- les referentiels metier ;
-- les donnees sensibles et medicales ;
-- les reservations, paiements, contrats, avis et signalements ;
+- le flux critique propriétaire -> pet-sitter -> réservation -> paiement test -> contrat ;
+- la séparation compte / profils métier ;
+- les rôles et droits ;
+- les référentiels métier ;
+- les données sensibles et médicales ;
+- les réservations, paiements, contrats, avis et signalements ;
 - le choix Next.js + Supabase + PostgreSQL + Stripe + Google Maps ;
-- les schemas MCD, MLD, MPD ;
+- les schémas MCD, MLD, MPD ;
 - les UML attendus ;
 - les contrats API et DTO ;
-- les regles metier testables ;
+- les règles métier testables ;
 - le plan de tests ;
-- le plan d'implementation backend.
+- le plan d'implémentation backend.
 
-Score de conformite documentaire estime : **96 / 100**.
+Score de conformité documentaire estime : **96 / 100**.
 
-Statut global : **conforme pour lancer l'implementation backend**.
+Statut global : **conforme pour lancer l'implémentation backend**.
 
 ## 2. Grille de lecture
 
-Niveaux utilises :
+Niveaux utilisés :
 
 - Conforme : l'attendu est couvert clairement.
-- Partiel : l'attendu est present mais demande precision ou production future.
+- Partiel : l'attendu est present mais demande précision ou production future.
 - Non couvert : l'attendu manque.
 - Hors MVP : l'attendu est volontairement reporte.
 
-## 3. Conformite avec l'ancien dossier hors partie developpement
+## 3. Conformité avec l'ancien dossier hors partie développement
 
-L'ancien dossier sert surtout a verifier la coherence produit, marche, positionnement et proposition de valeur. Sa partie dev historique ne doit pas piloter l'architecture finale.
+L'ancien dossier sert surtout a vérifier la cohérence produit, marché, positionnement et proposition de valeur. Sa partie dev historique ne doit pas piloter l'architecture finale.
 
-| Attendu produit | Statut | Verification |
+| Attendu produit | Statut | Vérification |
 |---|---|---|
-| Application de mise en relation proprietaires / pet-sitters | Conforme | Couvert dans passation, Merise, UML et API |
-| Positionnement confiance et securite | Conforme | Badges, verification, documents, avis, signalements |
-| Animaux fragiles, ages, sous traitement ou sensibles | Conforme | Capacites de soin, dossier medical, regles d'eligibilite |
-| Pivot hors NAC uniquement vers tous animaux | Conforme | Referentiel espece large et architecture extensible |
-| Propriétaires anxieux premium | Conforme | Donnees medicales, assurance, contrat, verification |
-| Pet-sitters pro/semi-pro differenciables | Conforme | Tests, documents, badges, abonnement prepare |
+| Application de mise en relation propriétaires / pet-sitters | Conforme | Couvert dans passation, Merise, UML et API |
+| Positionnement confiance et sécurité | Conforme | Badges, vérification, documents, avis, signalements |
+| Animaux fragiles, âgés, sous traitement ou sensibles | Conforme | Capacités de soin, dossier médical, règles d'eligibilite |
+| Pivot hors NAC uniquement vers tous animaux | Conforme | Referentiel espèce large et architecture extensible |
+| Propriétaires anxieux premium | Conforme | Données médicales, assurance, contrat, vérification |
+| Pet-sitters pro/semi-pro differenciables | Conforme | Tests, documents, badges, abonnement préparé |
 | Commission 15 % | Conforme | Passation, domaine, API, paiement, principes |
-| Assurance erreur medicale / niveau de garantie | Partiel | Modele `standard/premium` present, moteur assureur reel reporte |
-| Photos/videos quotidiennes | Partiel | Mention produit historique, non integre au MVP critique actuel |
-| Tchat temps reel | Hors MVP | Prepare comme extension, non prioritaire |
+| Assurance erreur médicale / niveau de garantie | Partiel | Modèle `standard/premium` present, moteur assureur réel reporte |
+| Photos/videos quotidiennes | Partiel | Mention produit historique, non intégré au MVP critique actuel |
+| Tchat temps réel | Hors MVP | Prepare comme extension, non prioritaire |
 | Notifications push | Hors MVP | FCM prevu en extension |
 | Landing page distincte | Conforme | Clarifie dans passation |
 | Prototype Adalo non base technique finale | Conforme | Clarifie dans passation et README |
 
-Conclusion : la coherence produit est respectee. Les fonctionnalites fortes du dossier historique qui ne sont pas dans le MVP critique sont correctement traitees comme extensions ou modelisations futures.
+Conclusion : la cohérence produit est respectee. Les fonctionnalites fortes du dossier historique qui ne sont pas dans le MVP critique sont correctement traitees comme extensions ou modelisations futures.
 
-## 4. Conformite avec la partie developpement cible
+## 4. Conformité avec la partie développement ciblée
 
 | Attendu partie dev | Statut | Preuve documentaire |
 |---|---|---|
 | Web app responsive + API | Conforme | `ARCHITECTURE_DECISION.md`, `API_CONTRACTS.md` |
 | Backend-first | Conforme | Passation, architecture, plan backend |
-| Socle exploitable, documente, maintenable | Conforme | `doc/tech/*` |
-| Comptes multi-roles | Conforme | Merise, DTO, API, regles `ID-*` |
-| Profils proprietaire et pet-sitter separes | Conforme | Merise, UML, regles `PR-*` |
-| Gestion animaux | Conforme | Merise, API, DTO, regles `AN-*` |
-| Dossier medical et documents animaux | Conforme | Merise, API, DTO, access control |
-| Capacites de soin | Conforme | Merise, referentiels, API |
-| Badges Verified Identity, Pro, Expert | Conforme | Passation, Merise, UML, regles |
-| Tests de validation | Conforme | Merise, UML, regles `QS-*` |
-| Recherche geolocalisee | Conforme | API, DTO, architecture Maps |
-| Localisation utile mais protegee | Conforme | DTO public, access control, environment |
-| Reservation directe | Conforme | UML sequence, activity, state, API |
-| Acceptation/refus pet-sitter | Conforme | API, sequence, regles |
-| Blocage de creneau apres acceptation | Conforme | Merise, UML, regles `AV-*`, `RS-*` |
+| Socle exploitable, documenté, maintenable | Conforme | `doc/tech/*` |
+| Comptes multi-rôles | Conforme | Merise, DTO, API, règles `ID-*` |
+| Profils propriétaire et pet-sitter séparés | Conforme | Merise, UML, règles `PR-*` |
+| Gestion animaux | Conforme | Merise, API, DTO, règles `AN-*` |
+| Dossier médical et documents animaux | Conforme | Merise, API, DTO, access control |
+| Capacités de soin | Conforme | Merise, référentiels, API |
+| Badges Verified Identity, Pro, Expert | Conforme | Passation, Merise, UML, règles |
+| Tests de validation | Conforme | Merise, UML, règles `QS-*` |
+| Recherche géolocalisée | Conforme | API, DTO, architecture Maps |
+| Localisation utile mais protégée | Conforme | DTO public, access control, environment |
+| Réservation directe | Conforme | UML sequence, activity, state, API |
+| Acceptation/refus pet-sitter | Conforme | API, sequence, règles |
+| Blocage de créneau après acceptation | Conforme | Merise, UML, règles `AV-*`, `RS-*` |
 | Paiement Stripe test | Conforme | API, architecture, environment |
-| Stripe Connect prepare | Conforme | Architecture decision, env, domain rules |
-| Contrat recapitulatif | Conforme | API, DTO, sequence, regles `CT-*` |
-| Avis apres prestation | Conforme | API, DTO, regles `RV-*` |
-| Signalements/tickets | Conforme | Merise, API, access, regles `RP-*` |
-| Back-office minimal | Conforme | API admin, access control, implementation plan |
+| Stripe Connect préparé | Conforme | Architecture décision, env, domain rules |
+| Contrat récapitulatif | Conforme | API, DTO, sequence, règles `CT-*` |
+| Avis après prestation | Conforme | API, DTO, règles `RV-*` |
+| Signalements/tickets | Conforme | Merise, API, access, règles `RP-*` |
+| Back-office minimal | Conforme | API admin, access control, implémentation plan |
 | Demandes publiques preparees | Partiel | Mentionnees comme extension, pas encore modelisees en tables dediees |
-| Messagerie complete preparee | Partiel | Mentionnee comme extension, pas modelisee detaillee |
-| Notifications avancees preparees | Partiel | Mentionnees comme extension, FCM env futur non detaille |
+| Messagerie complète préparée | Partiel | Mentionnée comme extension, pas modélisée détaillée |
+| Notifications avancées preparees | Partiel | Mentionnees comme extension, FCM env futur non detaille |
 | IA Act non contrainte directe | Partiel | Mention dans passation, pas encore dans doc tech dediee |
-| Pipeline typecheck/lint/tests/build | Conforme conceptuellement | Plan documente, pas implemente car code non initialise |
-| AGENT.md | Conforme | Fichier racine cree |
-| README racine projet | Conforme | Fichier racine cree |
+| Pipeline typecheck/lint/tests/build | Conforme conceptuellement | Plan documenté, pas implémenté car code non initialisé |
+| AGENT.md | Conforme | Fichier racine créé |
+| README racine projet | Conforme | Fichier racine créé |
 
-Conclusion : la partie developpement est bien couverte pour lancer l'implementation. Les manques restants concernent surtout les livrables de repository apres initialisation du projet.
+Conclusion : la partie développement est bien couverte pour lancer l'implémentation. Les manques restants concernent surtout les livrables de repository après initialisation du projet.
 
-## 5. Conformite Merise
+## 5. Conformité Merise
 
 Fichiers audites :
 
@@ -134,172 +134,172 @@ Fichiers audites :
 
 | Point attendu | Statut | Commentaire |
 |---|---|---|
-| MCD conceptuel independant de l'implementation | Conforme | Le MCD est plus conceptuel que les versions initiales |
-| MLD relationnel coherent | Conforme | Tables de jointure, cardinalites, relations normalisees |
+| MCD conceptuel indépendant de l'implémentation | Conforme | Le MCD est plus conceptuel que les versions initiales |
+| MLD relationnel cohérent | Conforme | Tables de jointure, cardinalites, relations normalisees |
 | MPD PostgreSQL/Supabase | Conforme | UUID, contraintes, notes RLS/Auth |
-| Separation compte / profils | Conforme | Un compte, deux profils optionnels |
+| Séparation compte / profils | Conforme | Un compte, deux profils optionnels |
 | Absence de mot de passe applicatif | Conforme | Supabase Auth est source |
-| Avis non redondant | Conforme | Avis relie a reservation seulement |
-| Reservation multi-animaux | Conforme | `reservation_animal` |
-| Disponibilite liee au blocage reservation | Conforme | `id_reservation` et statut bloque |
-| Signalement multi-cible controle | Conforme | Cible reservation/profil/avis, au plus une |
-| Test validation XOR espece/capacite | Conforme | Contrainte explicitee |
-| Commission coherente | Conforme | Taux sur reservation, montants dans paiement |
-| Demandes publiques de garde | Partiel | Preparees fonctionnellement, non integrees au schema MVP |
-| Messagerie | Hors MVP | Non modelisee, coherent avec arbitrage |
-| Notifications | Hors MVP | Non modelisees, coherent avec arbitrage |
+| Avis non redondant | Conforme | Avis relie a réservation seulement |
+| Réservation multi-animaux | Conforme | `reservation_animal` |
+| Disponibilite liee au blocage réservation | Conforme | `id_reservation` et statut bloqué |
+| Signalement multi-cible contrôlé | Conforme | Cible réservation/profil/avis, au plus une |
+| Test validation XOR espèce/capacité | Conforme | Contrainte explicitee |
+| Commission cohérente | Conforme | Taux sur réservation, montants dans paiement |
+| Demandes publiques de garde | Partiel | Preparees fonctionnellement, non integrees au schéma MVP |
+| Messagerie | Hors MVP | Non modélisée, cohérent avec arbitrage |
+| Notifications | Hors MVP | Non modelisees, cohérent avec arbitrage |
 
-Conclusion : les schemas Merise sont suffisamment propres pour servir de base aux migrations PostgreSQL.
+Conclusion : les schémas Merise sont suffisamment propres pour servir de base aux migrations PostgreSQL.
 
-## 6. Conformite UML
+## 6. Conformité UML
 
 Fichiers audites :
 
 - cas d'utilisation ;
 - classes domaine ;
-- etats reservation ;
-- etats profil pet-sitter ;
-- sequence reservation directe ;
+- états réservation ;
+- états profil pet-sitter ;
+- sequence réservation directe ;
 - sequence validation documentaire ;
-- activite recherche/reservation ;
+- activite recherche/réservation ;
 - composants ;
-- deploiement.
+- déploiement.
 
 | Diagramme attendu | Statut | Commentaire |
 |---|---|---|
-| Cas d'utilisation | Conforme | 5 acteurs + systemes externes |
-| Classes domaine | Conforme | Diagramme metier, pas copie brute du MPD |
-| Etats reservation | Conforme | Statuts metier separes du paiement |
-| Etats profil pet-sitter | Conforme | Expert non confondu avec statut |
-| Sequence reservation directe | Conforme | Owner, pet-sitter, API/use case, DB, Stripe, contrat |
+| Cas d'utilisation | Conforme | 5 acteurs + systèmes externes |
+| Classes domaine | Conforme | Diagramme métier, pas copie brute du MPD |
+| États réservation | Conforme | Statuts métier séparés du paiement |
+| États profil pet-sitter | Conforme | Expert non confondu avec statut |
+| Sequence réservation directe | Conforme | Owner, pet-sitter, API/use case, DB, Stripe, contrat |
 | Sequence validation documentaire | Conforme | Admin, document, statut, badge, audit |
-| Activite recherche/reservation | Conforme | Workflow lisible |
+| Activite recherche/réservation | Conforme | Workflow lisible |
 | Composants | Conforme | Couches et adapters |
-| Deploiement | Conforme | Vercel, Supabase, Stripe, Maps, GitHub |
-| Rendu image des UML | Partiel | PlantUML non installe localement, `.puml` valide structurellement |
+| Déploiement | Conforme | Vercel, Supabase, Stripe, Maps, GitHub |
+| Rendu image des UML | Partiel | PlantUML non installe localement, `.puml` validé structurellement |
 
-Conclusion : le set UML est complet et coherent avec la partie developpement attendue.
+Conclusion : le set UML est complet et cohérent avec la partie développement attendue.
 
-## 7. Conformite architecture et bonnes pratiques
+## 7. Conformité architecture et bonnes pratiques
 
-| Principe attendu | Statut | Verification |
+| Principe attendu | Statut | Vérification |
 |---|---|---|
 | POO pragmatique | Conforme | `ENGINEERING_PRINCIPLES.md`, structure domaine |
 | SOLID | Conforme | Documente et applique dans structure use cases/ports/adapters |
-| DRY/KISS/YAGNI | Conforme | MVP limite, extensions reportees |
+| DRY/KISS/YAGNI | Conforme | MVP limité, extensions reportees |
 | Clean Code | Conforme | Conventions documentees |
-| Separation of Concerns | Conforme | Architecture couches + modules |
+| Séparation of Concerns | Conforme | Architecture couches + modules |
 | High cohesion / low coupling | Conforme | Modules fonctionnels |
 | Single Source of Truth | Conforme | Auth, commission, paiement, badges clarifies |
 | Composition over inheritance | Conforme | Compte compose avec profils |
-| Defensive programming / fail fast | Conforme | Regles + erreurs + validation API |
+| Defensive programming / fail fast | Conforme | Règles + erreurs + validation API |
 | Design by Contract | Conforme | Pre/postconditions dans principes |
 | DDD pragmatique | Conforme | Bounded contexts identifies |
 | Hexagonal / Ports & Adapters | Conforme | Ports/adapters prevus |
 | CQRS leger | Conforme | Command/query distinguees sans surdesign |
-| TDD pragmatique | Conforme | Strategie de tests |
+| TDD pragmatique | Conforme | Stratégie de tests |
 | Security by Design | Conforme | RLS, secrets, permissions |
-| Accessibility by Design | Partiel | Principes presents, pas encore checklist front detaillee |
-| Optimisation apres mesure | Conforme | Documente |
+| Accessibility by Design | Partiel | Principes présents, pas encore checklist front détaillée |
+| Optimisation après mesure | Conforme | Documente |
 
 Conclusion : le cadrage technique est aligne avec les bonnes pratiques demandees. L'accessibilite sera surtout a concretiser lors du front.
 
 ## 8. Ecarts et actions correctives
 
-### Ecart 1 - AGENT.md cree et corrige
+### Écart 1 - AGENT.md créé et corrige
 
 Statut : corrige.
 
 Correction appliquee :
 
-- `AGENT.md` cree a la racine ;
-- regles de contribution, architecture, documentation, securite, tests et bonnes pratiques ajoutees.
+- `AGENT.md` créé à la racine ;
+- règles de contribution, architecture, documentation, sécurité, tests et bonnes pratiques ajoutees.
 
-### Ecart 2 - README racine cree et corrige
+### Écart 2 - README racine créé et corrige
 
 Statut : corrige.
 
 Correction appliquee :
 
-- `README.md` racine cree ;
-- vision projet, stack, architecture, documentation et regles fortes documentees.
+- `README.md` racine créé ;
+- vision projet, stack, architecture, documentation et règles fortes documentees.
 
-### Ecart 3 - OpenAPI machine-readable cree et corrige
+### Écart 3 - OpenAPI machine-readable créé et corrige
 
-Statut : corrige en premiere version.
+Statut : corrige en première version.
 
 Correction appliquee :
 
-- `doc/tech/openapi.yaml` cree ;
-- le contrat devra rester synchronise avec `API_CONTRACTS.md` pendant l'implementation.
+- `doc/tech/openapi.yaml` créé ;
+- le contrat devra rester synchronise avec `API_CONTRACTS.md` pendant l'implémentation.
 
-### Ecart 4 - Demandes publiques non modelisees physiquement
+### Écart 4 - Demandes publiques non modelisees physiquement
 
 Statut : volontairement partiel.
 
 Raison :
 
 - module hors flux critique MVP ;
-- compatible future mais non integre dans MPD.
+- compatible future mais non intégré dans MPD.
 
 Action recommandee :
 
 - ajouter un ADR ou backlog extension quand le module devient prioritaire.
 
-Priorite : basse.
+Priorité : basse.
 
-### Ecart 5 - Messagerie et photos/videos quotidiennes non detaillees
+### Écart 5 - Messagerie et photos/videos quotidiennes non détaillées
 
 Statut : hors MVP critique.
 
 Raison :
 
-- le flux principal est reservation directe + paiement + contrat ;
-- messagerie complete et suivi media peuvent alourdir le scope.
+- le flux principal est réservation directe + paiement + contrat ;
+- messagerie complète et suivi media peuvent alourdir le scope.
 
 Action recommandee :
 
 - conserver comme epic phase 2 ;
-- ne pas les implementer dans le premier backend.
+- ne pas les implémenter dans le premier backend.
 
-Priorite : basse.
+Priorité : basse.
 
-### Ecart 6 - Accessibilite front non transformee en checklist RGAA detaillee
+### Écart 6 - Accessibilité front non transformée en checklist RGAA détaillée
 
 Statut : partiel.
 
 Action recommandee :
 
-- creer plus tard `doc/front/ACCESSIBILITY_CHECKLIST.md` lorsque les maquettes et composants front arrivent.
+- créer plus tard `doc/front/ACCESSIBILITY_CHECKLIST.md` lorsque les maquettes et composants front arrivent.
 
-Priorite : moyenne avant integration front.
+Priorité : moyenne avant intégration front.
 
-### Ecart 7 - PlantUML non rendu localement
+### Écart 7 - PlantUML non rendu localement
 
 Statut : partiel.
 
 Action recommandee :
 
 - installer PlantUML ou utiliser extension VS Code ;
-- generer les PNG/SVG des diagrammes si le rendu final est demande.
+- générer les PNG/SVG des diagrammes si le rendu final est demande.
 
-Priorite : basse a moyenne selon rendu ecole.
+Priorité : basse a moyenne selon rendu ecole.
 
 ## 9. Risques residuels
 
-| Risque | Niveau | Reponse |
+| Risque | Niveau | Réponse |
 |---|---|---|
-| Derive de perimetre | Eleve | Suivre `BACKEND_IMPLEMENTATION_PLAN.md` et MVP critique |
-| Complexite reservation/paiement | Moyen | Tests prioritaires + separation statuts |
-| Donnees medicales exposees | Eleve | RLS + DTO publics + tests securite |
-| Confusion prototype Adalo / produit reel | Faible | Clarifie partout |
+| Derive de périmètre | Eleve | Suivre `BACKEND_IMPLEMENTATION_PLAN.md` et MVP critique |
+| Complexite réservation/paiement | Moyen | Tests prioritaires + séparation statuts |
+| Données médicales exposees | Eleve | RLS + DTO publics + tests sécurité |
+| Confusion prototype Adalo / produit réel | Faible | Clarifie partout |
 | Sur-engineering DDD | Moyen | KISS/YAGNI documentes |
 | Derive entre API_CONTRACTS et openapi.yaml | Moyen | Maintenir les deux documents ensemble ou choisir OpenAPI comme source executable |
 | Front non encore connu | Moyen | DTO front-ready et API REST stabilises |
 
 ## 10. Verdict final
 
-Le repository est **conforme au cadrage attendu** pour passer a l'implementation backend.
+Le repository est **conforme au cadrage attendu** pour passer à l'implémentation backend.
 
 Les livrables documentaires sont suffisamment complets pour coder un backend :
 
@@ -307,11 +307,11 @@ Les livrables documentaires sont suffisamment complets pour coder un backend :
 - backend-first ;
 - REST ;
 - front-ready ;
-- securise ;
+- sécurisé ;
 - teste ;
 - modulaire ;
-- conforme a la promesse produit ;
-- compatible avec une evolution future.
+- conforme à la promesse produit ;
+- compatible avec une évolution future.
 
 Avant de coder, il reste idealement a produire au moment de l'initialisation technique :
 
@@ -319,7 +319,7 @@ Avant de coder, il reste idealement a produire au moment de l'initialisation tec
 2. migrations Supabase ;
 3. seeds ;
 4. configuration Next.js ;
-5. scripts qualite : typecheck, lint, test, build ;
+5. scripts qualité : typecheck, lint, test, build ;
 6. pipeline CI minimal.
 
-Decision d'audit : **GO backend**.
+Décision d'audit : **GO backend**.

@@ -1,10 +1,10 @@
-# Plan d'implementation backend
+# Plan d'implémentation backend
 
-Ce plan decrit l'ordre de construction du backend MamiPet. L'objectif est de livrer par increments coherents, testables et integrables par le front.
+Ce plan décrit l'ordre de construction du backend MamiPet. L'objectif est de livrer par increments cohérents, testables et integrables par le front.
 
 ## 1. Phase 0 - Initialisation projet
 
-Objectif : creer le socle technique.
+Objectif : créer le socle technique.
 
 Taches :
 
@@ -15,33 +15,33 @@ Taches :
 - configurer `.env.example` ;
 - ajouter README projet ;
 - ajouter scripts npm ;
-- preparer pipeline minimal.
+- préparer pipeline minimal.
 
-Definition of Done :
+Définition of Done :
 
 - app demarre localement ;
 - typecheck passe ;
 - lint passe ;
 - structure respecte `PROJECT_STRUCTURE.md`.
 
-## 2. Phase 1 - Base de donnees et Supabase
+## 2. Phase 1 - Base de données et Supabase
 
 Objectif : poser les tables et contraintes.
 
 Taches :
 
-- creer migrations PostgreSQL depuis le MPD ;
-- creer enums ou checks ;
-- creer index ;
-- creer seeds referentiels ;
-- creer buckets Storage ;
+- créer migrations PostgreSQL depuis le MPD ;
+- créer enums ou checks ;
+- créer index ;
+- créer seeds référentiels ;
+- créer buckets Storage ;
 - activer RLS ;
 - ajouter policies de base.
 
-Definition of Done :
+Définition of Done :
 
 - migrations rejouables ;
-- seeds presents ;
+- seeds présents ;
 - RLS activee sur tables sensibles ;
 - contraintes critiques presentes.
 
@@ -53,12 +53,12 @@ Taches :
 
 - utilitaires Supabase serveur/client ;
 - endpoint `/api/me` ;
-- creation/synchronisation compte ;
+- création/synchronisation compte ;
 - activation profil owner ;
 - activation profil pet-sitter ;
 - tests permissions de base.
 
-Definition of Done :
+Définition of Done :
 
 - un utilisateur connecte voit son compte ;
 - un compte peut activer les deux profils ;
@@ -66,40 +66,40 @@ Definition of Done :
 
 ## 4. Phase 3 - Referentiels
 
-Objectif : exposer les donnees de reference.
+Objectif : exposer les données de référence.
 
 Taches :
 
-- endpoints reference-data ;
-- seeds especes ;
-- seeds capacites ;
+- endpoints référence-data ;
+- seeds espèces ;
+- seeds capacités ;
 - seeds lieux/formats/services ;
 - seeds badges ;
 - DTO publics.
 
-Definition of Done :
+Définition of Done :
 
-- referentiels lisibles publiquement ;
+- référentiels lisibles publiquement ;
 - code front peut alimenter les formulaires.
 
 ## 5. Phase 4 - Owners et animaux
 
-Objectif : permettre au proprietaire de preparer ses animaux.
+Objectif : permettre au propriétaire de préparer ses animaux.
 
 Taches :
 
 - CRUD profil owner ;
 - CRUD animaux ;
-- dossier medical ;
+- dossier médical ;
 - documents animaux via Storage ;
 - RLS owner ;
-- DTO prives.
+- DTO privés.
 
-Definition of Done :
+Définition of Done :
 
-- owner gere ses animaux ;
+- owner géré ses animaux ;
 - autre owner ne peut pas les lire ;
-- dossier medical protege.
+- dossier médical protégé.
 
 ## 6. Phase 5 - Pet-sitters et qualification
 
@@ -108,18 +108,18 @@ Objectif : permettre au pet-sitter de configurer son offre.
 Taches :
 
 - CRUD profil pet-sitter ;
-- configuration especes/capacites/lieux/formats/services ;
-- disponibilites ;
+- configuration espèces/capacités/lieux/formats/services ;
+- disponibilités ;
 - documents professionnels ;
 - tests de validation MVP ;
 - badges en lecture ;
 - RLS pet-sitter.
 
-Definition of Done :
+Définition of Done :
 
 - pet-sitter configure son profil ;
 - offre exploitable par la recherche ;
-- documents pros prives.
+- documents pros privés.
 
 ## 7. Phase 6 - Recherche publique
 
@@ -130,37 +130,37 @@ Taches :
 - endpoint `/api/pet-sitters` ;
 - endpoint `/api/pet-sitters/{id}` ;
 - filtres MVP ;
-- DTO public card/detail ;
-- masquage donnees sensibles ;
+- DTO public card/détail ;
+- masquage données sensibles ;
 - localisation approximative.
 
-Definition of Done :
+Définition of Done :
 
 - visiteur peut rechercher ;
-- donnees privees absentes ;
+- données privées absentes ;
 - filtres principaux operationnels.
 
-## 8. Phase 7 - Reservation directe
+## 8. Phase 7 - Réservation directe
 
-Objectif : implementer le coeur metier.
+Objectif : implémenter le coeur métier.
 
 Taches :
 
-- create reservation ;
-- sent/received reservations ;
+- create réservation ;
+- sent/received réservations ;
 - accept ;
 - refuse ;
 - cancel ;
 - incident ;
-- complete ;
-- blocage disponibilite ;
+- complète ;
+- blocage disponibilité ;
 - tests transitions.
 
-Definition of Done :
+Définition of Done :
 
-- owner cree demande ;
-- pet-sitter concerne accepte/refuse ;
-- creneau bloque apres acceptation ;
+- owner créé demande ;
+- pet-sitter concerné accepte/refuse ;
+- créneau bloqué après acceptation ;
 - statuts respectes.
 
 ## 9. Phase 8 - Paiement test et contrat
@@ -169,19 +169,19 @@ Objectif : fermer le flux critique.
 
 Taches :
 
-- payment intent simule/test ;
+- payment intent simulé/test ;
 - confirmation paiement ;
 - calcul commission ;
 - paiement succeeded ;
-- generation contrat recapitulatif ;
+- génération contrat récapitulatif ;
 - stockage contrat ;
 - DTO paiement/contrat.
 
-Definition of Done :
+Définition of Done :
 
-- reservation accepted -> awaiting_payment -> paid ;
+- réservation accepted -> awaiting_payment -> paid ;
 - paiement distinct ;
-- contrat genere.
+- contrat généré.
 
 ## 10. Phase 9 - Avis, signalements et moderation
 
@@ -189,16 +189,16 @@ Objectif : ajouter la confiance MVP.
 
 Taches :
 
-- creation avis apres reservation terminee ;
-- reponse pet-sitter ;
-- signalement general/cible ;
+- création avis après réservation terminée ;
+- réponse pet-sitter ;
+- signalement général/ciblé ;
 - cycle ticket ;
 - moderation basique.
 
-Definition of Done :
+Définition of Done :
 
 - avis impossible avant completion ;
-- signalement cree ticket ;
+- signalement créé ticket ;
 - cibles signalement controlees.
 
 ## 11. Phase 10 - Back-office minimal
@@ -209,62 +209,62 @@ Taches :
 
 - lister profils/documents ;
 - valider/rejeter documents ;
-- changer statut verification ;
+- changer statut vérification ;
 - attribuer/retirer badges ;
-- lister reservations/paiements ;
+- lister réservations/paiements ;
 - traiter signalements ;
 - audit minimal.
 
-Definition of Done :
+Définition of Done :
 
 - admin peut traiter les objets critiques ;
 - actions sensibles tracees.
 
 ## 12. Phase 11 - Stabilisation
 
-Objectif : livrer un backend propre et documente.
+Objectif : livrer un backend propre et documenté.
 
 Taches :
 
 - completer tests critiques ;
-- verifier DTO ;
-- verifier RLS ;
-- verifier docs ;
-- preparer donnees demo ;
+- vérifier DTO ;
+- vérifier RLS ;
+- vérifier docs ;
+- préparer données demo ;
 - nettoyer dette immediate ;
 - produire note de livraison.
 
-Definition of Done :
+Définition of Done :
 
 - build passe ;
 - lint passe ;
 - typecheck passe ;
 - tests critiques passent ;
 - README explique lancement ;
-- documentation mise a jour.
+- documentation mise à jour.
 
 ## 13. Ordre strict recommande
 
 1. Projet et tooling.
-2. Supabase schema + RLS.
+2. Supabase schéma + RLS.
 3. Auth/compte/profils.
 4. Referentiels.
 5. Animaux.
 6. Pet-sitter offer.
 7. Recherche publique.
-8. Reservation.
+8. Réservation.
 9. Paiement/contrat.
 10. Avis/signalement.
 11. Admin.
 12. Tests/stabilisation.
 
-## 14. Regles pendant implementation
+## 14. Règles pendant implémentation
 
-- Ne pas coder la messagerie complete au debut.
-- Ne pas coder notifications avancees au debut.
+- Ne pas coder la messagerie complète au debut.
+- Ne pas coder notifications avancées au debut.
 - Ne pas exposer les tables brutes au front.
 - Ne pas stocker de mot de passe applicatif.
-- Ne pas melanger reservation et paiement.
-- Ne pas contourner les policies avec service role sauf operation serveur justifiee.
-- Mettre a jour la documentation si une decision change.
+- Ne pas melanger réservation et paiement.
+- Ne pas contourner les policies avec service rôle sauf operation serveur justifiee.
+- Mettre à jour la documentation si une décision change.
 

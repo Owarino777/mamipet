@@ -1,12 +1,12 @@
 # MamiPet
 
-MamiPet est une marketplace de confiance pour la garde d'animaux. Le projet met en relation des proprietaires avec des pet-sitters qualifies, avec un positionnement fort sur la securite, la verification, les competences et la prise en charge d'animaux sensibles : animaux ages, sous traitement, handicapes, anxieux ou avec besoins specifiques.
+MamiPet est une marketplace de confiance pour la garde d'animaux. Le projet met en relation des propriétaires avec des pet-sitters qualifiés, avec un positionnement fort sur la sécurité, la vérification, les compétences et la prise en charge d'animaux sensibles : animaux âgés, sous traitement, handicapés, anxieux ou avec besoins spécifiques.
 
 La trajectoire du projet distingue clairement :
 
-- le prototype no-code Adalo, utilise pour valider les parcours et la proposition de valeur ;
-- la landing page, utilisee pour presenter l'offre et tester l'interet marche ;
-- le MVP applicatif reel, construit comme une web app responsive avec API, base relationnelle, securite, paiement test et back-office minimal.
+- le prototype no-code Adalo, utilisé pour valider les parcours et la proposition de valeur ;
+- la landing page, utilisée pour présenter l'offre et tester l'intérêt marché ;
+- le MVP applicatif réel, construit comme une web app responsive avec API, base relationnelle, sécurité, paiement test et back-office minimal.
 
 ## Stack cible
 
@@ -18,7 +18,7 @@ La trajectoire du projet distingue clairement :
 - Supabase PostgreSQL
 - Supabase Storage
 - Supabase RLS
-- Stripe Connect prepare, paiement MVP simule en mode test
+- Stripe Connect préparé, paiement MVP simulé en mode test
 - Google Maps API
 - Vercel
 - GitHub
@@ -27,14 +27,14 @@ La trajectoire du projet distingue clairement :
 
 Le projet suit une approche backend-first :
 
-1. stabiliser le modele metier ;
+1. stabiliser le modèle métier ;
 2. poser les migrations SQL et les policies RLS ;
-3. definir les contrats API et DTO ;
-4. implementer les use cases critiques ;
-5. tester les regles metier ;
-6. preparer le front a consommer des contrats stables.
+3. définir les contrats API et DTO ;
+4. implémenter les use cases critiques ;
+5. tester les règles métier ;
+6. préparer le front à consommer des contrats stables.
 
-Le repository est pense comme un monorepo propre :
+Le repository est pensé comme un monorepo propre :
 
 ```txt
 mamipet/
@@ -53,33 +53,33 @@ mamipet/
 
 ## Flux critique MVP
 
-Le flux prioritaire a implementer est :
+Le flux prioritaire à implémenter est :
 
-1. le proprietaire cree son compte ;
-2. il active son profil proprietaire ;
-3. il cree un ou plusieurs animaux ;
+1. le propriétaire crée son compte ;
+2. il active son profil propriétaire ;
+3. il crée un ou plusieurs animaux ;
 4. il recherche un pet-sitter ;
 5. il consulte une fiche publique ;
-6. il cree une demande de reservation ;
+6. il crée une demande de réservation ;
 7. le pet-sitter accepte ou refuse ;
-8. en cas d'acceptation, le creneau est bloque ;
-9. le proprietaire paie en mode test ;
-10. le contrat recapitulatif est genere ;
-11. la reservation peut etre terminee ;
-12. le proprietaire peut deposer un avis.
+8. en cas d'acceptation, le créneau est bloqué ;
+9. le propriétaire paie en mode test ;
+10. le contrat récapitulatif est généré ;
+11. la réservation peut être terminée ;
+12. le propriétaire peut déposer un avis.
 
 ## Documentation
 
-Toute la documentation est centralisee dans `doc/`.
+Toute la documentation est centralisée dans `doc/`.
 
-- `doc/PASSATION_PROJET_MAMIPET.md` : vision fonctionnelle et technique complete.
+- `doc/PASSATION_PROJET_MAMIPET.md` : vision fonctionnelle et technique complète.
 - `doc/merise/` : MCD, MLD, MPD.
 - `doc/UML/` : diagrammes UML.
-- `doc/tech/` : architecture, API, DTO, permissions, regles, tests, plan backend.
-- `doc/audits/` : audits de conformite.
-- `doc/references/` : references normatives, dont UML 2.5.1.
+- `doc/tech/` : architecture, API, DTO, permissions, règles, tests, plan backend.
+- `doc/audits/` : audits de conformité.
+- `doc/references/` : références normatives, dont UML 2.5.1.
 
-Documents essentiels avant implementation :
+Documents essentiels avant implémentation :
 
 - `doc/tech/ENGINEERING_PRINCIPLES.md`
 - `doc/tech/ARCHITECTURE_DECISION.md`
@@ -93,21 +93,21 @@ Documents essentiels avant implementation :
 - `doc/tech/ENVIRONMENT_AND_SECRETS.md`
 - `doc/tech/BACKEND_IMPLEMENTATION_PLAN.md`
 
-## Regles fortes
+## Règles fortes
 
 - Le prototype Adalo ne doit pas guider l'architecture finale.
-- Le compte utilisateur est distinct des profils metier.
-- Un compte peut avoir un profil proprietaire, un profil pet-sitter, ou les deux.
-- Les donnees medicales et documents sont prives par defaut.
-- Les statuts de reservation et de paiement sont separes.
-- Le paiement MVP est simule/test, Stripe Connect reste prepare.
+- Le compte utilisateur est distinct des profils métier.
+- Un compte peut avoir un profil propriétaire, un profil pet-sitter, ou les deux.
+- Les données médicales et documents sont privés par défaut.
+- Les statuts de réservation et de paiement sont séparés.
+- Le paiement MVP est simulé/test, Stripe Connect reste préparé.
 - La commission plateforme MVP est de 15 %.
 - Le front consomme des DTO, jamais les tables brutes.
-- Toute securite doit etre portee cote backend, SQL/RLS et services serveur.
+- Toute sécurité doit être portée côté backend, SQL/RLS et services serveur.
 
 ## Initialisation future
 
-Lorsque le code applicatif sera initialise, ajouter :
+Lorsque le code applicatif sera initialisé, ajouter :
 
 - `.env.example` ;
 - configuration Next.js ;
@@ -119,7 +119,7 @@ Lorsque le code applicatif sera initialise, ajouter :
 
 ## Maintenance documentaire
 
-Apres chaque modification importante, verifier si la documentation doit etre mise a jour.
+Après chaque modification importante, vérifier si la documentation doit être mise à jour.
 
-Si rien n'a besoin d'etre documente, le compte rendu de travail doit l'indiquer explicitement.
+Si rien n'a besoin d'être documenté, le compte rendu de travail doit l'indiquer explicitement.
 

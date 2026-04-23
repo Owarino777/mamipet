@@ -1,0 +1,98 @@
+@startuml
+title MamiPet - Diagramme de composants cible
+
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam component {
+  BackgroundColor #F8FBFF
+  BorderColor #32506D
+}
+skinparam database {
+  BackgroundColor #FFFDF2
+  BorderColor #7B6335
+}
+
+package "Application Next.js" {
+  component "Interface web\nReact" as UI
+  component "Routes serveur /\nServer Actions" as ServerRoutes
+  component "DTO publics,\nprives et admin" as DTO
+}
+
+package "Couche application" {
+  component "IdentiteAccessUseCases" as IdentityUC
+  component "ProfilUseCases" as ProfileUC
+  component "RechercheUseCases" as SearchUC
+  component "ReservationUseCases" as BookingUC
+  component "PaiementUseCases" as PaymentUC
+  component "ContratUseCases" as ContractUC
+  component "ModerationAdminUseCases" as AdminUC
+}
+
+package "Domaine" {
+  component "Regles metier\net invariants" as DomainRules
+  component "Transitions d'etats" as StateRules
+  component "Calcul commission\n15 %" as CommissionRules
+}
+
+package "Infrastructure" {
+  component "Supabase Auth\nAdapter" as SupabaseAuthAdapter
+  component "Supabase DB\nRepository" as DBRepo
+  component "Supabase Storage\nAdapter" as StorageAdapter
+  component "Stripe Adapter" as StripeAdapter
+  component "Google Maps Adapter" as MapsAdapter
+  component "Contract Generator" as ContractGenerator
+}
+
+database "PostgreSQL\nschema applicatif + RLS" as Postgres
+cloud "Supabase Auth" as SupabaseAuth
+collections "Supabase Storage" as SupabaseStorage
+cloud "Stripe Connect test" as Stripe
+cloud "Google Maps API" as Maps
+
+UI --> ServerRoutes : appels applicatifs
+ServerRoutes --> DTO : expose contrats stables
+ServerRoutes --> IdentityUC
+ServerRoutes --> ProfileUC
+ServerRoutes --> SearchUC
+ServerRoutes --> BookingUC
+ServerRoutes --> PaymentUC
+ServerRoutes --> ContractUC
+ServerRoutes --> AdminUC
+
+IdentityUC --> SupabaseAuthAdapter
+ProfileUC --> DBRepo
+SearchUC --> DBRepo
+SearchUC --> MapsAdapter
+BookingUC --> DomainRules
+BookingUC --> StateRules
+BookingUC --> CommissionRules
+BookingUC --> DBRepo
+PaymentUC --> StateRules
+PaymentUC --> StripeAdapter
+PaymentUC --> DBRepo
+ContractUC --> ContractGenerator
+ContractUC --> DBRepo
+ContractUC --> StorageAdapter
+AdminUC --> DomainRules
+AdminUC --> DBRepo
+
+SupabaseAuthAdapter --> SupabaseAuth
+DBRepo --> Postgres
+StorageAdapter --> SupabaseStorage
+StripeAdapter --> Stripe
+MapsAdapter --> Maps
+
+note bottom of DTO
+  Le front consomme des DTO,
+  pas les tables brutes.
+end note
+
+note bottom of Postgres
+  Les policies RLS protegent :
+  comptes, profils, animaux, documents,
+  reservations, paiements et signalements.
+end note
+
+@enduml

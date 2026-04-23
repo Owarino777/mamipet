@@ -1,0 +1,70 @@
+@startuml
+title MamiPet - Sequence validation documentaire pet-sitter
+
+skinparam shadowing false
+skinparam sequence {
+  ArrowColor #32506D
+  LifeLineBorderColor #32506D
+  LifeLineBackgroundColor #F8FBFF
+  ParticipantBorderColor #32506D
+  ParticipantBackgroundColor #F8FBFF
+}
+skinparam note {
+  BackgroundColor #FFF8D7
+  BorderColor #7B6335
+}
+
+actor "Pet-sitter" as PetSitter
+actor "Administrateur" as Admin
+participant "Web app Next.js" as Web
+participant "DocumentUseCase" as DocumentUC
+participant "AdminModerationUseCase" as AdminUC
+database "Supabase PostgreSQL\n+ RLS" as DB
+collections "Supabase Storage" as Storage
+
+PetSitter -> Web : deposerDocumentProfessionnel(type, fichier)
+Web -> DocumentUC : soumettreDocument(command)
+DocumentUC -> DB : verifierProfilPetSitter()
+DocumentUC -> Storage : stockerFichier(document)
+Storage --> DocumentUC : cheminStockage
+DocumentUC -> DB : insererDocument(statut = soumis)
+DocumentUC --> Web : document soumis
+Web --> PetSitter : confirmation depot
+
+Admin -> Web : consulterDocumentsSoumis()
+Web -> AdminUC : listerDocumentsSoumis()
+AdminUC -> DB : lireDocuments(statut = soumis)
+DB --> AdminUC : documents a traiter
+AdminUC --> Web : liste documents
+Web --> Admin : afficher documents
+
+alt document valide
+  Admin -> Web : validerDocument(idDocument)
+  Web -> AdminUC : validerDocumentProfessionnel(idDocument)
+  AdminUC -> DB : update Document = valide
+  AdminUC -> DB : verifierEligibiliteProfilPro()
+  alt tous justificatifs requis valides
+    AdminUC -> DB : update ProfilPetSitter = professionnel_verifie
+    AdminUC -> DB : attribuerBadge(Pro)\nsi non deja actif
+  else validation partielle
+    AdminUC -> DB : conserverStatutActuelProfil()
+  end
+  AdminUC -> DB : enregistrerActionAdmin()
+  AdminUC --> Web : validation confirmee
+  Web --> Admin : afficher succes
+else document rejete
+  Admin -> Web : rejeterDocument(idDocument, commentaire)
+  Web -> AdminUC : rejeterDocumentProfessionnel(idDocument, commentaire)
+  AdminUC -> DB : update Document = rejete
+  AdminUC -> DB : enregistrerActionAdmin()
+  AdminUC --> Web : rejet confirme
+  Web --> Admin : afficher succes
+end
+
+note over AdminUC,DB
+  Les validations documentaires doivent etre tracees.
+  Elles peuvent declencher un changement de statut
+  ou un badge, mais le badge reste distinct du statut.
+end note
+
+@enduml

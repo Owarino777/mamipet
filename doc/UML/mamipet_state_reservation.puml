@@ -1,0 +1,58 @@
+@startuml
+title MamiPet - Etats-transitions d'une reservation
+
+skinparam shadowing false
+skinparam state {
+  BackgroundColor #F8FBFF
+  BorderColor #32506D
+}
+skinparam note {
+  BackgroundColor #FFF8D7
+  BorderColor #7B6335
+}
+
+[*] --> en_attente_reponse : creerDemande()
+
+en_attente_reponse --> refusee : refuser()\n[motifRefus]
+en_attente_reponse --> acceptee : accepter()\n[pet-sitter concerne]
+en_attente_reponse --> annulee : annulerParProprietaire()
+
+acceptee --> en_attente_paiement : bloquerCreneau()\n+ creerDisponibiliteBloquee()
+acceptee --> annulee : annulerAvantPaiement()
+
+en_attente_paiement --> payee : paiementSucceeded()\n[Stripe succeeded]
+en_attente_paiement --> en_attente_paiement : paiementFailed()\n[Stripe failed]
+en_attente_paiement --> annulee : paiementExpired()\nou annuler()
+
+payee --> terminee : cloturerPrestation()
+payee --> annulee : annulerAvecRegleRemboursement()
+payee --> incident_signale : signalerIncident()
+
+terminee --> incident_signale : signalerIncidentApresPrestation()
+terminee --> [*]
+
+refusee --> [*]
+annulee --> [*]
+incident_signale --> [*]
+
+note right of en_attente_reponse
+  Etat initial apres creation par le proprietaire.
+  La reservation n'est pas encore payable.
+end note
+
+note right of en_attente_paiement
+  La reservation est acceptee et le creneau est bloque.
+  Le paiement reste un objet distinct.
+end note
+
+note bottom of payee
+  Le paiement Stripe reussi alimente la transition
+  vers payee, mais son statut reste porte par Paiement.
+end note
+
+note bottom of incident_signale
+  Un incident peut ouvrir un signalement.
+  Le ticket de support/moderation suit son propre cycle.
+end note
+
+@enduml

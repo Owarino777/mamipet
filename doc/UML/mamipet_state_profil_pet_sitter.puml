@@ -1,0 +1,54 @@
+@startuml
+title MamiPet - Etats-transitions du profil pet-sitter
+
+skinparam shadowing false
+skinparam state {
+  BackgroundColor #F8FBFF
+  BorderColor #32506D
+}
+skinparam note {
+  BackgroundColor #FFF8D7
+  BorderColor #7B6335
+}
+
+[*] --> brouillon : creerProfilPetSitter()
+
+brouillon --> publie_non_verifie : publierProfil()\n[profil minimum complet]
+brouillon --> rejete : rejetAdmin()
+
+publie_non_verifie --> identite_verifiee : validerIdentite()\n+ badge Verified Identity possible
+publie_non_verifie --> suspendu : suspendre()
+publie_non_verifie --> rejete : rejetAdmin()
+
+identite_verifiee --> professionnel_verifie : validerDocumentsProfessionnels()\n+ badge Pro possible
+identite_verifiee --> suspendu : suspendre()
+identite_verifiee --> rejete : rejetAdmin()
+
+professionnel_verifie --> suspendu : suspendre()
+professionnel_verifie --> identite_verifiee : documentProExpire()\nou retraitValidationPro()
+
+suspendu --> publie_non_verifie : reactiverSansValidationComplete()
+suspendu --> identite_verifiee : reactiverIdentiteValidee()
+suspendu --> professionnel_verifie : reactiverProfessionnelValide()
+suspendu --> rejete : rejetDefinitif()
+
+rejete --> brouillon : nouvelleSoumissionAutorisee()
+rejete --> [*]
+
+note right of publie_non_verifie
+  Le profil peut etre visible publiquement,
+  mais il est moins mis en avant et non eligible
+  aux besoins sensibles.
+end note
+
+note right of professionnel_verifie
+  Etat interne de verification.
+  Il ne signifie pas automatiquement "Expert".
+end note
+
+note bottom
+  Expert est un badge public issu d'un test reussi
+  sur un perimetre precis, pas un etat du profil.
+end note
+
+@enduml

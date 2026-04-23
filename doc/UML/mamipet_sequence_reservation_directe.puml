@@ -1,0 +1,108 @@
+@startuml
+title MamiPet - Sequence reservation directe, paiement et contrat
+
+skinparam shadowing false
+skinparam sequence {
+  ArrowColor #32506D
+  LifeLineBorderColor #32506D
+  LifeLineBackgroundColor #F8FBFF
+  ParticipantBorderColor #32506D
+  ParticipantBackgroundColor #F8FBFF
+}
+skinparam note {
+  BackgroundColor #FFF8D7
+  BorderColor #7B6335
+}
+
+actor "Proprietaire" as Owner
+actor "Pet-sitter" as PetSitter
+participant "Web app Next.js" as Web
+participant "ReservationUseCase" as ReservationUC
+participant "RechercheService" as Search
+database "Supabase PostgreSQL\n+ RLS" as DB
+participant "Stripe Connect\ntest" as Stripe
+participant "ContratService" as Contract
+collections "Supabase Storage" as Storage
+
+Owner -> Web : rechercherPetSitters(filtres)
+Web -> Search : rechercherPetSitters(filtres publics)
+Search -> DB : lireProfilsPublicsCompatibles()
+DB --> Search : DTO publics pet-sitters
+Search --> Web : resultats carte + liste
+Web --> Owner : afficher resultats
+
+Owner -> Web : consulterProfilPetSitter(idProfil)
+Web -> Search : chargerFichePublique(idProfil)
+Search -> DB : lireProfilPublicDetaille()
+DB --> Search : fiche publique protegee
+Search --> Web : fiche publique
+Web --> Owner : afficher fiche
+
+Owner -> Web : creerDemandeReservation(dates, animaux, lieu, format, services)
+Web -> ReservationUC : creerDemandeReservation(command)
+ReservationUC -> DB : verifierProprietaireEtAnimaux()
+ReservationUC -> DB : verifierPetSitterEtOffre()
+ReservationUC -> DB : verifierDisponibiliteEtDates()
+ReservationUC -> ReservationUC : calculerTarifEtCommission()
+ReservationUC -> DB : insererReservation(en_attente_reponse)\n+ animaux + services
+DB --> ReservationUC : reservation creee
+ReservationUC --> Web : reservation en_attente_reponse
+Web --> Owner : afficher demande envoyee
+
+PetSitter -> Web : consulterDemandesRecues()
+Web -> ReservationUC : listerDemandesRecues()
+ReservationUC -> DB : lireReservationsDuPetSitter()
+DB --> ReservationUC : demandes
+ReservationUC --> Web : demandes recues
+Web --> PetSitter : afficher demande
+
+alt refus pet-sitter
+  PetSitter -> Web : refuserDemande(motif)
+  Web -> ReservationUC : refuserReservation(id, motif)
+  ReservationUC -> DB : update statut = refusee
+  ReservationUC --> Web : reservation refusee
+  Web --> Owner : informer refus
+else acceptation pet-sitter
+  PetSitter -> Web : accepterDemande()
+  Web -> ReservationUC : accepterReservation(id)
+  ReservationUC -> DB : verifierReservationEnAttente()
+  ReservationUC -> DB : update statut = acceptee
+  ReservationUC -> DB : creerDisponibiliteBloquee(idReservation)
+  ReservationUC -> DB : update statut = en_attente_paiement
+  ReservationUC --> Web : reservation en_attente_paiement
+  Web --> Owner : afficher paiement requis
+
+  Owner -> Web : payerReservation()
+  Web -> ReservationUC : creerIntentionPaiement(idReservation)
+  ReservationUC -> DB : verifierReservationPayable()
+  ReservationUC -> Stripe : createPaymentIntent(montant, commission)
+  Stripe --> ReservationUC : clientSecret + referenceStripe
+  ReservationUC -> DB : insererPaiement(pending)
+  ReservationUC --> Web : clientSecret
+  Web -> Stripe : confirmerPaiementTest(clientSecret)
+  Stripe --> Web : paiement reussi
+
+  Web -> ReservationUC : confirmerPaiement(referenceStripe)
+  ReservationUC -> Stripe : verifierStatutPaiement()
+  Stripe --> ReservationUC : succeeded
+  ReservationUC -> DB : update Paiement = succeeded
+  ReservationUC -> DB : update Reservation = payee
+  ReservationUC -> Contract : genererContrat(idReservation)
+  Contract -> DB : lireDonneesContractuelles()
+  DB --> Contract : parties, animaux, dates, tarif, assurance
+  Contract -> Storage : stockerContrat()
+  Storage --> Contract : cheminFichier + hash
+  Contract -> DB : insererContratRecapitulatif()
+  Contract --> ReservationUC : contrat genere
+  ReservationUC --> Web : reservation payee + contrat
+  Web --> Owner : afficher confirmation + contrat
+end
+
+note over ReservationUC,DB
+  Invariants critiques :
+  - tous les animaux appartiennent au proprietaire ;
+  - la reservation n'est payable qu'apres acceptation ;
+  - le paiement et la reservation gardent des statuts separes.
+end note
+
+@enduml

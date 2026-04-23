@@ -1,0 +1,78 @@
+@startuml
+title MamiPet - Activite recherche et creation de reservation
+
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F8FBFF
+  BorderColor #32506D
+}
+skinparam diamond {
+  BackgroundColor #FFFDF2
+  BorderColor #7B6335
+}
+skinparam note {
+  BackgroundColor #FFF8D7
+  BorderColor #7B6335
+}
+
+start
+
+:Proprietaire connecte;
+:Completer profil proprietaire\nsi necessaire;
+:Creer ou selectionner un animal;
+
+if (Animal avec besoins sensibles ?) then (oui)
+  :Verifier dossier medical\net consignes;
+else (non)
+  :Continuer sans dossier medical;
+endif
+
+:Saisir criteres de recherche;
+:Appliquer filtres\nespece, capacite, lieu, format,\ndates, distance, tarif, badges;
+:Afficher liste et carte;
+
+if (Profil pet-sitter compatible trouve ?) then (oui)
+  :Consulter fiche publique;
+else (non)
+  :Afficher aucun resultat\nou proposer d'elargir les filtres;
+  stop
+endif
+
+if (Profil eligible pour besoins sensibles ?) then (oui)
+  :Selectionner dates, lieu, format,\nanimaux et services;
+else (non)
+  :Afficher limite d'eligibilite;
+  stop
+endif
+
+:Calculer tarif convenu\net commission 15 %;
+:Creer reservation\nen_attente_reponse;
+:Notifier ou rendre visible\nla demande au pet-sitter;
+
+if (Pet-sitter accepte ?) then (oui)
+  :Bloquer le creneau;
+  :Passer reservation\nen_attente_paiement;
+  :Declencher paiement Stripe test;
+
+  if (Paiement reussi ?) then (oui)
+    :Enregistrer paiement succeeded;
+    :Passer reservation a payee;
+    :Generer contrat recapitulatif;
+    :Afficher confirmation;
+  else (non)
+    :Conserver ou expirer\nla demande de paiement;
+  endif
+else (refus)
+  :Passer reservation a refusee;
+  :Afficher motif si renseigne;
+endif
+
+stop
+
+note right
+  Le paiement est un objet distinct.
+  Ses statuts ne remplacent pas les statuts
+  de la reservation.
+end note
+
+@enduml

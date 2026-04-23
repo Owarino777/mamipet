@@ -1,0 +1,79 @@
+@startuml
+title MamiPet - Diagramme de deploiement cible MVP
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam node {
+  BackgroundColor #F8FBFF
+  BorderColor #32506D
+}
+skinparam cloud {
+  BackgroundColor #FFFDF2
+  BorderColor #7B6335
+}
+skinparam database {
+  BackgroundColor #FFFDF2
+  BorderColor #7B6335
+}
+
+node "Navigateur utilisateur\nDesktop / mobile web" as Browser {
+  artifact "Web app responsive" as BrowserApp
+}
+
+cloud "Vercel" as Vercel {
+  node "Next.js Runtime" as NextRuntime {
+    artifact "Pages React" as Pages
+    artifact "Routes serveur /\nServer Actions" as Routes
+  }
+}
+
+cloud "Supabase Cloud\nregion UE cible" as Supabase {
+  node "Supabase Auth" as Auth
+  database "PostgreSQL\nschema MamiPet + RLS" as Postgres
+  node "Supabase Storage" as Storage
+}
+
+cloud "Stripe" as Stripe {
+  node "Stripe Connect\nenvironnement test" as StripeTest
+}
+
+cloud "Google Cloud" as Google {
+  node "Google Maps API" as Maps
+}
+
+cloud "GitHub" as GitHub {
+  artifact "Repository MVP" as Repo
+  artifact "CI minimale\nlint, tests, build" as CI
+}
+
+node "Administrateur MamiPet" as AdminDevice {
+  artifact "Back-office web" as BackOffice
+}
+
+BrowserApp --> Vercel : HTTPS
+BackOffice --> Vercel : HTTPS
+
+Routes --> Auth : Auth API
+Routes --> Postgres : SQL/API Supabase\nRLS
+Routes --> Storage : fichiers documents\net contrats
+Routes --> StripeTest : creation paiement\nconfirmation
+StripeTest --> Routes : webhook paiement\nHTTPS
+Routes --> Maps : geocodage,\ndistance, carte
+
+Repo --> CI : push / pull request
+CI --> Vercel : build et preview
+CI --> Supabase : migrations controlees\nsi activees
+
+note bottom of Supabase
+  Les environnements preproduction et production
+  doivent etre separes par variables, cles,
+  bases et buckets distincts.
+end note
+
+note bottom of Stripe
+  Le MVP utilise Stripe en mode test.
+  Les statuts Stripe alimentent Paiement,
+  puis les transitions metier de Reservation.
+end note
+
+@enduml

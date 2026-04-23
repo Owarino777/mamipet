@@ -4,12 +4,14 @@ Ce document sert de reference projet pour la suite du travail sur MamiPet. Il ex
 
 Il doit etre lu avec les schemas suivants :
 
-- `mamipet_mcd_conceptuel.puml`
-- `mamipet_mcd_mermaid.md`
-- `mamipet_mld_logique.puml`
-- `mamipet_mld_mermaid.md`
-- `mamipet_mpd_physique.puml`
-- `mamipet_mpd_mermaid.md`
+- `doc/merise/mamipet_mcd_conceptuel.puml`
+- `doc/merise/mamipet_mcd_mermaid.md`
+- `doc/merise/mamipet_mld_logique.puml`
+- `doc/merise/mamipet_mld_mermaid.md`
+- `doc/merise/mamipet_mpd_physique.puml`
+- `doc/merise/mamipet_mpd_mermaid.md`
+
+Les diagrammes UML produits a partir de cette passation sont ranges dans `doc/UML/`.
 
 ## 0. Objet du document
 
@@ -881,19 +883,21 @@ Ces modules doivent rester compatibles avec l'architecture, mais ne doivent pas 
 - back-office statistique avance ;
 - application mobile native.
 
-## 16. UML a produire ensuite
+## 16. UML produits
 
-Les UML doivent etre derives de ce document et des schemas MCD/MLD/MPD.
+Les UML sont derives de ce document et des schemas MCD/MLD/MPD.
 
-Ordre conseille :
+Fichiers produits dans `doc/UML/` :
 
-1. diagramme de cas d'utilisation ;
-2. diagramme de classes domaine ;
-3. diagramme d'etats reservation ;
-4. diagramme d'etats profil pet-sitter ;
-5. diagramme de sequence reservation directe ;
-6. diagramme de sequence validation documentaire ;
-7. diagramme d'activite recherche/reservation si necessaire.
+1. `mamipet_use_cases.puml` : diagramme de cas d'utilisation ;
+2. `mamipet_class_domain.puml` : diagramme de classes domaine ;
+3. `mamipet_state_reservation.puml` : diagramme d'etats reservation ;
+4. `mamipet_state_profil_pet_sitter.puml` : diagramme d'etats profil pet-sitter ;
+5. `mamipet_sequence_reservation_directe.puml` : sequence reservation directe ;
+6. `mamipet_sequence_validation_documentaire.puml` : sequence validation documentaire ;
+7. `mamipet_activity_recherche_reservation.puml` : activite recherche/reservation ;
+8. `mamipet_component_architecture.puml` : composants applicatifs ;
+9. `mamipet_deployment.puml` : deploiement cible.
 
 Points de vigilance UML :
 
@@ -941,7 +945,7 @@ Un backend MVP est considere coherent si :
 ## 19. Ordre de travail recommande
 
 1. Valider le document de passation et les schemas MCD/MLD/MPD.
-2. Produire les UML propres.
+2. Maintenir les UML propres avec les schemas.
 3. Ecrire les migrations SQL Supabase.
 4. Seeder les referentiels.
 5. Mettre en place les policies RLS.

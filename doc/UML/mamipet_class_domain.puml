@@ -1,0 +1,368 @@
+@startuml
+title MamiPet - Diagramme de classes domaine
+
+hide circle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam class {
+  BackgroundColor #F8FBFF
+  BorderColor #32506D
+}
+skinparam enum {
+  BackgroundColor #FFFDF2
+  BorderColor #7B6335
+}
+skinparam note {
+  BackgroundColor #FFF8D7
+  BorderColor #7B6335
+}
+
+package "Identite et profils" {
+  class CompteUtilisateur {
+    +idCompte: UUID
+    +email: Email
+    +statut: StatutCompte
+    +estAdministrateur: boolean
+    +activerProfilProprietaire()
+    +activerProfilPetSitter()
+  }
+
+  class ProfilProprietaire {
+    +idProfilProprietaire: UUID
+    +pseudo: string
+    +prenom: string
+    +ville: string
+    +pays: string
+    +mettreAJourProfil()
+  }
+
+  class ProfilPetSitter {
+    +idProfilPetSitter: UUID
+    +pseudo: string
+    +prenom: string
+    +description: string
+    +ville: string
+    +tarifBase: Money
+    +rayonInterventionKm: number
+    +statutVerification: StatutVerificationPetSitter
+    +visibilitePublique: boolean
+    +publier()
+    +suspendre()
+    +changerStatutVerification()
+  }
+}
+
+package "Animaux" {
+  class Animal {
+    +idAnimal: UUID
+    +nom: string
+    +sexe: string
+    +dateNaissance: Date
+    +poidsKg: number
+    +temperament: text
+    +besoinsSpecifiques: text
+  }
+
+  class DossierMedical {
+    +idDossierMedical: UUID
+    +protocoleSoin: text
+    +frequence: text
+    +consignesConfidentielles: text
+  }
+
+  class DocumentAnimal {
+    +idDocumentAnimal: UUID
+    +typeDocument: string
+    +cheminStockage: string
+    +dateDepot: DateTime
+  }
+
+  class Espece {
+    +idEspece: UUID
+    +code: string
+    +libelle: string
+  }
+}
+
+package "Offre et qualification pet-sitter" {
+  class CapaciteSoin {
+    +idCapaciteSoin: UUID
+    +code: string
+    +libelle: string
+  }
+
+  class LieuGarde {
+    +idLieuGarde: UUID
+    +code: string
+    +libelle: string
+  }
+
+  class FormatGarde {
+    +idFormatGarde: UUID
+    +code: string
+    +libelle: string
+  }
+
+  class ServiceAdditionnel {
+    +idServiceAdditionnel: UUID
+    +code: string
+    +libelle: string
+  }
+
+  class Disponibilite {
+    +idDisponibilite: UUID
+    +dateDebut: DateTime
+    +dateFin: DateTime
+    +statut: StatutDisponibilite
+    +commentaire: text
+    +bloquerPourReservation()
+  }
+
+  class DocumentProfessionnel {
+    +idDocumentProfessionnel: UUID
+    +typeDocument: string
+    +statut: StatutDocument
+    +cheminStockage: string
+    +valider()
+    +rejeter()
+  }
+
+  class TestValidation {
+    +idTestValidation: UUID
+    +typePerimetre: TypePerimetreTest
+    +score: number
+    +statut: StatutTest
+    +dateExpiration: DateTime
+    +validerResultat()
+  }
+
+  class BadgePublic {
+    +idBadgePublic: UUID
+    +code: string
+    +libelle: string
+  }
+
+  class AttributionBadgePublic {
+    +idAttribution: UUID
+    +origine: OrigineBadge
+    +actif: boolean
+    +dateObtention: DateTime
+    +dateRetrait: DateTime
+    +retirer()
+  }
+
+  class AbonnementPetSitter {
+    +idAbonnement: UUID
+    +formule: FormuleAbonnement
+    +statut: StatutAbonnement
+    +montant: Money
+    +assurancePremiumIncluse: boolean
+  }
+}
+
+package "Reservation, paiement et confiance" {
+  class Reservation {
+    +idReservation: UUID
+    +dateDemande: DateTime
+    +dateDebut: DateTime
+    +dateFin: DateTime
+    +statut: StatutReservation
+    +niveauAssurance: NiveauAssurance
+    +tarifConvenu: Money
+    +tauxCommissionPlateforme: Percentage
+    +consignes: text
+    +motifRefus: text
+    +motifAnnulation: text
+    +accepter()
+    +refuser()
+    +passerEnAttentePaiement()
+    +marquerPayee()
+    +terminer()
+    +signalerIncident()
+    +annuler()
+  }
+
+  class ReservationAnimal {
+    +tarifAnimal: Money
+    +notesAnimal: text
+  }
+
+  class ReservationServiceAdditionnel {
+    +prixService: Money
+  }
+
+  class Paiement {
+    +idPaiement: UUID
+    +statut: StatutPaiement
+    +montantTotal: Money
+    +commissionPlateforme: Money
+    +montantPrestataire: Money
+    +referenceStripe: string
+    +confirmer()
+    +rembourser()
+    +expirer()
+  }
+
+  class ContratRecapitulatif {
+    +idContrat: UUID
+    +dateGeneration: DateTime
+    +niveauAssurance: NiveauAssurance
+    +cheminFichier: string
+    +hashDocument: string
+    +genererDepuisReservation()
+  }
+
+  class Avis {
+    +idAvis: UUID
+    +noteGlobale: number
+    +commentaire: text
+    +notePonctualite: number
+    +noteCommunication: number
+    +noteSoins: number
+    +noteConfiance: number
+    +reponsePetSitter: text
+    +repondre()
+  }
+
+  class Signalement {
+    +idSignalement: UUID
+    +categorie: CategorieSignalement
+    +motif: text
+    +statutTicket: StatutTicket
+    +commentaireResolution: text
+    +ouvrir()
+    +prendreEnCharge()
+    +clore()
+  }
+}
+
+enum StatutCompte {
+  actif
+  suspendu
+  supprime
+}
+
+enum StatutVerificationPetSitter {
+  brouillon
+  publie_non_verifie
+  identite_verifiee
+  professionnel_verifie
+  suspendu
+  rejete
+}
+
+enum StatutReservation {
+  en_attente_reponse
+  acceptee
+  refusee
+  en_attente_paiement
+  payee
+  annulee
+  terminee
+  incident_signale
+}
+
+enum StatutPaiement {
+  pending
+  succeeded
+  failed
+  refunded
+  partially_refunded
+  expired
+}
+
+enum StatutDisponibilite {
+  disponible
+  indisponible
+  bloque_reservation
+}
+
+enum StatutDocument {
+  soumis
+  valide
+  rejete
+  expire
+}
+
+enum StatutTest {
+  a_passer
+  reussi
+  echoue
+  expire
+}
+
+enum StatutTicket {
+  ouvert
+  en_cours
+  traite
+  rejete
+  clos
+}
+
+enum NiveauAssurance {
+  standard
+  premium
+}
+
+CompteUtilisateur "1" o-- "0..1" ProfilProprietaire : active
+CompteUtilisateur "1" o-- "0..1" ProfilPetSitter : active
+
+ProfilProprietaire "1" o-- "0..*" Animal : possede
+Animal "1" --> "1" Espece : appartient a
+Animal "1" o-- "0..1" DossierMedical : dispose de
+DossierMedical "1" o-- "0..*" DocumentAnimal : contient
+
+ProfilPetSitter "0..*" -- "0..*" Espece : accepte
+ProfilPetSitter "0..*" -- "0..*" CapaciteSoin : maitrise
+ProfilPetSitter "0..*" -- "0..*" LieuGarde : propose
+ProfilPetSitter "0..*" -- "0..*" FormatGarde : propose
+ProfilPetSitter "0..*" -- "0..*" ServiceAdditionnel : propose
+ProfilPetSitter "1" o-- "0..*" Disponibilite : declare
+ProfilPetSitter "1" o-- "0..*" DocumentProfessionnel : depose
+ProfilPetSitter "1" o-- "0..*" TestValidation : passe
+TestValidation "0..*" --> "0..1" Espece : cible
+TestValidation "0..*" --> "0..1" CapaciteSoin : cible
+ProfilPetSitter "1" o-- "0..*" AttributionBadgePublic : obtient
+BadgePublic "1" <-- "0..*" AttributionBadgePublic : reference
+ProfilPetSitter "1" o-- "0..*" AbonnementPetSitter : souscrit
+
+ProfilProprietaire "1" --> "0..*" Reservation : effectue
+ProfilPetSitter "1" --> "0..*" Reservation : recoit
+Reservation "1" --> "1" LieuGarde : retient
+Reservation "1" --> "1" FormatGarde : retient
+Reservation "1" o-- "1..*" ReservationAnimal : concerne
+ReservationAnimal "*" --> "1" Animal : animal
+Reservation "1" o-- "0..*" ReservationServiceAdditionnel : inclut
+ReservationServiceAdditionnel "*" --> "1" ServiceAdditionnel : service
+Reservation "1" o-- "0..1" Paiement : genere
+Reservation "1" o-- "0..1" ContratRecapitulatif : genere
+Reservation "1" o-- "0..1" Avis : donne lieu
+Reservation "0..1" -- "0..1" Disponibilite : bloque
+
+CompteUtilisateur "1" --> "0..*" Signalement : cree
+Signalement "0..*" --> "0..1" Reservation : cible
+Signalement "0..*" --> "0..1" ProfilPetSitter : cible
+Signalement "0..*" --> "0..1" Avis : cible
+
+note right of TestValidation
+  Contrainte XOR :
+  un test cible soit une espece,
+  soit une capacite de soin,
+  jamais les deux.
+end note
+
+note bottom of Avis
+  Un avis depend uniquement de la reservation.
+  Le proprietaire et le pet-sitter sont deduits
+  de la reservation.
+end note
+
+note bottom of Paiement
+  Les statuts de paiement Stripe
+  ne remplacent jamais les statuts
+  metier de la reservation.
+end note
+
+@enduml

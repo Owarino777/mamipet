@@ -1,0 +1,410 @@
+@startuml
+title MamiPet - MLD logique relationnel
+
+hide circle
+hide methods
+left to right direction
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam roundcorner 6
+skinparam defaultTextAlignment left
+skinparam ArrowColor #666666
+skinparam EntityBorderColor #7A7A7A
+skinparam EntityBackgroundColor #FBFBFB
+skinparam note {
+  BackgroundColor #FDF6FF
+  BorderColor #A066CC
+}
+
+package "1. Comptes et profils" {
+  entity "compte_utilisateur" as compte_utilisateur {
+    * id_compte : UUID <<PK>>
+    --
+    * email : TEXTE <<UQ>>
+    * statut_compte : TEXTE
+    * est_administrateur : BOOLEEN
+    * date_creation : DATETIME
+  }
+
+  entity "profil_proprietaire" as profil_proprietaire {
+    * id_profil_proprietaire : UUID <<PK>>
+    --
+    * id_compte : UUID <<FK,UQ>>
+    pseudo : TEXTE
+    * prenom : TEXTE
+    telephone : TEXTE
+    adresse_ligne1 : TEXTE
+    adresse_ligne2 : TEXTE
+    code_postal : TEXTE
+    * ville : TEXTE
+    * pays : TEXTE
+    latitude : DECIMAL
+    longitude : DECIMAL
+    * date_creation : DATETIME
+  }
+
+  entity "profil_pet_sitter" as profil_pet_sitter {
+    * id_profil_pet_sitter : UUID <<PK>>
+    --
+    * id_compte : UUID <<FK,UQ>>
+    pseudo : TEXTE
+    * prenom : TEXTE
+    telephone : TEXTE
+    photo_url : TEXTE
+    description : TEXTE
+    adresse_ligne1 : TEXTE
+    adresse_ligne2 : TEXTE
+    code_postal : TEXTE
+    * ville : TEXTE
+    * pays : TEXTE
+    latitude : DECIMAL
+    longitude : DECIMAL
+    * tarif_base : DECIMAL
+    * rayon_km : ENTIER
+    * statut_verification : TEXTE
+    * visibilite_publique : BOOLEEN
+    * date_creation : DATETIME
+  }
+}
+
+package "2. Referentiels et animaux" {
+  entity "espece" as espece {
+    * id_espece : UUID <<PK>>
+    --
+    * code_espece : TEXTE <<UQ>>
+    * libelle_espece : TEXTE <<UQ>>
+  }
+
+  entity "capacite_soin" as capacite_soin {
+    * id_capacite_soin : UUID <<PK>>
+    --
+    * code_capacite_soin : TEXTE <<UQ>>
+    * libelle_capacite_soin : TEXTE <<UQ>>
+  }
+
+  entity "lieu_garde" as lieu_garde {
+    * id_lieu_garde : UUID <<PK>>
+    --
+    * code_lieu_garde : TEXTE <<UQ>>
+    * libelle_lieu_garde : TEXTE <<UQ>>
+  }
+
+  entity "format_garde" as format_garde {
+    * id_format_garde : UUID <<PK>>
+    --
+    * code_format_garde : TEXTE <<UQ>>
+    * libelle_format_garde : TEXTE <<UQ>>
+  }
+
+  entity "service_additionnel" as service_additionnel {
+    * id_service_additionnel : UUID <<PK>>
+    --
+    * code_service_additionnel : TEXTE <<UQ>>
+    * libelle_service_additionnel : TEXTE <<UQ>>
+  }
+
+  entity "animal" as animal {
+    * id_animal : UUID <<PK>>
+    --
+    * id_profil_proprietaire : UUID <<FK>>
+    * id_espece : UUID <<FK>>
+    * nom : TEXTE
+    * sexe : TEXTE
+    date_naissance : DATE
+    couleur : TEXTE
+    poids_kg : DECIMAL
+    temperament : TEXTE
+    besoins_specifiques : TEXTE
+    * date_creation : DATETIME
+    --
+    (UQ id_animal, id_profil_proprietaire)
+  }
+
+  entity "dossier_medical" as dossier_medical {
+    * id_dossier_medical : UUID <<PK>>
+    --
+    * id_animal : UUID <<FK,UQ>>
+    protocole_soin : TEXTE
+    frequence : TEXTE
+    consignes_confidentielles : TEXTE
+    * date_creation : DATETIME
+  }
+
+  entity "document_animal" as document_animal {
+    * id_document_animal : UUID <<PK>>
+    --
+    * id_dossier_medical : UUID <<FK>>
+    * type_document : TEXTE
+    nom_fichier : TEXTE
+    chemin_fichier : TEXTE
+    * date_depot : DATETIME
+  }
+}
+
+package "3. Qualification pet-sitter" {
+  entity "badge_public" as badge_public {
+    * id_badge_public : UUID <<PK>>
+    --
+    * code_badge_public : TEXTE <<UQ>>
+    * libelle_badge_public : TEXTE <<UQ>>
+  }
+
+  entity "profil_pet_sitter_espece" as profil_pet_sitter_espece {
+    * id_profil_pet_sitter : UUID <<PK,FK>>
+    * id_espece : UUID <<PK,FK>>
+  }
+
+  entity "profil_pet_sitter_capacite_soin" as profil_pet_sitter_capacite_soin {
+    * id_profil_pet_sitter : UUID <<PK,FK>>
+    * id_capacite_soin : UUID <<PK,FK>>
+  }
+
+  entity "profil_pet_sitter_lieu_garde" as profil_pet_sitter_lieu_garde {
+    * id_profil_pet_sitter : UUID <<PK,FK>>
+    * id_lieu_garde : UUID <<PK,FK>>
+  }
+
+  entity "profil_pet_sitter_format_garde" as profil_pet_sitter_format_garde {
+    * id_profil_pet_sitter : UUID <<PK,FK>>
+    * id_format_garde : UUID <<PK,FK>>
+  }
+
+  entity "profil_pet_sitter_service_additionnel" as profil_pet_sitter_service_additionnel {
+    * id_profil_pet_sitter : UUID <<PK,FK>>
+    * id_service_additionnel : UUID <<PK,FK>>
+  }
+
+  entity "disponibilite" as disponibilite {
+    * id_disponibilite : UUID <<PK>>
+    --
+    * id_profil_pet_sitter : UUID <<FK>>
+    id_reservation : UUID <<FK,UQ>>
+    * date_debut_disponibilite : DATETIME
+    * date_fin_disponibilite : DATETIME
+    * statut_disponibilite : TEXTE
+    commentaire : TEXTE
+  }
+
+  entity "document_professionnel" as document_professionnel {
+    * id_document_professionnel : UUID <<PK>>
+    --
+    * id_profil_pet_sitter : UUID <<FK>>
+    * type_document_professionnel : TEXTE
+    * statut_document : TEXTE
+    nom_fichier : TEXTE
+    chemin_fichier : TEXTE
+    * date_soumission : DATETIME
+    date_validation : DATETIME
+    commentaire_admin : TEXTE
+  }
+
+  entity "test_validation" as test_validation {
+    * id_test_validation : UUID <<PK>>
+    --
+    * id_profil_pet_sitter : UUID <<FK>>
+    id_espece : UUID <<FK>>
+    id_capacite_soin : UUID <<FK>>
+    * type_perimetre : TEXTE
+    * statut_test : TEXTE
+    score : DECIMAL
+    date_passage : DATETIME
+    date_validation : DATETIME
+    date_expiration : DATETIME
+    commentaire_admin : TEXTE
+  }
+
+  entity "profil_pet_sitter_badge_public" as profil_pet_sitter_badge_public {
+    * id_profil_pet_sitter_badge_public : UUID <<PK>>
+    --
+    * id_profil_pet_sitter : UUID <<FK>>
+    * id_badge_public : UUID <<FK>>
+    * origine_badge : TEXTE
+    * actif : BOOLEEN
+    * date_obtention : DATETIME
+    date_retrait : DATETIME
+  }
+
+  entity "abonnement_pet_sitter" as abonnement_pet_sitter {
+    * id_abonnement_pet_sitter : UUID <<PK>>
+    --
+    * id_profil_pet_sitter : UUID <<FK>>
+    * formule_abonnement : TEXTE
+    * statut_abonnement : TEXTE
+    * date_debut_abonnement : DATETIME
+    * date_fin_abonnement : DATETIME
+    * assurance_premium_incluse : BOOLEEN
+    montant_abonnement : DECIMAL
+    reference_paiement_externe : TEXTE
+  }
+}
+
+package "4. Reservation, paiement et confiance" {
+  entity "reservation" as reservation {
+    * id_reservation : UUID <<PK>>
+    --
+    * id_profil_proprietaire : UUID <<FK>>
+    * id_profil_pet_sitter : UUID <<FK>>
+    * id_lieu_garde : UUID <<FK>>
+    * id_format_garde : UUID <<FK>>
+    * date_demande : DATETIME
+    * date_debut_reservation : DATETIME
+    * date_fin_reservation : DATETIME
+    * statut_reservation : TEXTE
+    * niveau_assurance_applique : TEXTE
+    * tarif_convenu : DECIMAL
+    * taux_commission_plateforme : DECIMAL
+    consignes_reservation : TEXTE
+    motif_refus : TEXTE
+    motif_annulation : TEXTE
+    date_reponse : DATETIME
+    --
+    (UQ id_reservation, id_profil_proprietaire)
+  }
+
+  entity "reservation_animal" as reservation_animal {
+    * id_reservation : UUID <<PK,FK>>
+    * id_animal : UUID <<PK,FK>>
+    --
+    * id_profil_proprietaire : UUID <<FK>>
+    * tarif_animal : DECIMAL
+    notes_animal_reservation : TEXTE
+  }
+
+  entity "reservation_service_additionnel" as reservation_service_additionnel {
+    * id_reservation : UUID <<PK,FK>>
+    * id_service_additionnel : UUID <<PK,FK>>
+    --
+    * prix_service : DECIMAL
+  }
+
+  entity "paiement" as paiement {
+    * id_paiement : UUID <<PK>>
+    --
+    * id_reservation : UUID <<FK,UQ>>
+    * statut_paiement : TEXTE
+    * montant_total : DECIMAL
+    * commission_plateforme : DECIMAL
+    montant_prestataire : DECIMAL
+    reference_paiement_externe : TEXTE <<UQ>>
+    groupe_transfert_externe : TEXTE
+    date_paiement : DATETIME
+    date_expiration : DATETIME
+    date_remboursement : DATETIME
+  }
+
+  entity "contrat_recapitulatif" as contrat_recapitulatif {
+    * id_contrat_recapitulatif : UUID <<PK>>
+    --
+    * id_reservation : UUID <<FK,UQ>>
+    * date_generation : DATETIME
+    * niveau_assurance : TEXTE
+    * clauses_standard : TEXTE
+    chemin_fichier : TEXTE
+    empreinte_document : TEXTE <<UQ>>
+  }
+
+  entity "avis" as avis {
+    * id_avis : UUID <<PK>>
+    --
+    * id_reservation : UUID <<FK,UQ>>
+    * note_globale : ENTIER
+    commentaire : TEXTE
+    note_ponctualite : ENTIER
+    note_communication : ENTIER
+    note_soins : ENTIER
+    note_confiance : ENTIER
+    * date_avis : DATETIME
+    reponse_pet_sitter : TEXTE
+    date_reponse_pet_sitter : DATETIME
+  }
+
+  entity "signalement" as signalement {
+    * id_signalement : UUID <<PK>>
+    --
+    * id_compte_createur : UUID <<FK>>
+    id_reservation : UUID <<FK>>
+    id_profil_pet_sitter : UUID <<FK>>
+    id_avis : UUID <<FK>>
+    * categorie_signalement : TEXTE
+    * motif : TEXTE
+    * statut_ticket : TEXTE
+    commentaire_resolution : TEXTE
+    * date_signalement : DATETIME
+    date_resolution : DATETIME
+  }
+}
+
+compte_utilisateur ||--o| profil_proprietaire : "active"
+compte_utilisateur ||--o| profil_pet_sitter : "active"
+
+profil_proprietaire ||--o{ animal : "possede"
+espece ||--o{ animal : "classe"
+animal ||--o| dossier_medical : "possede"
+dossier_medical ||--o{ document_animal : "contient"
+
+profil_pet_sitter ||--o{ profil_pet_sitter_espece : "accepte"
+espece ||--o{ profil_pet_sitter_espece : "reference"
+profil_pet_sitter ||--o{ profil_pet_sitter_capacite_soin : "maitrise"
+capacite_soin ||--o{ profil_pet_sitter_capacite_soin : "reference"
+profil_pet_sitter ||--o{ profil_pet_sitter_lieu_garde : "propose"
+lieu_garde ||--o{ profil_pet_sitter_lieu_garde : "reference"
+profil_pet_sitter ||--o{ profil_pet_sitter_format_garde : "propose"
+format_garde ||--o{ profil_pet_sitter_format_garde : "reference"
+profil_pet_sitter ||--o{ profil_pet_sitter_service_additionnel : "propose"
+service_additionnel ||--o{ profil_pet_sitter_service_additionnel : "reference"
+
+profil_pet_sitter ||--o{ disponibilite : "declare"
+reservation o|--o| disponibilite : "bloque"
+profil_pet_sitter ||--o{ document_professionnel : "depose"
+profil_pet_sitter ||--o{ test_validation : "passe"
+espece ||--o{ test_validation : "cible"
+capacite_soin ||--o{ test_validation : "cible"
+profil_pet_sitter ||--o{ profil_pet_sitter_badge_public : "obtient"
+badge_public ||--o{ profil_pet_sitter_badge_public : "reference"
+profil_pet_sitter ||--o{ abonnement_pet_sitter : "souscrit"
+
+profil_proprietaire ||--o{ reservation : "effectue"
+profil_pet_sitter ||--o{ reservation : "recoit"
+lieu_garde ||--o{ reservation : "retient"
+format_garde ||--o{ reservation : "retient"
+
+reservation ||--|{ reservation_animal : "concerne"
+animal ||--o{ reservation_animal : "est_concerne"
+reservation ||--o{ reservation_service_additionnel : "inclut"
+service_additionnel ||--o{ reservation_service_additionnel : "est_inclus"
+
+reservation ||--o| paiement : "genere"
+reservation ||--o| contrat_recapitulatif : "genere"
+reservation ||--o| avis : "donne_lieu"
+
+compte_utilisateur ||--o{ signalement : "cree"
+reservation ||--o{ signalement : "peut_concerner"
+profil_pet_sitter ||--o{ signalement : "peut_concerner"
+avis ||--o{ signalement : "peut_concerner"
+
+note top of compte_utilisateur
+Le mot de passe n'apparait pas dans le MLD :
+il est gere par le service d'authentification.
+end note
+
+note right of test_validation
+Contrainte XOR logique :
+type_perimetre = espece => id_espece renseigne
+type_perimetre = capacite_soin => id_capacite_soin renseigne
+end note
+
+note right of reservation_animal
+Integrite composite :
+la reservation et les animaux doivent
+appartenir au meme profil proprietaire.
+end note
+
+note bottom of signalement
+Au plus une cible directe :
+reservation, profil pet-sitter ou avis.
+Un signalement general peut rester sans cible.
+end note
+
+@enduml

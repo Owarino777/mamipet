@@ -1,0 +1,232 @@
+@startuml
+title MamiPet - MCD conceptuel Merise
+left to right direction
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam defaultTextAlignment center
+skinparam rectangle {
+  RoundCorner 6
+}
+skinparam usecase {
+  BackgroundColor #FFF7E6
+  BorderColor #D98C00
+}
+skinparam note {
+  BackgroundColor #FDF6FF
+  BorderColor #A066CC
+}
+
+package "1. Identite et profils" {
+  rectangle "COMPTE_UTILISATEUR\n--\n_id_compte_\nemail\nstatut_compte\nest_administrateur\ndate_creation" as CU #F8FBFF
+
+  rectangle "PROFIL_PROPRIETAIRE\n--\n_id_profil_proprietaire_\npseudo\nprenom\ntelephone\nville\npays\nlocalisation\ndate_creation" as PP #F8FBFF
+
+  rectangle "PROFIL_PET_SITTER\n--\n_id_profil_pet_sitter_\npseudo\nprenom\ntelephone\nphoto\ndescription\nville\npays\nlocalisation\ntarif_base\nrayon_intervention\nstatut_verification\nvisibilite_publique\ndate_creation" as PS #F8FBFF
+}
+
+package "2. Referentiels et animaux" {
+  rectangle "ESPECE\n--\n_id_espece_\ncode_espece\nlibelle_espece" as ES #F4FFF7
+
+  rectangle "CAPACITE_SOIN\n--\n_id_capacite_soin_\ncode_capacite_soin\nlibelle_capacite_soin" as CS #F4FFF7
+
+  rectangle "LIEU_GARDE\n--\n_id_lieu_garde_\ncode_lieu_garde\nlibelle_lieu_garde" as LG #F4FFF7
+
+  rectangle "FORMAT_GARDE\n--\n_id_format_garde_\ncode_format_garde\nlibelle_format_garde" as FG #F4FFF7
+
+  rectangle "SERVICE_ADDITIONNEL\n--\n_id_service_additionnel_\ncode_service_additionnel\nlibelle_service_additionnel" as SA #F4FFF7
+
+  rectangle "ANIMAL\n--\n_id_animal_\nnom\nsexe\ndate_naissance\ncouleur\npoids\ntemperament\nbesoins_specifiques\ndate_creation" as AN #F4FFF7
+
+  rectangle "DOSSIER_MEDICAL\n--\n_id_dossier_medical_\nprotocole_soin\nfrequence\nconsignes_confidentielles\ndate_creation" as DM #F4FFF7
+
+  rectangle "DOCUMENT_ANIMAL\n--\n_id_document_animal_\ntype_document\ndate_depot" as DA #F4FFF7
+}
+
+package "3. Qualification pet-sitter" {
+  rectangle "DISPONIBILITE\n--\n_id_disponibilite_\ndate_debut\ndate_fin\nstatut_disponibilite\ncommentaire" as DI #FFFDF2
+
+  rectangle "DOCUMENT_PROFESSIONNEL\n--\n_id_document_professionnel_\ntype_document\nstatut_document\ndate_soumission\ndate_validation\ncommentaire_admin" as DP #FFFDF2
+
+  rectangle "TEST_VALIDATION\n--\n_id_test_validation_\nstatut_test\nscore\ndate_passage\ndate_validation\ndate_expiration\ncommentaire_admin" as TV #FFFDF2
+
+  rectangle "BADGE_PUBLIC\n--\n_id_badge_public_\ncode_badge\nlibelle_badge" as BP #FFFDF2
+
+  rectangle "ABONNEMENT_PET_SITTER\n--\n_id_abonnement_pet_sitter_\nformule_abonnement\nstatut_abonnement\ndate_debut\ndate_fin\nmontant_abonnement\nassurance_premium_incluse" as AB #FFFDF2
+}
+
+package "4. Reservation, paiement et confiance" {
+  rectangle "RESERVATION\n--\n_id_reservation_\ndate_demande\ndate_debut\ndate_fin\nstatut_reservation\nniveau_assurance\ntarif_convenu\ntaux_commission\nconsignes\nmotif_refus\nmotif_annulation\ndate_reponse" as RE #FFF8F3
+
+  rectangle "PAIEMENT\n--\n_id_paiement_\nstatut_paiement\nmontant_total\ncommission_plateforme\nmontant_prestataire\ndate_paiement\ndate_expiration\ndate_remboursement" as PA #FFF8F3
+
+  rectangle "CONTRAT_RECAPITULATIF\n--\n_id_contrat_recapitulatif_\ndate_generation\nniveau_assurance\nclauses_standard" as CR #FFF8F3
+
+  rectangle "AVIS\n--\n_id_avis_\nnote_globale\ncommentaire\nnote_ponctualite\nnote_communication\nnote_soins\nnote_confiance\nreponse_pet_sitter\ndate_avis" as AV #FFF8F3
+
+  rectangle "SIGNALEMENT\n--\n_id_signalement_\ncategorie_signalement\nmotif\nstatut_ticket\ncommentaire_resolution\ndate_signalement\ndate_resolution" as SI #FFF8F3
+}
+
+usecase "Activer" as ACT_PP
+usecase "Activer" as ACT_PS
+usecase "Posseder" as POS_AN
+usecase "Appartenir" as APP_ES
+usecase "Disposer" as DIS_DM
+usecase "Joindre" as JOI_DA
+
+usecase "Accepter" as ACC_ES
+usecase "Maitriser" as MAI_CS
+usecase "Proposer" as PRO_LG
+usecase "Proposer" as PRO_FG
+usecase "Proposer" as PRO_SA
+usecase "Declarer" as DEC_DI
+usecase "Bloquer" as BLO_DI
+usecase "Deposer" as DEP_DP
+usecase "Passer" as PAS_TV
+usecase "Cibler espece" as CIB_ES
+usecase "Cibler capacite" as CIB_CS
+usecase "Obtenir\norigine_badge\nactif\ndate_obtention\ndate_retrait" as OBT_BP
+usecase "Souscrire" as SOU_AB
+
+usecase "Effectuer" as EFF_RE
+usecase "Recevoir" as REC_RE
+usecase "Retenir" as RET_LG
+usecase "Retenir" as RET_FG
+usecase "Concerner\ntarif_animal\nnotes_animal" as CON_AN
+usecase "Inclure\nprix_service" as INC_SA
+usecase "Generer" as GEN_PA
+usecase "Generer" as GEN_CR
+usecase "Donner lieu" as DON_AV
+usecase "Creer" as CRE_SI
+usecase "Concerner reservation" as CON_RE
+usecase "Concerner profil" as CON_PS
+usecase "Concerner avis" as CON_AV
+
+CU -- ACT_PP : 0,1
+ACT_PP -- PP : 1,1
+
+CU -- ACT_PS : 0,1
+ACT_PS -- PS : 1,1
+
+PP -- POS_AN : 0,n
+POS_AN -- AN : 1,1
+
+AN -- APP_ES : 1,1
+APP_ES -- ES : 0,n
+
+AN -- DIS_DM : 0,1
+DIS_DM -- DM : 1,1
+
+DM -- JOI_DA : 0,n
+JOI_DA -- DA : 1,1
+
+PS -- ACC_ES : 0,n
+ACC_ES -- ES : 0,n
+
+PS -- MAI_CS : 0,n
+MAI_CS -- CS : 0,n
+
+PS -- PRO_LG : 0,n
+PRO_LG -- LG : 0,n
+
+PS -- PRO_FG : 0,n
+PRO_FG -- FG : 0,n
+
+PS -- PRO_SA : 0,n
+PRO_SA -- SA : 0,n
+
+PS -- DEC_DI : 0,n
+DEC_DI -- DI : 1,1
+
+RE -- BLO_DI : 0,1
+BLO_DI -- DI : 0,1
+
+PS -- DEP_DP : 0,n
+DEP_DP -- DP : 1,1
+
+PS -- PAS_TV : 0,n
+PAS_TV -- TV : 1,1
+
+TV -- CIB_ES : 0,1
+CIB_ES -- ES : 0,n
+
+TV -- CIB_CS : 0,1
+CIB_CS -- CS : 0,n
+
+PS -- OBT_BP : 0,n
+OBT_BP -- BP : 0,n
+
+PS -- SOU_AB : 0,n
+SOU_AB -- AB : 1,1
+
+PP -- EFF_RE : 0,n
+EFF_RE -- RE : 1,1
+
+PS -- REC_RE : 0,n
+REC_RE -- RE : 1,1
+
+RE -- RET_LG : 1,1
+RET_LG -- LG : 0,n
+
+RE -- RET_FG : 1,1
+RET_FG -- FG : 0,n
+
+RE -- CON_AN : 1,n
+CON_AN -- AN : 0,n
+
+RE -- INC_SA : 0,n
+INC_SA -- SA : 0,n
+
+RE -- GEN_PA : 0,1
+GEN_PA -- PA : 1,1
+
+RE -- GEN_CR : 0,1
+GEN_CR -- CR : 1,1
+
+RE -- DON_AV : 0,1
+DON_AV -- AV : 1,1
+
+CU -- CRE_SI : 0,n
+CRE_SI -- SI : 1,1
+
+SI -- CON_RE : 0,1
+CON_RE -- RE : 0,n
+
+SI -- CON_PS : 0,1
+CON_PS -- PS : 0,n
+
+SI -- CON_AV : 0,1
+CON_AV -- AV : 0,n
+
+note top of CU
+Authentification geree par Supabase Auth.
+Le MCD ne stocke pas de mot de passe.
+end note
+
+note top of TV
+Contrainte conceptuelle :
+un TEST_VALIDATION cible soit une ESPECE,
+soit une CAPACITE_SOIN, jamais les deux.
+end note
+
+note right of DI
+Une disponibilite est un creneau declare.
+Une reservation acceptee peut bloquer
+un creneau dedie.
+end note
+
+note bottom of AV
+Un avis depend d'une reservation terminee.
+Le proprietaire et le pet-sitter sont deduits
+de la reservation, sans liaison redondante.
+end note
+
+note bottom of SI
+Un signalement peut viser une reservation,
+un profil pet-sitter ou un avis.
+Les demandes publiques, messages et notifications
+sont prevus hors MVP critique.
+end note
+
+@enduml

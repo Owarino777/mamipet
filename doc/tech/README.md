@@ -19,6 +19,7 @@ Les decisions retenues sont les suivantes :
 - `ARCHITECTURE_DECISION.md` : decisions d'architecture.
 - `PROJECT_STRUCTURE.md` : structure cible du projet.
 - `API_CONTRACTS.md` : endpoints REST attendus.
+- `openapi.yaml` : contrat API REST machine-readable.
 - `DTO_CONTRACTS.md` : formats de donnees front-ready.
 - `ACCESS_CONTROL_MATRIX.md` : droits par role.
 - `DOMAIN_RULES.md` : regles metier numerotees.
@@ -29,4 +30,3 @@ Les decisions retenues sont les suivantes :
 ## Regle de maintenance documentaire
 
 Apres chaque modification importante du backend, verifier si l'un de ces documents doit etre mis a jour. Si rien n'est a documenter, l'indiquer explicitement dans le compte rendu.
-

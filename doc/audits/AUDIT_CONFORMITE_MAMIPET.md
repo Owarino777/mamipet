@@ -1,23 +1,35 @@
 # Audit de conformite MamiPet
 
-Date de l'audit : 2026-04-23
+Date : 2026-04-23
+Version : 2.0 - Audit complet base sur le dossier de synthese final (partie dev sections 6 a 8)
 
 Perimetre audite :
 
-- dossier produit historique hors partie developpement ;
-- partie developpement cible ;
-- documentation actuelle du repository ;
-- schemas Merise ;
-- UML ;
-- documentation technique pre-backend.
+- dossier de synthese final sections 6 (MVP prototype), 7 (etude technique et cadrage) et 8 (projection startup) ;
+- dossier produit hors partie developpement pour coherence produit ;
+- documentation actuelle du repository.
 
-Documents audites :
+Documents de reference :
+
+- Dossier de synthese Groupe 6 (version finale avec section 7 technique)
+
+Documents audites dans le repository :
 
 - `doc/PASSATION_PROJET_MAMIPET.md`
 - `doc/README.md`
 - `doc/merise/*`
 - `doc/UML/*`
-- `doc/tech/*`
+- `doc/tech/README.md`
+- `doc/tech/ARCHITECTURE_DECISION.md`
+- `doc/tech/PROJECT_STRUCTURE.md`
+- `doc/tech/ENGINEERING_PRINCIPLES.md`
+- `doc/tech/DOMAIN_RULES.md`
+- `doc/tech/ACCESS_CONTROL_MATRIX.md`
+- `doc/tech/API_CONTRACTS.md`
+- `doc/tech/DTO_CONTRACTS.md`
+- `doc/tech/ENVIRONMENT_AND_SECRETS.md`
+- `doc/tech/TEST_STRATEGY.md`
+- `doc/tech/BACKEND_IMPLEMENTATION_PLAN.md`
 
 ## 1. Synthese executive
 
@@ -41,9 +53,9 @@ La documentation actuelle couvre correctement :
 - le plan de tests ;
 - le plan d'implementation backend.
 
-Score de conformite documentaire estime : **91 / 100**.
+Score de conformite documentaire estime : **96 / 100**.
 
-Statut global : **conforme pour lancer l'implementation backend, sous reserve de corriger les points mineurs listes en section 8**.
+Statut global : **conforme pour lancer l'implementation backend**.
 
 ## 2. Grille de lecture
 
@@ -106,8 +118,8 @@ Conclusion : la coherence produit est respectee. Les fonctionnalites fortes du d
 | Notifications avancees preparees | Partiel | Mentionnees comme extension, FCM env futur non detaille |
 | IA Act non contrainte directe | Partiel | Mention dans passation, pas encore dans doc tech dediee |
 | Pipeline typecheck/lint/tests/build | Conforme conceptuellement | Plan documente, pas implemente car code non initialise |
-| AGENT.md | Non couvert | Attendu futur, fichier non cree |
-| README racine projet | Non couvert | Attendu futur, seul `doc/README.md` existe |
+| AGENT.md | Conforme | Fichier racine cree |
+| README racine projet | Conforme | Fichier racine cree |
 
 Conclusion : la partie developpement est bien couverte pour lancer l'implementation. Les manques restants concernent surtout les livrables de repository apres initialisation du projet.
 
@@ -194,37 +206,32 @@ Conclusion : le cadrage technique est aligne avec les bonnes pratiques demandees
 
 ## 8. Ecarts et actions correctives
 
-### Ecart 1 - AGENT.md non cree
+### Ecart 1 - AGENT.md cree et corrige
 
-Statut : non bloquant avant initialisation code, mais attendu dans la partie dev.
+Statut : corrige.
 
-Action recommandee :
+Correction appliquee :
 
-- creer `AGENT.md` a la racine lors de l'initialisation projet ;
-- y rappeler les regles de contribution, doc, tests, architecture, securite et IA.
+- `AGENT.md` cree a la racine ;
+- regles de contribution, architecture, documentation, securite, tests et bonnes pratiques ajoutees.
 
-Priorite : haute avant debut implementation.
+### Ecart 2 - README racine cree et corrige
 
-### Ecart 2 - README racine absent
+Statut : corrige.
 
-Statut : non bloquant tant que le repo ne contient que la doc.
+Correction appliquee :
 
-Action recommandee :
+- `README.md` racine cree ;
+- vision projet, stack, architecture, documentation et regles fortes documentees.
 
-- creer un `README.md` racine avec installation, scripts, architecture, liens doc.
+### Ecart 3 - OpenAPI machine-readable cree et corrige
 
-Priorite : haute au moment d'initialiser Next.js.
+Statut : corrige en premiere version.
 
-### Ecart 3 - OpenAPI machine-readable absent
+Correction appliquee :
 
-Statut : partiel. `API_CONTRACTS.md` est clair, mais un `openapi.yaml` serait mieux pour industrialiser.
-
-Action recommandee :
-
-- generer `doc/tech/openapi.yaml` apres stabilisation des endpoints ;
-- ou le produire avant code si besoin de contrat strict.
-
-Priorite : moyenne.
+- `doc/tech/openapi.yaml` cree ;
+- le contrat devra rester synchronise avec `API_CONTRACTS.md` pendant l'implementation.
 
 ### Ecart 4 - Demandes publiques non modelisees physiquement
 
@@ -287,7 +294,7 @@ Priorite : basse a moyenne selon rendu ecole.
 | Donnees medicales exposees | Eleve | RLS + DTO publics + tests securite |
 | Confusion prototype Adalo / produit reel | Faible | Clarifie partout |
 | Sur-engineering DDD | Moyen | KISS/YAGNI documentes |
-| Sous-documentation API future | Moyen | Transformer API_CONTRACTS en OpenAPI si besoin |
+| Derive entre API_CONTRACTS et openapi.yaml | Moyen | Maintenir les deux documents ensemble ou choisir OpenAPI comme source executable |
 | Front non encore connu | Moyen | DTO front-ready et API REST stabilises |
 
 ## 10. Verdict final
@@ -308,12 +315,11 @@ Les livrables documentaires sont suffisamment complets pour coder un backend :
 
 Avant de coder, il reste idealement a produire au moment de l'initialisation technique :
 
-1. `README.md` racine ;
-2. `AGENT.md` racine ;
-3. `.env.example` ;
-4. migrations Supabase ;
-5. seeds ;
-6. eventuellement `openapi.yaml`.
+1. `.env.example` ;
+2. migrations Supabase ;
+3. seeds ;
+4. configuration Next.js ;
+5. scripts qualite : typecheck, lint, test, build ;
+6. pipeline CI minimal.
 
-Decision d'audit : **GO backend apres creation du socle projet**.
-
+Decision d'audit : **GO backend**.

@@ -1,0 +1,1550 @@
+openapi: 3.1.0
+info:
+  title: MamiPet MVP API
+  version: 0.1.0
+  description: >
+    Contrat REST du MVP MamiPet. L'API est implementee via Next.js Route
+    Handlers. Supabase Auth gere l'authentification. Les donnees sensibles ne
+    doivent jamais etre exposees dans les DTO publics.
+servers:
+  - url: http://localhost:3000/api
+    description: Local development
+  - url: https://preview.mamipet.example/api
+    description: Preview target
+tags:
+  - name: Me
+  - name: Profiles
+  - name: ReferenceData
+  - name: Animals
+  - name: PetSitter
+  - name: Search
+  - name: Reservations
+  - name: Payments
+  - name: Contracts
+  - name: Reviews
+  - name: Reports
+  - name: Admin
+security:
+  - bearerAuth: []
+paths:
+  /me:
+    get:
+      tags: [Me]
+      summary: Get current account and active roles
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentUserResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /profiles/owner:
+    post:
+      tags: [Profiles]
+      summary: Activate or create owner profile
+      responses:
+        "201":
+          description: Owner profile created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerProfileResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /profiles/owner/me:
+    get:
+      tags: [Profiles]
+      summary: Get my owner profile
+      responses:
+        "200":
+          description: Owner profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerProfileResponse"
+    patch:
+      tags: [Profiles]
+      summary: Update my owner profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateOwnerProfileRequest"
+      responses:
+        "200":
+          description: Updated owner profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerProfileResponse"
+
+  /profiles/pet-sitter:
+    post:
+      tags: [Profiles]
+      summary: Activate or create pet-sitter profile
+      responses:
+        "201":
+          description: Pet-sitter profile created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PetSitterPrivateProfileResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /profiles/pet-sitter/me:
+    get:
+      tags: [Profiles]
+      summary: Get my pet-sitter profile
+      responses:
+        "200":
+          description: Pet-sitter profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PetSitterPrivateProfileResponse"
+    patch:
+      tags: [Profiles]
+      summary: Update my pet-sitter profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePetSitterProfileRequest"
+      responses:
+        "200":
+          description: Updated pet-sitter profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PetSitterPrivateProfileResponse"
+
+  /reference-data/species:
+    get:
+      tags: [ReferenceData]
+      security: []
+      summary: List species
+      responses:
+        "200":
+          $ref: "#/components/responses/ReferenceList"
+  /reference-data/care-capabilities:
+    get:
+      tags: [ReferenceData]
+      security: []
+      summary: List care capabilities
+      responses:
+        "200":
+          $ref: "#/components/responses/ReferenceList"
+  /reference-data/care-locations:
+    get:
+      tags: [ReferenceData]
+      security: []
+      summary: List care locations
+      responses:
+        "200":
+          $ref: "#/components/responses/ReferenceList"
+  /reference-data/care-formats:
+    get:
+      tags: [ReferenceData]
+      security: []
+      summary: List care formats
+      responses:
+        "200":
+          $ref: "#/components/responses/ReferenceList"
+  /reference-data/additional-services:
+    get:
+      tags: [ReferenceData]
+      security: []
+      summary: List additional services
+      responses:
+        "200":
+          $ref: "#/components/responses/ReferenceList"
+  /reference-data/public-badges:
+    get:
+      tags: [ReferenceData]
+      security: []
+      summary: List public badges
+      responses:
+        "200":
+          $ref: "#/components/responses/ReferenceList"
+
+  /animals:
+    get:
+      tags: [Animals]
+      summary: List my animals
+      responses:
+        "200":
+          description: Animal list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnimalListResponse"
+    post:
+      tags: [Animals]
+      summary: Create animal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAnimalRequest"
+      responses:
+        "201":
+          description: Created animal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnimalResponse"
+
+  /animals/{animalId}:
+    parameters:
+      - $ref: "#/components/parameters/AnimalId"
+    get:
+      tags: [Animals]
+      summary: Get one of my animals
+      responses:
+        "200":
+          description: Animal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnimalResponse"
+    patch:
+      tags: [Animals]
+      summary: Update one of my animals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAnimalRequest"
+      responses:
+        "200":
+          description: Updated animal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnimalResponse"
+    delete:
+      tags: [Animals]
+      summary: Delete or deactivate one of my animals
+      responses:
+        "204":
+          description: Deleted
+
+  /animals/{animalId}/medical-record:
+    parameters:
+      - $ref: "#/components/parameters/AnimalId"
+    put:
+      tags: [Animals]
+      summary: Upsert medical record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertMedicalRecordRequest"
+      responses:
+        "200":
+          description: Medical record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MedicalRecordResponse"
+
+  /animals/{animalId}/documents:
+    parameters:
+      - $ref: "#/components/parameters/AnimalId"
+    post:
+      tags: [Animals]
+      summary: Upload animal document
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [type, file]
+              properties:
+                type:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Uploaded animal document
+
+  /pet-sitter/offer/species:
+    put:
+      tags: [PetSitter]
+      summary: Replace accepted species
+      requestBody:
+        $ref: "#/components/requestBodies/IdsBody"
+      responses:
+        "204":
+          description: Updated
+  /pet-sitter/offer/care-capabilities:
+    put:
+      tags: [PetSitter]
+      summary: Replace care capabilities
+      requestBody:
+        $ref: "#/components/requestBodies/IdsBody"
+      responses:
+        "204":
+          description: Updated
+  /pet-sitter/offer/care-locations:
+    put:
+      tags: [PetSitter]
+      summary: Replace care locations
+      requestBody:
+        $ref: "#/components/requestBodies/IdsBody"
+      responses:
+        "204":
+          description: Updated
+  /pet-sitter/offer/care-formats:
+    put:
+      tags: [PetSitter]
+      summary: Replace care formats
+      requestBody:
+        $ref: "#/components/requestBodies/IdsBody"
+      responses:
+        "204":
+          description: Updated
+  /pet-sitter/offer/additional-services:
+    put:
+      tags: [PetSitter]
+      summary: Replace additional services
+      requestBody:
+        $ref: "#/components/requestBodies/IdsBody"
+      responses:
+        "204":
+          description: Updated
+
+  /pet-sitter/availabilities:
+    get:
+      tags: [PetSitter]
+      summary: List my availabilities
+      responses:
+        "200":
+          description: Availability list
+    post:
+      tags: [PetSitter]
+      summary: Create availability
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAvailabilityRequest"
+      responses:
+        "201":
+          description: Created availability
+
+  /pet-sitter/documents:
+    get:
+      tags: [PetSitter]
+      summary: List my professional documents
+      responses:
+        "200":
+          description: Document list
+    post:
+      tags: [PetSitter]
+      summary: Upload professional document
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [type, file]
+              properties:
+                type:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Uploaded professional document
+
+  /pet-sitters:
+    get:
+      tags: [Search]
+      security: []
+      summary: Search public pet-sitter profiles
+      parameters:
+        - name: species
+          in: query
+          schema:
+            type: string
+        - name: careCapabilities
+          in: query
+          schema:
+            type: string
+        - name: careLocation
+          in: query
+          schema:
+            type: string
+        - name: careFormat
+          in: query
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: radiusKm
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Public pet-sitter cards
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicPetSitterCardListResponse"
+
+  /pet-sitters/{petSitterProfileId}:
+    parameters:
+      - $ref: "#/components/parameters/PetSitterProfileId"
+    get:
+      tags: [Search]
+      security: []
+      summary: Get public pet-sitter profile
+      responses:
+        "200":
+          description: Public pet-sitter profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicPetSitterProfileResponse"
+
+  /reservations:
+    post:
+      tags: [Reservations]
+      summary: Create reservation request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReservationRequest"
+      responses:
+        "201":
+          description: Created reservation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationResponse"
+  /reservations/sent:
+    get:
+      tags: [Reservations]
+      summary: List reservations sent by owner
+      responses:
+        "200":
+          description: Sent reservations
+  /reservations/received:
+    get:
+      tags: [Reservations]
+      summary: List reservations received by pet-sitter
+      responses:
+        "200":
+          description: Received reservations
+  /reservations/{reservationId}:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    get:
+      tags: [Reservations]
+      summary: Get authorized reservation
+      responses:
+        "200":
+          description: Reservation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationResponse"
+  /reservations/{reservationId}/accept:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    post:
+      tags: [Reservations]
+      summary: Accept reservation
+      responses:
+        "200":
+          description: Accepted reservation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationResponse"
+  /reservations/{reservationId}/refuse:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    post:
+      tags: [Reservations]
+      summary: Refuse reservation
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Refused reservation
+  /reservations/{reservationId}/cancel:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    post:
+      tags: [Reservations]
+      summary: Cancel reservation
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Cancelled reservation
+  /reservations/{reservationId}/complete:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    post:
+      tags: [Reservations]
+      summary: Complete reservation
+      responses:
+        "200":
+          description: Completed reservation
+  /reservations/{reservationId}/incident:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    post:
+      tags: [Reservations]
+      summary: Report reservation incident
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Incident reported
+
+  /reservations/{reservationId}/payment-intent:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    post:
+      tags: [Payments]
+      summary: Create simulated Stripe payment intent
+      responses:
+        "201":
+          description: Payment intent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentIntentResponse"
+  /reservations/{reservationId}/payment-confirmation:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    post:
+      tags: [Payments]
+      summary: Confirm test payment
+      responses:
+        "200":
+          description: Payment confirmed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentResponse"
+  /reservations/{reservationId}/payment:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    get:
+      tags: [Payments]
+      summary: Get authorized payment
+      responses:
+        "200":
+          description: Payment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentResponse"
+  /reservations/{reservationId}/contract:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    post:
+      tags: [Contracts]
+      summary: Generate contract
+      responses:
+        "201":
+          description: Generated contract
+    get:
+      tags: [Contracts]
+      summary: Get authorized contract
+      responses:
+        "200":
+          description: Contract
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContractResponse"
+  /reservations/{reservationId}/review:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    post:
+      tags: [Reviews]
+      summary: Create review after completed reservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewRequest"
+      responses:
+        "201":
+          description: Created review
+
+  /reviews/{reviewId}/reply:
+    parameters:
+      - $ref: "#/components/parameters/ReviewId"
+    patch:
+      tags: [Reviews]
+      summary: Reply to review as concerned pet-sitter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reply]
+              properties:
+                reply:
+                  type: string
+      responses:
+        "200":
+          description: Review reply saved
+
+  /reports:
+    post:
+      tags: [Reports]
+      summary: Create report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReportRequest"
+      responses:
+        "201":
+          description: Created report
+  /reports/me:
+    get:
+      tags: [Reports]
+      summary: List my reports
+      responses:
+        "200":
+          description: My reports
+
+  /admin/pet-sitter-profiles:
+    get:
+      tags: [Admin]
+      summary: Admin list pet-sitter profiles
+      responses:
+        "200":
+          description: Pet-sitter profiles
+  /admin/pet-sitter-profiles/{petSitterProfileId}/verification-status:
+    parameters:
+      - $ref: "#/components/parameters/PetSitterProfileId"
+    patch:
+      tags: [Admin]
+      summary: Admin update pet-sitter verification status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  $ref: "#/components/schemas/PetSitterVerificationStatus"
+      responses:
+        "200":
+          description: Verification status updated
+  /admin/professional-documents:
+    get:
+      tags: [Admin]
+      summary: Admin list professional documents
+      responses:
+        "200":
+          description: Professional documents
+  /admin/professional-documents/{documentId}/validate:
+    parameters:
+      - $ref: "#/components/parameters/DocumentId"
+    post:
+      tags: [Admin]
+      summary: Admin validate professional document
+      responses:
+        "200":
+          description: Document validated
+  /admin/professional-documents/{documentId}/reject:
+    parameters:
+      - $ref: "#/components/parameters/DocumentId"
+    post:
+      tags: [Admin]
+      summary: Admin reject professional document
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+      responses:
+        "200":
+          description: Document rejected
+  /admin/pet-sitter-profiles/{petSitterProfileId}/badges:
+    parameters:
+      - $ref: "#/components/parameters/PetSitterProfileId"
+    post:
+      tags: [Admin]
+      summary: Admin assign public badge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [badgeId, origin]
+              properties:
+                badgeId:
+                  type: string
+                  format: uuid
+                origin:
+                  type: string
+      responses:
+        "201":
+          description: Badge assigned
+  /admin/pet-sitter-profiles/{petSitterProfileId}/badges/{badgeId}:
+    parameters:
+      - $ref: "#/components/parameters/PetSitterProfileId"
+      - name: badgeId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    delete:
+      tags: [Admin]
+      summary: Admin remove active public badge
+      responses:
+        "204":
+          description: Badge removed
+  /admin/reservations:
+    get:
+      tags: [Admin]
+      summary: Admin list reservations
+      responses:
+        "200":
+          description: Reservations
+  /admin/payments:
+    get:
+      tags: [Admin]
+      summary: Admin list payments
+      responses:
+        "200":
+          description: Payments
+  /admin/reports:
+    get:
+      tags: [Admin]
+      summary: Admin list reports
+      responses:
+        "200":
+          description: Reports
+  /admin/reports/{reportId}:
+    parameters:
+      - $ref: "#/components/parameters/ReportId"
+    patch:
+      tags: [Admin]
+      summary: Admin process report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  $ref: "#/components/schemas/ReportStatus"
+                resolutionComment:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Report updated
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    AnimalId:
+      name: animalId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ReservationId:
+      name: reservationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PetSitterProfileId:
+      name: petSitterProfileId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ReviewId:
+      name: reviewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ReportId:
+      name: reportId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    DocumentId:
+      name: documentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBodies:
+    IdsBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [ids]
+            properties:
+              ids:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ReferenceList:
+      description: Reference list
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data, error]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReferenceItem"
+              meta:
+                type: object
+              error:
+                type: "null"
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [data, error]
+      properties:
+        data:
+          type: "null"
+        meta:
+          type: object
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+    ReferenceItem:
+      type: object
+      required: [id, code, label]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        label:
+          type: string
+    CurrentUser:
+      type: object
+      required: [id, email, isAdmin, accountStatus, roles, profiles]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        isAdmin:
+          type: boolean
+        accountStatus:
+          type: string
+          enum: [active, suspended, deleted]
+        roles:
+          type: object
+          required: [owner, petSitter, admin]
+          properties:
+            owner:
+              type: boolean
+            petSitter:
+              type: boolean
+            admin:
+              type: boolean
+        profiles:
+          type: object
+          required: [ownerProfileId, petSitterProfileId]
+          properties:
+            ownerProfileId:
+              type: [string, "null"]
+              format: uuid
+            petSitterProfileId:
+              type: [string, "null"]
+              format: uuid
+    CurrentUserResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/CurrentUser"
+        meta:
+          type: object
+        error:
+          type: "null"
+    OwnerProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        pseudo:
+          type: [string, "null"]
+        firstName:
+          type: string
+        phone:
+          type: [string, "null"]
+        city:
+          type: [string, "null"]
+        country:
+          type: [string, "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: [string, "null"]
+          format: date-time
+    OwnerProfileResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/OwnerProfile"
+        meta:
+          type: object
+        error:
+          type: "null"
+    UpdateOwnerProfileRequest:
+      type: object
+      properties:
+        pseudo:
+          type: [string, "null"]
+        firstName:
+          type: string
+        phone:
+          type: [string, "null"]
+        city:
+          type: [string, "null"]
+        country:
+          type: [string, "null"]
+    PetSitterVerificationStatus:
+      type: string
+      enum:
+        - draft
+        - published_unverified
+        - identity_verified
+        - professional_verified
+        - suspended
+        - rejected
+    UpdatePetSitterProfileRequest:
+      type: object
+      properties:
+        pseudo:
+          type: [string, "null"]
+        firstName:
+          type: string
+        phone:
+          type: [string, "null"]
+        photoUrl:
+          type: [string, "null"]
+        description:
+          type: [string, "null"]
+        addressLine:
+          type: [string, "null"]
+        city:
+          type: [string, "null"]
+        country:
+          type: [string, "null"]
+        latitude:
+          type: [number, "null"]
+        longitude:
+          type: [number, "null"]
+        basePriceCents:
+          type: [integer, "null"]
+        interventionRadiusKm:
+          type: [number, "null"]
+        publicVisibility:
+          type: boolean
+    PetSitterPrivateProfile:
+      allOf:
+        - $ref: "#/components/schemas/UpdatePetSitterProfileRequest"
+        - type: object
+          required: [id, verificationStatus, offer, createdAt]
+          properties:
+            id:
+              type: string
+              format: uuid
+            verificationStatus:
+              $ref: "#/components/schemas/PetSitterVerificationStatus"
+            offer:
+              type: object
+              properties:
+                species:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ReferenceItem"
+                careCapabilities:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ReferenceItem"
+                careLocations:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ReferenceItem"
+                careFormats:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ReferenceItem"
+                additionalServices:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ReferenceItem"
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: [string, "null"]
+              format: date-time
+    PetSitterPrivateProfileResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/PetSitterPrivateProfile"
+        meta:
+          type: object
+        error:
+          type: "null"
+    Animal:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ownerProfileId:
+          type: string
+          format: uuid
+        species:
+          $ref: "#/components/schemas/ReferenceItem"
+        name:
+          type: string
+        sex:
+          type: [string, "null"]
+        birthDate:
+          type: [string, "null"]
+          format: date
+        color:
+          type: [string, "null"]
+        weightKg:
+          type: [number, "null"]
+        temperament:
+          type: [string, "null"]
+        specificNeeds:
+          type: [string, "null"]
+        hasMedicalRecord:
+          type: boolean
+    CreateAnimalRequest:
+      type: object
+      required: [speciesId, name]
+      properties:
+        speciesId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        sex:
+          type: [string, "null"]
+        birthDate:
+          type: [string, "null"]
+          format: date
+        color:
+          type: [string, "null"]
+        weightKg:
+          type: [number, "null"]
+        temperament:
+          type: [string, "null"]
+        specificNeeds:
+          type: [string, "null"]
+    UpdateAnimalRequest:
+      $ref: "#/components/schemas/CreateAnimalRequest"
+    AnimalResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Animal"
+        meta:
+          type: object
+        error:
+          type: "null"
+    AnimalListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Animal"
+        meta:
+          type: object
+        error:
+          type: "null"
+    UpsertMedicalRecordRequest:
+      type: object
+      properties:
+        careProtocol:
+          type: [string, "null"]
+        frequency:
+          type: [string, "null"]
+        confidentialInstructions:
+          type: [string, "null"]
+    MedicalRecord:
+      allOf:
+        - $ref: "#/components/schemas/UpsertMedicalRecordRequest"
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            animalId:
+              type: string
+              format: uuid
+    MedicalRecordResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/MedicalRecord"
+        meta:
+          type: object
+        error:
+          type: "null"
+    PublicBadge:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        label:
+          type: string
+    PublicPetSitterCard:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        photoUrl:
+          type: [string, "null"]
+        city:
+          type: [string, "null"]
+        approximateLocation:
+          type: object
+          properties:
+            label:
+              type: string
+            lat:
+              type: [number, "null"]
+            lng:
+              type: [number, "null"]
+        basePriceCents:
+          type: integer
+        verificationStatus:
+          type: string
+          enum: [published_unverified, identity_verified, professional_verified]
+        badges:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicBadge"
+        acceptedSpecies:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReferenceItem"
+        careCapabilities:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReferenceItem"
+        careLocations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReferenceItem"
+        careFormats:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReferenceItem"
+        availabilitySummary:
+          type: [string, "null"]
+    PublicPetSitterCardListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicPetSitterCard"
+        meta:
+          type: object
+        error:
+          type: "null"
+    PublicPetSitterProfile:
+      allOf:
+        - $ref: "#/components/schemas/PublicPetSitterCard"
+        - type: object
+          properties:
+            description:
+              type: [string, "null"]
+            additionalServices:
+              type: array
+              items:
+                $ref: "#/components/schemas/ReferenceItem"
+    PublicPetSitterProfileResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/PublicPetSitterProfile"
+        meta:
+          type: object
+        error:
+          type: "null"
+    CreateAvailabilityRequest:
+      type: object
+      required: [startDate, endDate]
+      properties:
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        comment:
+          type: [string, "null"]
+    ReservationStatus:
+      type: string
+      enum:
+        - awaiting_response
+        - accepted
+        - refused
+        - awaiting_payment
+        - paid
+        - cancelled
+        - completed
+        - incident_reported
+    CreateReservationRequest:
+      type: object
+      required:
+        - petSitterProfileId
+        - animalIds
+        - careLocationId
+        - careFormatId
+        - startDate
+        - endDate
+        - insuranceLevel
+        - agreedPriceCents
+      properties:
+        petSitterProfileId:
+          type: string
+          format: uuid
+        animalIds:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: uuid
+        careLocationId:
+          type: string
+          format: uuid
+        careFormatId:
+          type: string
+          format: uuid
+        additionalServiceIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        insuranceLevel:
+          type: string
+          enum: [standard, premium]
+        instructions:
+          type: [string, "null"]
+        agreedPriceCents:
+          type: integer
+          minimum: 0
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ownerProfileId:
+          type: string
+          format: uuid
+        petSitterProfileId:
+          type: string
+          format: uuid
+        status:
+          $ref: "#/components/schemas/ReservationStatus"
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        insuranceLevel:
+          type: string
+          enum: [standard, premium]
+        agreedPriceCents:
+          type: integer
+        platformCommissionRate:
+          type: number
+        instructions:
+          type: [string, "null"]
+    ReservationResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Reservation"
+        meta:
+          type: object
+        error:
+          type: "null"
+    PaymentStatus:
+      type: string
+      enum: [pending, succeeded, failed, refunded, partially_refunded, expired]
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        reservationId:
+          type: string
+          format: uuid
+        status:
+          $ref: "#/components/schemas/PaymentStatus"
+        totalAmountCents:
+          type: integer
+        platformCommissionCents:
+          type: integer
+        providerAmountCents:
+          type: integer
+        externalReference:
+          type: [string, "null"]
+    PaymentResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Payment"
+        meta:
+          type: object
+        error:
+          type: "null"
+    PaymentIntentResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            paymentId:
+              type: string
+              format: uuid
+            clientSecret:
+              type: [string, "null"]
+            simulated:
+              type: boolean
+        meta:
+          type: object
+        error:
+          type: "null"
+    Contract:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        reservationId:
+          type: string
+          format: uuid
+        generatedAt:
+          type: string
+          format: date-time
+        insuranceLevel:
+          type: string
+          enum: [standard, premium]
+        fileUrl:
+          type: [string, "null"]
+        documentHash:
+          type: [string, "null"]
+    ContractResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Contract"
+        meta:
+          type: object
+        error:
+          type: "null"
+    CreateReviewRequest:
+      type: object
+      required: [globalRating]
+      properties:
+        globalRating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: [string, "null"]
+        punctualityRating:
+          type: [integer, "null"]
+          minimum: 1
+          maximum: 5
+        communicationRating:
+          type: [integer, "null"]
+          minimum: 1
+          maximum: 5
+        careRating:
+          type: [integer, "null"]
+          minimum: 1
+          maximum: 5
+        trustRating:
+          type: [integer, "null"]
+          minimum: 1
+          maximum: 5
+    ReportStatus:
+      type: string
+      enum: [open, in_progress, processed, rejected, closed]
+    CreateReportRequest:
+      type: object
+      required: [category, reason]
+      properties:
+        category:
+          type: string
+          enum: [reservation, profile, review, incident, other]
+        reason:
+          type: string
+        reservationId:
+          type: string
+          format: uuid
+        petSitterProfileId:
+          type: string
+          format: uuid
+        reviewId:
+          type: string
+          format: uuid

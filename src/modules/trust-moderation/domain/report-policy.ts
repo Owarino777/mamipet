@@ -1,9 +1,9 @@
 import { DomainError } from "@/shared/errors/domain-error";
 
 type ReportTarget = {
-  reservationId?: string | null;
-  petSitterProfileId?: string | null;
-  reviewId?: string | null;
+  reservationId?: string | null | undefined;
+  petSitterProfileId?: string | null | undefined;
+  reviewId?: string | null | undefined;
 };
 
 export function assertReportTarget(target: ReportTarget): void {

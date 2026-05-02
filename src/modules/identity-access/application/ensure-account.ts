@@ -12,21 +12,30 @@ export async function ensureAccount(
   supabase: SupabaseClient,
   user: User,
 ): Promise<AccountRow> {
-  const { data, error } = await supabase
+  const { data: existingAccount, error: readError } = await supabase
     .from("compte_utilisateur")
-    .upsert(
-      {
-        id_compte: user.id,
-        email: user.email ?? "",
-        statut_compte: "active",
-        est_administrateur: false,
-      },
-      { onConflict: "id_compte" },
-    )
+    .select("id_compte,email,statut_compte,est_administrateur")
+    .eq("id_compte", user.id)
+    .maybeSingle();
+
+  throwIfSupabaseError(readError, "Unable to read current account.");
+
+  if (existingAccount) {
+    return existingAccount as AccountRow;
+  }
+
+  const { data: createdAccount, error: createError } = await supabase
+    .from("compte_utilisateur")
+    .insert({
+      id_compte: user.id,
+      email: user.email ?? "",
+      statut_compte: "active",
+      est_administrateur: false,
+    })
     .select("id_compte,email,statut_compte,est_administrateur")
     .single();
 
-  throwIfSupabaseError(error, "Unable to synchronize current account.");
+  throwIfSupabaseError(createError, "Unable to synchronize current account.");
 
-  return data as AccountRow;
+  return createdAccount as AccountRow;
 }

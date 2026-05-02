@@ -80,7 +80,16 @@ Implémenté :
 - endpoints publics de référentiels ;
 - CRUD animaux propriétaire ;
 - upsert du dossier médical propriétaire ;
-- première migration Supabase et seeds référentiels ;
+- offre pet-sitter : espèces, capacités, lieux, formats et services ;
+- recherche publique des pet-sitters visibles ;
+- réservation directe propriétaire vers pet-sitter ;
+- acceptation, refus, annulation, blocage de créneau ;
+- paiement MVP simulé et génération de récapitulatif contractuel ;
+- avis après réservation terminée ;
+- réponse du pet-sitter à un avis ;
+- signalements généraux ou ciblés ;
+- back-office admin minimal : profils pet-sitters, documents pros, badges, réservations, paiements, signalements ;
+- migrations Supabase initiales, policies RLS MVP et seeds référentiels ;
 - règles domaine unitaires pour réservation, paiement, qualification, avis et signalement.
 
 Configuration locale :
@@ -89,15 +98,74 @@ Configuration locale :
 - renseigner `NEXT_PUBLIC_SUPABASE_URL` ;
 - renseigner `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ;
 - appliquer `supabase/migrations/202605020001_initial_schema.sql` sur le projet Supabase ;
+- appliquer `supabase/migrations/202605020002_pet_sitter_offer_access.sql` ;
+- appliquer `supabase/migrations/202605020003_reservation_flow_access.sql` ;
+- appliquer `supabase/migrations/202605020004_trust_admin_access.sql` ;
 - exécuter `supabase/seeds/001_reference_data.sql`.
 
 À faire ensuite :
 
-- pet-sitter offer : espèces, capacités, lieux, formats, services, disponibilités ;
-- recherche publique pet-sitters ;
-- réservation directe ;
-- paiement test et contrat ;
-- avis, signalements et back-office admin.
+- documents Storage réels ;
+- Stripe Connect réel après la simulation MVP ;
+- Google Maps côté recherche ;
+- tests d'intégration authentifiés sur Supabase.
+
+## Routes API MVP
+
+Routes publiques :
+
+- `GET /api/health`
+- `GET /api/reference-data/species`
+- `GET /api/reference-data/care-capabilities`
+- `GET /api/reference-data/care-locations`
+- `GET /api/reference-data/care-formats`
+- `GET /api/reference-data/additional-services`
+- `GET /api/reference-data/public-badges`
+- `GET /api/pet-sitters`
+- `GET /api/pet-sitters/{petSitterId}`
+
+Routes authentifiées :
+
+- `GET /api/me`
+- `POST /api/profiles/owner`
+- `GET /api/profiles/owner/me`
+- `PATCH /api/profiles/owner/me`
+- `POST /api/profiles/pet-sitter`
+- `GET /api/profiles/pet-sitter/me`
+- `PATCH /api/profiles/pet-sitter/me`
+- `GET /api/profiles/pet-sitter/me/offer`
+- `PUT /api/profiles/pet-sitter/me/offer`
+- `GET /api/animals`
+- `POST /api/animals`
+- `GET /api/animals/{animalId}`
+- `PATCH /api/animals/{animalId}`
+- `DELETE /api/animals/{animalId}`
+- `PUT /api/animals/{animalId}/medical-record`
+- `GET /api/reservations`
+- `POST /api/reservations`
+- `PATCH /api/reservations/{reservationId}/accept`
+- `PATCH /api/reservations/{reservationId}/refuse`
+- `PATCH /api/reservations/{reservationId}/cancel`
+- `PATCH /api/reservations/{reservationId}/complete`
+- `POST /api/reservations/{reservationId}/pay`
+- `POST /api/reservations/{reservationId}/review`
+- `PATCH /api/reviews/{reviewId}/reply`
+- `POST /api/reports`
+- `GET /api/reports/me`
+
+Routes admin :
+
+- `GET /api/admin/pet-sitter-profiles`
+- `PATCH /api/admin/pet-sitter-profiles/{profileId}/verification-status`
+- `POST /api/admin/pet-sitter-profiles/{profileId}/badges`
+- `DELETE /api/admin/pet-sitter-profiles/{profileId}/badges/{badgeId}`
+- `GET /api/admin/professional-documents`
+- `POST /api/admin/professional-documents/{documentId}/validate`
+- `POST /api/admin/professional-documents/{documentId}/reject`
+- `GET /api/admin/reservations`
+- `GET /api/admin/payments`
+- `GET /api/admin/reports`
+- `PATCH /api/admin/reports/{reportId}`
 
 ## Documentation
 
@@ -154,10 +222,10 @@ npm run build
 
 À finaliser ensuite :
 
-- installation des dépendances et génération du `package-lock.json` ;
 - pipeline CI minimal ;
-- branchement Supabase réel ;
-- endpoints REST des phases 2 et suivantes.
+- routes documents Storage réels ;
+- routes disponibilités manuelles pet-sitter ;
+- tests d'intégration authentifiés avec comptes Supabase de démonstration.
 
 ## Maintenance documentaire
 

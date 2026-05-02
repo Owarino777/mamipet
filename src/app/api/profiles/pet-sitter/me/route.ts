@@ -1,4 +1,7 @@
-import { mapPetSitterProfileRow } from "@/modules/pet-sitters/presentation/pet-sitter-profile.mapper";
+import {
+  mapPetSitterProfileRow,
+  petSitterProfileSelect,
+} from "@/modules/pet-sitters/presentation/pet-sitter-profile.mapper";
 import { updatePetSitterProfileSchema } from "@/modules/pet-sitters/presentation/pet-sitter-profile.schemas";
 import { requireAuthenticatedUser } from "@/shared/auth/current-user";
 import { NotFoundError } from "@/shared/errors/http-error";
@@ -11,7 +14,7 @@ export async function GET(request: Request) {
     const { supabase, user } = await requireAuthenticatedUser(request);
     const { data, error } = await supabase
       .from("profil_pet_sitter")
-      .select("*")
+      .select(petSitterProfileSelect)
       .eq("id_compte", user.id)
       .maybeSingle();
 
@@ -63,7 +66,7 @@ export async function PATCH(request: Request) {
       .from("profil_pet_sitter")
       .update(updatePayload)
       .eq("id_compte", user.id)
-      .select("*")
+      .select(petSitterProfileSelect)
       .maybeSingle();
 
     throwIfSupabaseError(error, "Unable to update pet-sitter profile.");

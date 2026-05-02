@@ -68,6 +68,37 @@ Le flux prioritaire à implémenter est :
 11. la réservation peut être terminée ;
 12. le propriétaire peut déposer un avis.
 
+## État backend actuel
+
+Implémenté :
+
+- socle Next.js + TypeScript strict ;
+- clients Supabase SSR/browser et middleware de rafraîchissement de session ;
+- `/api/health` ;
+- `/api/me` avec synchronisation du compte applicatif ;
+- création, lecture et modification des profils owner et pet-sitter ;
+- endpoints publics de référentiels ;
+- CRUD animaux propriétaire ;
+- upsert du dossier médical propriétaire ;
+- première migration Supabase et seeds référentiels ;
+- règles domaine unitaires pour réservation, paiement, qualification, avis et signalement.
+
+Configuration locale :
+
+- copier `.env.example` vers `.env.local` ;
+- renseigner `NEXT_PUBLIC_SUPABASE_URL` ;
+- renseigner `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ;
+- appliquer `supabase/migrations/202605020001_initial_schema.sql` sur le projet Supabase ;
+- exécuter `supabase/seeds/001_reference_data.sql`.
+
+À faire ensuite :
+
+- pet-sitter offer : espèces, capacités, lieux, formats, services, disponibilités ;
+- recherche publique pet-sitters ;
+- réservation directe ;
+- paiement test et contrat ;
+- avis, signalements et back-office admin.
+
 ## Documentation
 
 Toute la documentation est centralisée dans `doc/`.
@@ -107,19 +138,29 @@ Documents essentiels avant implémentation :
 
 ## Initialisation future
 
-Lorsque le code applicatif sera initialisé, ajouter :
+Le socle applicatif est initialisé avec Next.js, TypeScript strict, Vitest,
+une première migration Supabase et les scripts qualité.
 
-- `.env.example` ;
-- configuration Next.js ;
-- configuration Supabase ;
-- migrations ;
-- seeds ;
-- scripts `typecheck`, `lint`, `test`, `build` ;
-- pipeline CI minimal.
+Commandes utiles :
+
+```bash
+npm install
+npm run dev
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
+
+À finaliser ensuite :
+
+- installation des dépendances et génération du `package-lock.json` ;
+- pipeline CI minimal ;
+- branchement Supabase réel ;
+- endpoints REST des phases 2 et suivantes.
 
 ## Maintenance documentaire
 
 Après chaque modification importante, vérifier si la documentation doit être mise à jour.
 
 Si rien n'a besoin d'être documenté, le compte rendu de travail doit l'indiquer explicitement.
-

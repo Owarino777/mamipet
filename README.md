@@ -81,6 +81,8 @@ Implémenté :
 - CRUD animaux propriétaire ;
 - upsert du dossier médical propriétaire ;
 - offre pet-sitter : espèces, capacités, lieux, formats et services ;
+- disponibilités manuelles pet-sitter ;
+- dépôt et consultation des documents professionnels pet-sitter ;
 - recherche publique des pet-sitters visibles ;
 - réservation directe propriétaire vers pet-sitter ;
 - acceptation, refus, annulation, blocage de créneau ;
@@ -135,6 +137,12 @@ Routes authentifiées :
 - `PATCH /api/profiles/pet-sitter/me`
 - `GET /api/profiles/pet-sitter/me/offer`
 - `PUT /api/profiles/pet-sitter/me/offer`
+- `GET /api/pet-sitter/availabilities`
+- `POST /api/pet-sitter/availabilities`
+- `PATCH /api/pet-sitter/availabilities/{availabilityId}`
+- `DELETE /api/pet-sitter/availabilities/{availabilityId}`
+- `GET /api/pet-sitter/documents`
+- `POST /api/pet-sitter/documents`
 - `GET /api/animals`
 - `POST /api/animals`
 - `GET /api/animals/{animalId}`
@@ -223,8 +231,7 @@ npm run build
 À finaliser ensuite :
 
 - pipeline CI minimal ;
-- routes documents Storage réels ;
-- routes disponibilités manuelles pet-sitter ;
+- upload binaire Storage réel pour documents animaux et documents pros ;
 - tests d'intégration authentifiés avec comptes Supabase de démonstration.
 
 ## Maintenance documentaire

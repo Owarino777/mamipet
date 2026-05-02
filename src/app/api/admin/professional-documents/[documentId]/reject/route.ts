@@ -3,7 +3,7 @@ import { professionalDocumentDecisionSchema } from "@/modules/administration/pre
 import {
   mapProfessionalDocumentRow,
   professionalDocumentSelect,
-} from "@/app/api/admin/professional-documents/route";
+} from "@/modules/pet-sitters/presentation/professional-document.mapper";
 import { NotFoundError } from "@/shared/errors/http-error";
 import { parseJsonBody } from "@/shared/http/request-json";
 import { jsonError, jsonOk } from "@/shared/http/route-response";

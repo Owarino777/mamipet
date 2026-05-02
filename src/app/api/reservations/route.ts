@@ -110,7 +110,7 @@ export async function POST(request: Request) {
       mapReservationRow(created),
       { status: 201 },
       {
-      paymentPreview,
+        paymentPreview,
       },
     );
   } catch (error) {

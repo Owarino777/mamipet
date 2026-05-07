@@ -184,9 +184,11 @@ export function PetSitterMap({
             latitude={selectedPetSitter.latitude}
             longitude={selectedPetSitter.longitude}
             anchor="bottom"
-            offset={[0, -44]}
+            offset={[0, -36]}
+            maxWidth="380px"
             closeButton={false}
             closeOnClick={false}
+            closeOnMove={false}
           >
             <article className="map-floating-card map-floating-card--in-popup" aria-live="polite">
               <div className="map-floating-card__media">
@@ -195,7 +197,7 @@ export function PetSitterMap({
                     src={activeImage.url}
                     alt={activeImage.alt}
                     fill
-                    sizes="300px"
+                    sizes="380px"
                   />
                 ) : null}
                 {selectedImages.length > 1 ? (
@@ -307,9 +309,6 @@ export function PetSitterMap({
       <button className="map-search-button" type="button" onClick={onSearchArea}>
         Rechercher dans cette zone
       </button>
-      {selectedPetSitter ? (
-        <div />
-      ) : null}
       <p className="map-privacy-label">OpenFreeMap · adresse exacte masquée</p>
     </div>
   );

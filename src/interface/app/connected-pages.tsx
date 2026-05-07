@@ -9,8 +9,6 @@ import { demoPetSitters } from "@/interface/shared/product-data";
 import {
   ConnectedShellIdentity,
   DemoSessionGreeting,
-  DemoSessionLink,
-  setDemoSessionById,
   useDemoSession,
 } from "@/interface/shared/demo-session-client";
 import {
@@ -31,6 +29,7 @@ import {
   SensitiveDataNotice,
   TrustBadge,
 } from "@/interface/shared/product-ui";
+import { createSupabaseBrowserClient } from "@/shared/supabase/browser-client";
 
 export function OwnerDashboardPage() {
   const workspace = useDemoWorkspace();
@@ -543,6 +542,7 @@ export function AdminDashboardPage() {
 export function LoginPage() {
   const router = useRouter();
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
     <PublicShell compact>
@@ -562,30 +562,40 @@ export function LoginPage() {
           </div>
           <form
             className="auth-form"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
               const formData = new FormData(event.currentTarget);
               const email = String(formData.get("email") ?? "").toLowerCase();
+              const password = String(formData.get("password") ?? "");
 
-              if (!email) {
+              if (!email || !password) {
                 setLoginError("Renseignez un email pour accéder à votre espace.");
                 return;
               }
 
-              if (email.includes("pet") || email.includes("sarah")) {
-                setDemoSessionById("petSitter");
-                router.push("/pet-sitter/dashboard");
-                return;
-              }
+              setIsSubmitting(true);
+              setLoginError(null);
 
-              if (email.includes("admin")) {
-                setDemoSessionById("admin");
-                router.push("/admin/dashboard");
-                return;
-              }
+              try {
+                const supabase = createSupabaseBrowserClient();
+                const { error } = await supabase.auth.signInWithPassword({
+                  email,
+                  password,
+                });
 
-              setDemoSessionById("owner");
-              router.push("/dashboard");
+                if (error) {
+                  setLoginError(error.message);
+                  return;
+                }
+
+                const dashboardRoute = await resolveDashboardRoute();
+                router.push(dashboardRoute);
+                return;
+              } catch (error) {
+                setLoginError(getErrorMessage(error));
+              } finally {
+                setIsSubmitting(false);
+              }
             }}
           >
             <label>
@@ -596,26 +606,11 @@ export function LoginPage() {
               Mot de passe
               <input name="password" type="password" placeholder="••••••••" />
             </label>
-            <button className="primary-button" type="submit">
+            <button className="primary-button" type="submit" disabled={isSubmitting}>
               Continuer
             </button>
             {loginError ? <p className="workspace-status">{loginError}</p> : null}
           </form>
-          <div className="auth-shortcuts">
-            <DemoSessionLink className="secondary-button" href="/dashboard" sessionId="owner">
-              Accéder à l&apos;espace propriétaire
-            </DemoSessionLink>
-            <DemoSessionLink
-              className="secondary-button"
-              href="/pet-sitter/dashboard"
-              sessionId="petSitter"
-            >
-              Accéder à l&apos;espace pet-sitter
-            </DemoSessionLink>
-            <DemoSessionLink className="secondary-button" href="/admin/dashboard" sessionId="admin">
-              Accéder au back-office
-            </DemoSessionLink>
-          </div>
         </section>
       </main>
     </PublicShell>
@@ -625,6 +620,9 @@ export function LoginPage() {
 export function RegisterPage() {
   const router = useRouter();
   const [role, setRole] = useState<"owner" | "petSitter">("owner");
+  const [registerError, setRegisterError] = useState<string | null>(null);
+  const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
     <PublicShell compact>
@@ -659,10 +657,63 @@ export function RegisterPage() {
           </div>
           <form
             className="auth-form"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
-              setDemoSessionById(role);
-              router.push(role === "petSitter" ? "/pet-sitter/dashboard" : "/dashboard");
+              const formData = new FormData(event.currentTarget);
+              const firstName = String(formData.get("firstName") ?? "").trim();
+              const email = String(formData.get("email") ?? "").trim().toLowerCase();
+              const password = String(formData.get("password") ?? "");
+              const city = String(formData.get("city") ?? "").trim() || "Caen";
+
+              setRegisterError(null);
+              setRegisterSuccess(null);
+
+              if (!firstName || !email || !password) {
+                setRegisterError("Prénom, email et mot de passe sont requis.");
+                return;
+              }
+
+              setIsSubmitting(true);
+
+              try {
+                const supabase = createSupabaseBrowserClient();
+                const { data, error } = await supabase.auth.signUp({
+                  email,
+                  password,
+                  options: {
+                    data: {
+                      firstName,
+                      city,
+                    },
+                  },
+                });
+
+                if (error) {
+                  setRegisterError(error.message);
+                  return;
+                }
+
+                if (!data.session) {
+                  setRegisterSuccess(
+                    "Compte créé. Vérifiez votre email puis connectez-vous pour continuer.",
+                  );
+                  router.push("/login");
+                  return;
+                }
+
+                if (role === "owner") {
+                  await ensureOwnerProfile({ firstName, city });
+                  router.push("/dashboard");
+                  return;
+                }
+
+                await ensurePetSitterProfile({ firstName, city });
+                router.push("/pet-sitter/dashboard");
+              } catch (error) {
+                setRegisterError(getErrorMessage(error));
+              } finally {
+                setIsSubmitting(false);
+              }
             }}
           >
             <label>
@@ -716,10 +767,12 @@ export function RegisterPage() {
                 </select>
               </label>
             )}
-            <button className="primary-button" type="submit">
-              Créer mon compte
+            <button className="primary-button" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Création en cours..." : "Créer mon compte"}
             </button>
           </form>
+          {registerError ? <p className="workspace-status">{registerError}</p> : null}
+          {registerSuccess ? <p className="workspace-status">{registerSuccess}</p> : null}
           <p>
             Déjà un compte ?{" "}
             <Link href="/login">Se connecter</Link>
@@ -1014,4 +1067,90 @@ function formatAdminStatus(status: DemoAdminTask["status"]): string {
 
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "Action impossible.";
+}
+
+type ApiFailure = {
+  error?: {
+    message?: string;
+  } | null;
+};
+
+async function resolveDashboardRoute(): Promise<string> {
+  const response = await fetch("/api/me", {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return "/dashboard";
+  }
+
+  const payload = (await response.json()) as {
+    data?: {
+      isAdmin: boolean;
+      roles: {
+        owner: boolean;
+        petSitter: boolean;
+      };
+    };
+  };
+
+  if (payload.data?.isAdmin) {
+    return "/admin/dashboard";
+  }
+
+  if (payload.data?.roles.petSitter) {
+    return "/pet-sitter/dashboard";
+  }
+
+  return "/dashboard";
+}
+
+async function ensureOwnerProfile(input: { firstName: string; city: string }) {
+  const response = await fetch("/api/profiles/owner", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      firstName: input.firstName,
+      city: input.city,
+      country: "France",
+    }),
+  });
+
+  if (response.ok || response.status === 409) {
+    return;
+  }
+
+  const payload = (await response.json()) as ApiFailure;
+  throw new Error(payload.error?.message ?? "Impossible de créer le profil propriétaire.");
+}
+
+async function ensurePetSitterProfile(input: { firstName: string; city: string }) {
+  const response = await fetch("/api/profiles/pet-sitter", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      firstName: input.firstName,
+      city: input.city,
+      country: "France",
+      basePriceCents: 2800,
+      interventionRadiusKm: 15,
+      publicVisibility: false,
+      description: "Profil créé depuis le parcours d'inscription.",
+    }),
+  });
+
+  if (response.ok || response.status === 409) {
+    return;
+  }
+
+  const payload = (await response.json()) as ApiFailure;
+  throw new Error(payload.error?.message ?? "Impossible de créer le profil pet-sitter.");
 }

@@ -6,7 +6,7 @@ import Image from "next/image";
 import type React from "react";
 import { demoPetSitters, type PublicPetSitter, type ReferenceTag } from "./product-data";
 import { formatEuro, formatRating } from "./format";
-import { DemoSessionHeaderAction } from "./demo-session-client";
+import { PublicHeaderAuthAction } from "./public-auth-client";
 import { Map, Marker } from "@vis.gl/react-maplibre";
 
 type ShellProps = {
@@ -39,7 +39,7 @@ export function PublicHeader() {
         <Link href="/#devenir-pet-sitter">Devenir pet-sitter</Link>
       </nav>
       <div className="header-actions">
-        <DemoSessionHeaderAction />
+        <PublicHeaderAuthAction />
         <Link className="ghost-button" href="/register">
           Inscription
         </Link>

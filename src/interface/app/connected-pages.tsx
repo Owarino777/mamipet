@@ -1914,14 +1914,16 @@ function completeLocalRegistration(input: {
   role: "owner" | "petSitter";
 }) {
   const roleKind: WorkspaceKind = input.role === "owner" ? "owner" : "petSitter";
+  const route = roleKind === "petSitter" ? "/pet-sitter/onboarding" : "/dashboard";
 
   setLocalDemoSession({
     activeRole: roleKind,
     enabledRoles: [roleKind],
     id: buildLocalSessionId(roleKind, input.email),
     name: input.firstName,
+    petSitterProfileStatus: roleKind === "petSitter" ? "draft" : undefined,
     roleLabel: getRoleLabelFromWorkspaceKind(roleKind),
-    route: getDefaultWorkspaceRoute(roleKind),
+    route,
   });
   demoWorkspaceActions.startEmptyWorkspace();
 }

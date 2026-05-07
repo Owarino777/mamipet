@@ -520,6 +520,8 @@ textarea {
 }
 
 .section-heading--inline {
+  grid-template-columns: 1fr auto;
+  align-items: center;
   justify-content: space-between;
   gap: 18px;
 }
@@ -2255,7 +2257,21 @@ textarea {
   }
 
   .public-nav a {
+    border-bottom: 2px solid transparent;
+    color: var(--text);
     padding: 12px 0;
+    text-decoration: none;
+    transition: color 140ms ease, border-color 140ms ease;
+  }
+
+  .public-nav a:hover {
+    color: var(--green);
+  }
+
+  .public-nav a.active,
+  .public-nav a[aria-current="page"] {
+    border-bottom-color: var(--green);
+    color: var(--green);
   }
 
   .quick-search {

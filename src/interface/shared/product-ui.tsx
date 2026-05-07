@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import type React from "react";
 import { demoPetSitters, type PublicPetSitter, type ReferenceTag } from "./product-data";
 import { formatEuro, formatRating } from "./format";
@@ -24,6 +25,10 @@ export function PublicShell({ children, compact = false }: ShellProps) {
 }
 
 export function PublicHeader() {
+  const pathname = usePathname();
+  const isSearchPage = pathname.startsWith("/pet-sitters");
+  const isBecomePage = pathname === "/register";
+
   return (
     <header className="public-header">
       <Link className="brand-mark" href="/" aria-label="Accueil MamiPet">
@@ -33,10 +38,20 @@ export function PublicHeader() {
         <span>Mami<span>Pet</span></span>
       </Link>
       <nav className="public-nav" aria-label="Navigation principale">
-        <Link href="/pet-sitters">Trouver une garde</Link>
-        <Link href="/#fonctionnement">Comment ça marche</Link>
-        <Link href="/#garanties">Garanties</Link>
-        <Link href="/#devenir-pet-sitter">Devenir pet-sitter</Link>
+        <Link
+          className={isSearchPage ? "active" : undefined}
+          href="/pet-sitters"
+          aria-current={isSearchPage ? "page" : undefined}
+        >
+          Rechercher un pet-sitter
+        </Link>
+        <Link
+          className={isBecomePage ? "active" : undefined}
+          href="/register"
+          aria-current={isBecomePage ? "page" : undefined}
+        >
+          Devenir pet-sitter
+        </Link>
       </nav>
       <div className="header-actions">
         <PublicHeaderAuthAction />
@@ -205,44 +220,58 @@ export function ApproximateMap({
   compact?: boolean;
   petSitters?: PublicPetSitter[];
 }) {
-  const visiblePetSitters = petSitters.slice(0, 3);
+  const [isMounted, setIsMounted] = useState(false);
+  const visiblePetSitters = petSitters
+    .filter(
+      (petSitter) =>
+        Number.isFinite(petSitter.latitude) && Number.isFinite(petSitter.longitude),
+    )
+    .slice(0, 3);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <div className={compact ? "map-preview map-preview--compact" : "map-preview"}>
-      <Map
-        initialViewState={{
-          latitude:
-            visiblePetSitters.length > 0
-              ? visiblePetSitters.reduce((s, ps) => s + ps.latitude, 0) / visiblePetSitters.length
-              : 49.18,
-          longitude:
-            visiblePetSitters.length > 0
-              ? visiblePetSitters.reduce((s, ps) => s + ps.longitude, 0) / visiblePetSitters.length
-              : -0.37,
-          zoom: 11,
-        }}
-        mapStyle="https://tiles.openfreemap.org/styles/liberty"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        attributionControl={false}
-        dragRotate={false}
-      >
-        {visiblePetSitters.map((petSitter) => (
-          <Marker
-            key={petSitter.id}
-            latitude={petSitter.latitude}
-            longitude={petSitter.longitude}
-            anchor="bottom"
-          >
-            <Link
-              className="map-price"
-              href={`/pet-sitters/${petSitter.id}`}
-              aria-label={`Voir le profil de ${petSitter.firstName} ${petSitter.lastInitial}`}
+      {isMounted ? (
+        <Map
+          initialViewState={{
+            latitude:
+              visiblePetSitters.length > 0
+                ? visiblePetSitters.reduce((s, ps) => s + ps.latitude, 0) /
+                visiblePetSitters.length
+                : 49.18,
+            longitude:
+              visiblePetSitters.length > 0
+                ? visiblePetSitters.reduce((s, ps) => s + ps.longitude, 0) /
+                visiblePetSitters.length
+                : -0.37,
+            zoom: 11,
+          }}
+          mapStyle="https://tiles.openfreemap.org/styles/liberty"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+          attributionControl={false}
+          dragRotate={false}
+        >
+          {visiblePetSitters.map((petSitter) => (
+            <Marker
+              key={petSitter.id}
+              latitude={petSitter.latitude}
+              longitude={petSitter.longitude}
+              anchor="bottom"
             >
-              {formatEuro(petSitter.basePriceCents)}
-            </Link>
-          </Marker>
-        ))}
-      </Map>
+              <Link
+                className="map-price"
+                href={`/pet-sitters/${petSitter.id}`}
+                aria-label={`Voir le profil de ${petSitter.firstName} ${petSitter.lastInitial}`}
+              >
+                {formatEuro(petSitter.basePriceCents)}
+              </Link>
+            </Marker>
+          ))}
+        </Map>
+      ) : null}
       <Link className="map-preview__open" href="/pet-sitters">
         Ouvrir la carte interactive
       </Link>

@@ -51,13 +51,23 @@ export function PetSitterMap({
   onSearchArea,
 }: PetSitterMapProps) {
   const mapRef = useRef<MapRef | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const [isMapReady, setIsMapReady] = useState(false);
   const [hasMapError, setHasMapError] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
+  const mappablePetSitters = useMemo(
+    () =>
+      petSitters.filter(
+        (petSitter) =>
+          Number.isFinite(petSitter.latitude) && Number.isFinite(petSitter.longitude),
+      ),
+    [petSitters],
+  );
   const selectedPetSitter = useMemo(
-    () => petSitters.find((petSitter) => petSitter.id === selectedPetSitterId) ?? null,
-    [petSitters, selectedPetSitterId],
+    () =>
+      mappablePetSitters.find((petSitter) => petSitter.id === selectedPetSitterId) ?? null,
+    [mappablePetSitters, selectedPetSitterId],
   );
   const selectedImages = useMemo(() => {
     if (!selectedPetSitter) {
@@ -76,6 +86,10 @@ export function PetSitterMap({
     ];
   }, [selectedPetSitter]);
   const activeImage = selectedImages[galleryIndex] ?? null;
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -122,6 +136,15 @@ export function PetSitterMap({
     );
   }
 
+  if (!isMounted) {
+    return (
+      <div className="maplibre-map-shell maplibre-map-shell--fallback">
+        <h2>Chargement de la carte</h2>
+        <p>La carte interactive se prépare...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="maplibre-map-shell">
       <Map
@@ -153,7 +176,7 @@ export function PetSitterMap({
       >
         <NavigationControl position="bottom-right" visualizePitch={false} />
         <AttributionControl compact position="bottom-left" />
-        {petSitters.map((petSitter) => (
+        {mappablePetSitters.map((petSitter) => (
           <Marker
             anchor="bottom"
             key={petSitter.id}

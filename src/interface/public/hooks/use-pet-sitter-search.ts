@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { demoPetSitters, type PublicPetSitter } from "@/interface/shared/product-data";
 import {
   createViewportFromMapMove,
@@ -43,6 +43,13 @@ type ApiPetSitterProfileDto = {
   badges: ReferenceItemDto[];
 };
 
+type PetSitterSearchCacheEntry = {
+  profiles?: PublicPetSitter[];
+  promise?: Promise<PublicPetSitter[]>;
+};
+
+const petSitterSearchCache = new Map<string, PetSitterSearchCacheEntry>();
+
 export const quickFilters = [
   { code: "verified_identity", label: "Identité vérifiée" },
   { code: "pro", label: "Pro" },
@@ -85,7 +92,6 @@ export function usePetSitterSearch() {
   const [selectedPetSitterId, setSelectedPetSitterId] = useState<string | null>(null);
   const [petSitters, setPetSitters] = useState<PublicPetSitter[]>(demoPetSitters);
   const [isLoading, setIsLoading] = useState(false);
-  const petSitterCacheRef = useRef(new Map<string, PublicPetSitter[]>());
 
   useEffect(() => {
     window.queueMicrotask(() => {
@@ -121,54 +127,29 @@ export function usePetSitterSearch() {
   }, []);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const cacheKey = city.trim().toLowerCase();
-    const cachedProfiles = petSitterCacheRef.current.get(cacheKey);
-
-    if (cachedProfiles) {
-      setPetSitters(cachedProfiles);
-      return;
-    }
+    let ignoreResult = false;
 
     async function loadPetSitters() {
       setIsLoading(true);
 
       try {
-        const searchParams = new URLSearchParams({
-          city,
-          pageSize: "24",
-        });
-        const response = await fetch(`/api/pet-sitters?${searchParams}`, {
-          signal: controller.signal,
-        });
+        const profiles = await loadPublicPetSitters(city);
 
-        if (!response.ok) {
-          return;
-        }
-
-        const payload = (await response.json()) as {
-          data: ApiPetSitterProfileDto[] | null;
-        };
-        const profiles = (payload.data ?? [])
-          .filter((profile) => !containsForbiddenPublicFields(profile))
-          .map(mapApiPetSitter);
-
-        if (profiles.length > 0) {
-          petSitterCacheRef.current.set(cacheKey, profiles);
+        if (!ignoreResult && profiles.length > 0) {
           setPetSitters(profiles);
         }
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
       } finally {
-        setIsLoading(false);
+        if (!ignoreResult) {
+          setIsLoading(false);
+        }
       }
     }
 
     void loadPetSitters();
 
-    return () => controller.abort();
+    return () => {
+      ignoreResult = true;
+    };
   }, [city]);
 
   const results = useMemo(
@@ -255,6 +236,53 @@ export function usePetSitterSearch() {
         : [...currentFilters, filterCode],
     );
   }
+}
+
+async function loadPublicPetSitters(city: string): Promise<PublicPetSitter[]> {
+  const cacheKey = city.trim().toLowerCase();
+  const cacheEntry = petSitterSearchCache.get(cacheKey);
+
+  if (cacheEntry?.profiles) {
+    return cacheEntry.profiles;
+  }
+
+  if (cacheEntry?.promise) {
+    return cacheEntry.promise;
+  }
+
+  const promise = fetchPublicPetSitters(city).then((profiles) => {
+    if (profiles.length > 0) {
+      petSitterSearchCache.set(cacheKey, { profiles });
+    } else {
+      petSitterSearchCache.delete(cacheKey);
+    }
+
+    return profiles;
+  });
+
+  petSitterSearchCache.set(cacheKey, { promise });
+
+  return promise;
+}
+
+async function fetchPublicPetSitters(city: string): Promise<PublicPetSitter[]> {
+  const searchParams = new URLSearchParams({
+    city,
+    pageSize: "24",
+  });
+  const response = await fetch(`/api/pet-sitters?${searchParams}`);
+
+  if (!response.ok) {
+    return [];
+  }
+
+  const payload = (await response.json()) as {
+    data: ApiPetSitterProfileDto[] | null;
+  };
+
+  return (payload.data ?? [])
+    .filter((profile) => !containsForbiddenPublicFields(profile))
+    .map(mapApiPetSitter);
 }
 
 export function filterPublicPetSitters(

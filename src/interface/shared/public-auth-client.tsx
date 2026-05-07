@@ -45,7 +45,6 @@ export function PublicHeaderAuthAction() {
 
     useEffect(() => {
         if (!session) {
-            setDashboardHref("/dashboard");
             return;
         }
 

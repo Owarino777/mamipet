@@ -51,10 +51,12 @@ export function PetSitterMap({
   onSearchArea,
 }: PetSitterMapProps) {
   const mapRef = useRef<MapRef | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
   const [isMapReady, setIsMapReady] = useState(false);
   const [hasMapError, setHasMapError] = useState(false);
-  const [galleryIndex, setGalleryIndex] = useState(0);
+  const [galleryState, setGalleryState] = useState<{
+    petSitterId: string | null;
+    index: number;
+  }>({ petSitterId: null, index: 0 });
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const mappablePetSitters = useMemo(
     () =>
@@ -85,11 +87,9 @@ export function PetSitterMap({
       },
     ];
   }, [selectedPetSitter]);
+  const galleryIndex =
+    galleryState.petSitterId === selectedPetSitterId ? galleryState.index : 0;
   const activeImage = selectedImages[galleryIndex] ?? null;
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -120,10 +120,6 @@ export function PetSitterMap({
     [onMoveEnd],
   );
 
-  useEffect(() => {
-    setGalleryIndex(0);
-  }, [selectedPetSitterId]);
-
   if (hasMapError) {
     return (
       <div className="maplibre-map-shell maplibre-map-shell--fallback">
@@ -132,15 +128,6 @@ export function PetSitterMap({
           La liste reste utilisable. La carte se recharge automatiquement dès que
           le provider gratuit répond.
         </p>
-      </div>
-    );
-  }
-
-  if (!isMounted) {
-    return (
-      <div className="maplibre-map-shell maplibre-map-shell--fallback">
-        <h2>Chargement de la carte</h2>
-        <p>La carte interactive se prépare...</p>
       </div>
     );
   }
@@ -230,7 +217,14 @@ export function PetSitterMap({
                       type="button"
                       aria-label="Image précédente"
                       onClick={() =>
-                        setGalleryIndex((i) => (i === 0 ? selectedImages.length - 1 : i - 1))
+                        setGalleryState((current) => ({
+                          petSitterId: selectedPetSitter.id,
+                          index:
+                            current.petSitterId !== selectedPetSitter.id ||
+                            current.index === 0
+                              ? selectedImages.length - 1
+                              : current.index - 1,
+                        }))
                       }
                     >
                       ‹
@@ -240,7 +234,14 @@ export function PetSitterMap({
                       type="button"
                       aria-label="Image suivante"
                       onClick={() =>
-                        setGalleryIndex((i) => (i === selectedImages.length - 1 ? 0 : i + 1))
+                        setGalleryState((current) => ({
+                          petSitterId: selectedPetSitter.id,
+                          index:
+                            current.petSitterId !== selectedPetSitter.id ||
+                            current.index === selectedImages.length - 1
+                              ? 0
+                              : current.index + 1,
+                        }))
                       }
                     >
                       ›

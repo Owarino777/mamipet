@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -8,7 +8,6 @@ import type React from "react";
 import { demoPetSitters, type PublicPetSitter, type ReferenceTag } from "./product-data";
 import { formatEuro, formatRating } from "./format";
 import { PublicHeaderAuthAction } from "./public-auth-client";
-import { Map, Marker } from "@vis.gl/react-maplibre";
 
 type ShellProps = {
   children: React.ReactNode;
@@ -220,58 +219,26 @@ export function ApproximateMap({
   compact?: boolean;
   petSitters?: PublicPetSitter[];
 }) {
-  const [isMounted, setIsMounted] = useState(false);
-  const visiblePetSitters = petSitters
-    .filter(
-      (petSitter) =>
-        Number.isFinite(petSitter.latitude) && Number.isFinite(petSitter.longitude),
-    )
-    .slice(0, 3);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const visiblePetSitters = petSitters.slice(0, 3);
 
   return (
     <div className={compact ? "map-preview map-preview--compact" : "map-preview"}>
-      {isMounted ? (
-        <Map
-          initialViewState={{
-            latitude:
-              visiblePetSitters.length > 0
-                ? visiblePetSitters.reduce((s, ps) => s + ps.latitude, 0) /
-                visiblePetSitters.length
-                : 49.18,
-            longitude:
-              visiblePetSitters.length > 0
-                ? visiblePetSitters.reduce((s, ps) => s + ps.longitude, 0) /
-                visiblePetSitters.length
-                : -0.37,
-            zoom: 11,
-          }}
-          mapStyle="https://tiles.openfreemap.org/styles/liberty"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-          attributionControl={false}
-          dragRotate={false}
+      <iframe
+        title="Carte approximative des pet-sitters"
+        src="https://www.openstreetmap.org/export/embed.html?bbox=-0.4388%2C49.1554%2C-0.3057%2C49.2102&layer=mapnik&marker=49.1829%2C-0.3707"
+        loading="lazy"
+        referrerPolicy="no-referrer"
+      />
+      {visiblePetSitters.map((petSitter, index) => (
+        <Link
+          className={`map-price map-price--${index + 1}`}
+          href={`/pet-sitters/${petSitter.id}`}
+          key={petSitter.id}
+          aria-label={`Voir le profil de ${petSitter.firstName} ${petSitter.lastInitial}`}
         >
-          {visiblePetSitters.map((petSitter) => (
-            <Marker
-              key={petSitter.id}
-              latitude={petSitter.latitude}
-              longitude={petSitter.longitude}
-              anchor="bottom"
-            >
-              <Link
-                className="map-price"
-                href={`/pet-sitters/${petSitter.id}`}
-                aria-label={`Voir le profil de ${petSitter.firstName} ${petSitter.lastInitial}`}
-              >
-                {formatEuro(petSitter.basePriceCents)}
-              </Link>
-            </Marker>
-          ))}
-        </Map>
-      ) : null}
+          {formatEuro(petSitter.basePriceCents)}
+        </Link>
+      ))}
       <Link className="map-preview__open" href="/pet-sitters">
         Ouvrir la carte interactive
       </Link>

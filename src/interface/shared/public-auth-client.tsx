@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { createSupabaseBrowserClient } from "@/shared/supabase/browser-client";
+import { clearDemoSession } from "./demo-session-client";
 
 type MeResponse = {
     data: {
@@ -108,6 +109,7 @@ export function PublicHeaderAuthAction() {
                 type="button"
                 onClick={() => {
                     void supabase.auth.signOut();
+                    clearDemoSession();
                     setDashboardHref("/dashboard");
                 }}
             >

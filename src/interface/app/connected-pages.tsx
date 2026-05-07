@@ -3,13 +3,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import type React from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { demoPetSitters } from "@/interface/shared/product-data";
 import {
+  activateDemoSessionRole,
+  clearDemoSession,
   ConnectedShellIdentity,
   DemoSessionGreeting,
+  publishDemoPetSitterProfile,
+  type DemoSessionRole,
   setLocalDemoSession,
+  switchDemoSessionRole,
   useDemoSession,
 } from "@/interface/shared/demo-session-client";
 import {
@@ -41,6 +46,11 @@ export function OwnerDashboardPage() {
     (booking) => booking.status === "completed" && !booking.review,
   );
   const petById = useMemo(() => createPetById(workspace.pets), [workspace.pets]);
+
+  const blockedContent = useRoleAccess("owner");
+  if (blockedContent) {
+    return blockedContent;
+  }
 
   return (
     <ConnectedShell role="Propriétaire" active="Tableau de bord">
@@ -171,6 +181,11 @@ export function OwnerAnimalsPage() {
   const [isAddingPet, setIsAddingPet] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
+  const blockedContent = useRoleAccess("owner");
+  if (blockedContent) {
+    return blockedContent;
+  }
+
   return (
     <ConnectedShell role="Propriétaire" active="Mes animaux">
       <main className="workspace-main">
@@ -297,6 +312,11 @@ export function BookingFlowPage() {
     selectedPets.length > 0
       ? 7600 + selectedPets.length * 1500 + (insuranceLevel === "premium" ? 900 : 0)
       : 0;
+
+  const blockedContent = useRoleAccess("owner");
+  if (blockedContent) {
+    return blockedContent;
+  }
 
   return (
     <ConnectedShell role="Propriétaire" active="Réservation">
@@ -468,8 +488,13 @@ export function PetSitterDashboardPage() {
     (booking) => booking.status === "accepted" || booking.status === "paid",
   ).length;
 
+  const blockedContent = useRoleAccess("petSitter");
+  if (blockedContent) {
+    return blockedContent;
+  }
+
   return (
-    <ConnectedShell role="Pet-sitter" active="Pet-sitter">
+    <ConnectedShell role="Pet-sitter" active="Tableau de bord">
       <main className="workspace-main">
         <div className="workspace-heading">
           <div>
@@ -538,14 +563,429 @@ export function PetSitterDashboardPage() {
   );
 }
 
+type CompetencyAnswer = {
+  label: string;
+  isCorrect: boolean;
+  feedback: string;
+};
+
+type CompetencyTrack = {
+  detail: string;
+  id: string;
+  label: string;
+  publicBadge: string;
+  scenario: string;
+  answers: CompetencyAnswer[];
+};
+
+const petSitterCompetencyTests: CompetencyTrack[] = [
+  {
+    id: "dogs",
+    label: "Chiens",
+    detail: "Promenades, signaux de stress, rappel des consignes.",
+    publicBadge: "Expert chiens",
+    scenario:
+      "Le propriétaire signale que son chien devient anxieux quand il croise d'autres chiens. Pendant la promenade, le chien se fige et tire vers l'arrière. Que faites-vous ?",
+    answers: [
+      {
+        label:
+          "Je réduis la distance, je garde une laisse détendue et je contacte le propriétaire si la consigne manque.",
+        isCorrect: true,
+        feedback:
+          "Bonne réponse : vous protégez l'animal, respectez ses limites et restez dans le cadre des consignes.",
+      },
+      {
+        label:
+          "Je force la promenade pour respecter la durée prévue et éviter d'inquiéter le propriétaire.",
+        isCorrect: false,
+        feedback:
+          "À éviter : forcer un animal anxieux peut aggraver le stress et créer un risque de fuite ou de morsure.",
+      },
+      {
+        label:
+          "Je détache le chien pour qu'il se calme plus vite et choisisse lui-même son chemin.",
+        isCorrect: false,
+        feedback:
+          "Non : un chien anxieux ne doit pas être détaché sans autorisation explicite et environnement maîtrisé.",
+      },
+    ],
+  },
+  {
+    id: "cats",
+    label: "Chats",
+    detail: "Territoire, litière, alimentation, manipulation douce.",
+    publicBadge: "Expert chats",
+    scenario:
+      "Vous arrivez pour une visite à domicile. Le chat sous traitement se cache sous un meuble et refuse le contact. Quelle est la meilleure conduite ?",
+    answers: [
+      {
+        label:
+          "Je vérifie le protocole, je limite les gestes brusques et je préviens le propriétaire si la prise n'est pas faisable sereinement.",
+        isCorrect: true,
+        feedback:
+          "Bonne réponse : la sécurité et la traçabilité priment, surtout avec un traitement médical.",
+      },
+      {
+        label:
+          "Je le sors rapidement de sa cachette pour terminer la visite dans le temps prévu.",
+        isCorrect: false,
+        feedback:
+          "À éviter : sortir un chat de force peut provoquer griffures, fuite et perte de confiance.",
+      },
+      {
+        label:
+          "Je publie la situation sur un groupe pour demander comment donner le médicament.",
+        isCorrect: false,
+        feedback:
+          "Non : les informations médicales et le domicile restent confidentiels.",
+      },
+    ],
+  },
+  {
+    id: "birds",
+    label: "Oiseaux",
+    detail: "Cage, sorties contrôlées, prévention des fuites.",
+    publicBadge: "Expert oiseaux",
+    scenario:
+      "Un propriétaire demande une sortie quotidienne pour son oiseau. En arrivant, une fenêtre est entrouverte. Que faites-vous avant d'ouvrir la cage ?",
+    answers: [
+      {
+        label:
+          "Je sécurise la pièce, ferme les ouvertures, vérifie les consignes puis seulement ensuite j'ouvre la cage.",
+        isCorrect: true,
+        feedback:
+          "Bonne réponse : l'environnement doit être sécurisé avant toute manipulation.",
+      },
+      {
+        label:
+          "J'ouvre la cage tout de suite pour respecter l'habitude de sortie.",
+        isCorrect: false,
+        feedback:
+          "À éviter : une ouverture non sécurisée suffit pour perdre l'animal.",
+      },
+      {
+        label:
+          "Je déplace la cage dans une autre pièce sans prévenir, même si ce n'est pas prévu.",
+        isCorrect: false,
+        feedback:
+          "Non : modifier l'environnement sans consigne peut stresser l'animal.",
+      },
+    ],
+  },
+  {
+    id: "nacs",
+    label: "NAC",
+    detail: "Lapins, rongeurs, reptiles, température et alimentation.",
+    publicBadge: "Expert NAC",
+    scenario:
+      "Vous gardez un lapin. Il mange peu depuis le matin et reste immobile, alors que le propriétaire indique qu'il mange normalement beaucoup de foin. Quelle réaction est attendue ?",
+    answers: [
+      {
+        label:
+          "Je signale rapidement le changement, je suis les consignes d'urgence et je ne modifie pas l'alimentation au hasard.",
+        isCorrect: true,
+        feedback:
+          "Bonne réponse : chez les NAC, une baisse d'alimentation peut devenir urgente.",
+      },
+      {
+        label:
+          "J'attends le lendemain, car les petits animaux changent souvent de rythme.",
+        isCorrect: false,
+        feedback:
+          "À éviter : attendre peut être dangereux, surtout pour un lapin qui ne s'alimente plus.",
+      },
+      {
+        label:
+          "Je donne une friandise non prévue pour relancer l'appétit.",
+        isCorrect: false,
+        feedback:
+          "Non : l'alimentation spécifique doit respecter les consignes du propriétaire.",
+      },
+    ],
+  },
+  {
+    id: "senior",
+    label: "Animaux âgés",
+    detail: "Mobilité, traitement, surveillance et fatigue.",
+    publicBadge: "Expert animaux âgés",
+    scenario:
+      "Un chien âgé sous surveillance renforcée se lève difficilement et semble plus fatigué que d'habitude. Que devez-vous faire ?",
+    answers: [
+      {
+        label:
+          "Je note l'évolution, j'adapte l'effort, je respecte le protocole et je préviens le propriétaire si l'état change.",
+        isCorrect: true,
+        feedback:
+          "Bonne réponse : les animaux âgés demandent une observation calme, documentée et prudente.",
+      },
+      {
+        label:
+          "Je maintiens exactement la même activité pour éviter de changer ses habitudes.",
+        isCorrect: false,
+        feedback:
+          "À éviter : une routine doit rester adaptée à l'état réel de l'animal.",
+      },
+      {
+        label:
+          "Je lui donne un médicament que j'ai déjà utilisé pour un autre animal âgé.",
+        isCorrect: false,
+        feedback:
+          "Non : aucun traitement ne doit être donné hors protocole vétérinaire transmis.",
+      },
+    ],
+  },
+];
+
+export function PetSitterOnboardingPage() {
+  const router = useRouter();
+  const session = useDemoSession();
+  const [selectedTests, setSelectedTests] = useState<string[]>(["dogs", "cats"]);
+  const [activeTestId, setActiveTestId] = useState("dogs");
+  const [validatedTestIds, setValidatedTestIds] = useState<string[]>(
+    session?.petSitterValidatedTests ?? [],
+  );
+  const [selectedAnswerLabel, setSelectedAnswerLabel] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const activeTest =
+    petSitterCompetencyTests.find((test) => test.id === activeTestId) ??
+    petSitterCompetencyTests[0];
+  const selectedTracks = petSitterCompetencyTests.filter((test) =>
+    selectedTests.includes(test.id),
+  );
+  const selectedTestLabels = selectedTracks.map((test) => test.label);
+  const validatedTestLabels = petSitterCompetencyTests
+    .filter((test) => selectedTests.includes(test.id))
+    .filter((test) => validatedTestIds.includes(test.id))
+    .map((test) => test.label);
+  const selectedAnswer = activeTest?.answers.find(
+    (answer) => answer.label === selectedAnswerLabel,
+  );
+  const remainingTestsCount = selectedTests.filter(
+    (testId) => !validatedTestIds.includes(testId),
+  ).length;
+  const canActivateProfile =
+    selectedTests.length > 0 && selectedTests.every((testId) => validatedTestIds.includes(testId));
+
+  if (!activeTest) {
+    throw new Error("At least one pet-sitter competency test is required.");
+  }
+
+  return (
+    <ConnectedShell role="Pet-sitter" active="Tests & profil">
+      <main className="workspace-main">
+        <div className="workspace-heading">
+          <div>
+            <p className="section-kicker">Activation pet-sitter</p>
+            <h1>Construisez un profil fiable avant d&apos;apparaître en recherche.</h1>
+          </div>
+        </div>
+
+        <ol className="onboarding-stepper" aria-label="Étapes d'activation pet-sitter">
+          <li className="onboarding-stepper__item onboarding-stepper__item--active">
+            Espèces
+          </li>
+          <li
+            className={
+              validatedTestIds.length > 0
+                ? "onboarding-stepper__item onboarding-stepper__item--active"
+                : "onboarding-stepper__item"
+            }
+          >
+            Tests
+          </li>
+          <li
+            className={
+              canActivateProfile
+                ? "onboarding-stepper__item onboarding-stepper__item--active"
+                : "onboarding-stepper__item"
+            }
+          >
+            Profil
+          </li>
+          <li className="onboarding-stepper__item">Publication</li>
+        </ol>
+
+        <section className="onboarding-layout">
+          <article className="workspace-card onboarding-panel onboarding-panel--blue">
+            <p className="section-kicker">Étape 1 sur 4</p>
+            <h2>Espèces et besoins pris en charge</h2>
+            <p>
+              Choisissez uniquement les familles d&apos;animaux que vous pouvez
+              réellement garder. Chaque sélection déclenche un test adapté.
+            </p>
+            <div className="competency-grid">
+              {petSitterCompetencyTests.map((test) => (
+                <label
+                  className={
+                    activeTestId === test.id
+                      ? "competency-card competency-card--active"
+                      : "competency-card"
+                  }
+                  key={test.id}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedTests.includes(test.id)}
+                    onChange={(event) => {
+                      const nextSelectedTests = event.target.checked
+                        ? Array.from(new Set([...selectedTests, test.id]))
+                        : selectedTests.filter((testId) => testId !== test.id);
+
+                      setSelectedTests(nextSelectedTests);
+                      setValidatedTestIds((current) =>
+                        nextSelectedTests.includes(test.id)
+                          ? current
+                          : current.filter((testId) => testId !== test.id),
+                      );
+                      if (event.target.checked) {
+                        setActiveTestId(test.id);
+                      }
+                      if (!event.target.checked && activeTestId === test.id) {
+                        setActiveTestId(nextSelectedTests[0] ?? "dogs");
+                      }
+                      setSelectedAnswerLabel(null);
+                      setMessage(null);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTestId(test.id);
+                      setSelectedAnswerLabel(null);
+                      setMessage(null);
+                    }}
+                  >
+                    {test.label}
+                  </button>
+                  <span>{test.detail}</span>
+                  <em>
+                    {validatedTestIds.includes(test.id)
+                      ? `${test.publicBadge} validé`
+                      : selectedTests.includes(test.id)
+                        ? "Test à passer"
+                        : "Non proposé sur mon profil"}
+                  </em>
+                </label>
+              ))}
+            </div>
+          </article>
+
+          <article className="workspace-card onboarding-panel onboarding-panel--pink">
+            <p className="section-kicker">Étape 2 sur 4</p>
+            <h2>Test {activeTest.label.toLowerCase()}</h2>
+            <p className="test-scenario">{activeTest.scenario}</p>
+            <div className="test-answer-list">
+              {activeTest.answers.map((answer) => (
+                <button
+                  className={
+                    selectedAnswerLabel === answer.label
+                      ? "test-answer test-answer--selected"
+                      : "test-answer"
+                  }
+                  type="button"
+                  key={answer.label}
+                  onClick={() => {
+                    setSelectedAnswerLabel(answer.label);
+                    if (answer.isCorrect) {
+                      setValidatedTestIds((current) =>
+                        current.includes(activeTest.id)
+                          ? current
+                          : [...current, activeTest.id],
+                      );
+                    }
+                    setMessage(answer.feedback);
+                  }}
+                >
+                  {answer.label}
+                </button>
+              ))}
+            </div>
+            {selectedAnswer ? (
+              <p
+                className={
+                  selectedAnswer.isCorrect
+                    ? "test-feedback test-feedback--success"
+                    : "test-feedback test-feedback--warning"
+                }
+              >
+                {selectedAnswer.feedback}
+              </p>
+            ) : (
+              <p className="test-feedback">
+                Sélectionnez la réponse la plus sûre. Une mauvaise réponse n&apos;active
+                pas le badge, mais vous pouvez relire le scénario.
+              </p>
+            )}
+          </article>
+
+          <aside className="workspace-card onboarding-summary">
+            <p className="section-kicker">Étape 3 et 4</p>
+            <h2>Profil et abonnement</h2>
+            <p>
+              Votre profil public ne mettra en avant que les garanties validées :
+              espèces, badges Expert, formule et documents professionnels.
+            </p>
+            <dl>
+              <div>
+                <dt>Compte</dt>
+                <dd>{session?.name ?? "Compte MamiPet"}</dd>
+              </div>
+              <div>
+                <dt>Espèces sélectionnées</dt>
+                <dd>{selectedTestLabels.join(", ") || "Aucun"}</dd>
+              </div>
+              <div>
+                <dt>Tests validés</dt>
+                <dd>{validatedTestLabels.join(", ") || "Aucun test validé"}</dd>
+              </div>
+              <div>
+                <dt>Formule</dt>
+                <dd>Classique 0 € · Pro préparé après justificatif</dd>
+              </div>
+            </dl>
+            <button
+              className="primary-button"
+              type="button"
+              disabled={!canActivateProfile}
+              onClick={() => {
+                publishDemoPetSitterProfile(
+                  validatedTestIds.filter((testId) => selectedTests.includes(testId)),
+                );
+                setMessage(
+                  "Profil pet-sitter activé avec les garanties validées.",
+                );
+                router.push("/pet-sitter/dashboard");
+              }}
+            >
+              Valider mon profil pet-sitter
+            </button>
+            {!canActivateProfile ? (
+              <p className="workspace-status">
+                {selectedTests.length === 0
+                  ? "Sélectionnez au moins une famille d'animaux à proposer."
+                  : `${remainingTestsCount} test(s) sélectionné(s) restent à valider avant publication.`}
+              </p>
+            ) : null}
+          </aside>
+        </section>
+      </main>
+    </ConnectedShell>
+  );
+}
+
 export function AdminDashboardPage() {
   const workspace = useDemoWorkspace();
   const pendingDocuments = workspace.documents.filter((task) => task.status === "pending");
   const pendingReports = workspace.reports.filter((task) => task.status === "pending");
   const paidBookings = workspace.bookings.filter((booking) => booking.status === "paid");
 
+  const blockedContent = useRoleAccess("admin");
+  if (blockedContent) {
+    return blockedContent;
+  }
+
   return (
-    <ConnectedShell role="Admin" active="Admin">
+    <ConnectedShell role="Admin" active="Tableau de bord">
       <main className="workspace-main">
         <div className="workspace-heading">
           <div>
@@ -730,7 +1170,7 @@ export function RegisterPage() {
                       firstName,
                       role,
                     });
-                    router.push(role === "owner" ? "/dashboard" : "/pet-sitter/dashboard");
+                    router.push(role === "owner" ? "/dashboard" : "/pet-sitter/onboarding");
                     return;
                   }
 
@@ -768,7 +1208,7 @@ export function RegisterPage() {
                   role,
                 });
                 await ensurePetSitterProfile({ firstName, city });
-                router.push("/pet-sitter/dashboard");
+                router.push("/pet-sitter/onboarding");
               } catch (error) {
                 setRegisterError(getErrorMessage(error));
               } finally {
@@ -954,14 +1394,83 @@ function ConnectedShell({
   children: React.ReactNode;
 }) {
   const session = useDemoSession();
-  const links: Array<[string, string]> = [
-    ["Tableau de bord", "/dashboard"],
-    ["Mes animaux", "/owner/animals"],
-    ["Recherche", "/pet-sitters"],
-    ["Réservation", "/reservations/new"],
-    ["Pet-sitter", "/pet-sitter/dashboard"],
-    ["Admin", "/admin/dashboard"],
-  ];
+  const router = useRouter();
+  const links = getConnectedLinks(session, role);
+  const sessionActiveRole = session?.activeRole;
+  const sessionEnabledRolesKey = session?.enabledRoles?.join("|") ?? "";
+
+  useEffect(() => {
+    let isMounted = true;
+    const supabase = createSupabaseBrowserClient();
+    const renderedRole = getWorkspaceKindFromRoleLabel(role);
+    const isPetSitterActivationPage =
+      renderedRole === "petSitter" && active === "Tests & profil";
+
+    if (session?.source === "local" && isPetSitterActivationPage) {
+      if (!sessionEnabledRolesKey.split("|").includes("petSitter")) {
+        activateDemoSessionRole("petSitter");
+      } else if (sessionActiveRole !== "petSitter") {
+        switchDemoSessionRole("petSitter");
+      }
+      return;
+    }
+
+    if (session?.source === "local" && sessionEnabledRolesKey.split("|").includes(renderedRole)) {
+      if (sessionActiveRole !== renderedRole) {
+        switchDemoSessionRole(renderedRole);
+      }
+      return;
+    }
+
+    void supabase.auth
+      .getUser()
+      .then(async ({ data }) => {
+        const user = data.user;
+
+        if (!isMounted || !user?.email) {
+          return;
+        }
+
+        const sessionProfile = await resolveSessionProfile(renderedRole);
+        const roleKind = sessionProfile.activeRole;
+        const nextSession = {
+          activeRole: roleKind,
+          enabledRoles: sessionProfile.enabledRoles,
+          id: buildLocalSessionId(roleKind, user.email),
+          name: getDisplayNameFromAuth(user.email, user.user_metadata),
+          roleLabel: getRoleLabelFromWorkspaceKind(roleKind),
+          route: getDefaultWorkspaceRoute(roleKind),
+        };
+
+        if (
+          session?.source === "local" &&
+          session.id === nextSession.id &&
+          session.name === nextSession.name &&
+          session.route === nextSession.route
+        ) {
+          return;
+        }
+
+        setLocalDemoSession(nextSession);
+        demoWorkspaceActions.ensureWorkspaceForCurrentSession();
+      })
+      .catch(() => {
+        // Connected demo state remains usable when Supabase is unavailable locally.
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    active,
+    role,
+    sessionActiveRole,
+    sessionEnabledRolesKey,
+    session?.id,
+    session?.name,
+    session?.route,
+    session?.source,
+  ]);
 
   return (
     <div className="connected-shell">
@@ -975,6 +1484,27 @@ function ConnectedShell({
           </span>
         </Link>
         <ConnectedShellIdentity workspaceRole={role} />
+        {session && (session.enabledRoles?.length ?? 0) > 1 ? (
+          <div className="connected-role-switcher" aria-label="Changer de profil actif">
+            {session.enabledRoles?.map((enabledRole) => (
+              <button
+                className={
+                  session.activeRole === enabledRole
+                    ? "connected-role-switcher__button connected-role-switcher__button--active"
+                    : "connected-role-switcher__button"
+                }
+                type="button"
+                key={enabledRole}
+                onClick={() => {
+                  switchDemoSessionRole(enabledRole);
+                  router.push(getDefaultWorkspaceRoute(enabledRole));
+                }}
+              >
+                {getShortRoleLabel(enabledRole)}
+              </button>
+            ))}
+          </div>
+        ) : null}
         <nav aria-label="Navigation espace connecté">
           {links.map(([label, href]) => (
             <Link className={active === label ? "active" : ""} href={href} key={href}>
@@ -983,18 +1513,267 @@ function ConnectedShell({
           ))}
         </nav>
         {session ? (
-          <button
-            className="secondary-button"
-            type="button"
-            onClick={() => demoWorkspaceActions.reset()}
-          >
-            Réinitialiser l&apos;espace
-          </button>
+          <div className="connected-sidebar-actions">
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={() => demoWorkspaceActions.reset()}
+            >
+              Réinitialiser l&apos;espace
+            </button>
+            <button
+              className="ghost-button"
+              type="button"
+              onClick={() => {
+                const supabase = createSupabaseBrowserClient();
+                void supabase.auth.signOut();
+                clearDemoSession();
+                router.push("/login");
+              }}
+            >
+              Déconnexion
+            </button>
+          </div>
         ) : null}
       </aside>
       {children}
     </div>
   );
+}
+
+type WorkspaceKind = DemoSessionRole;
+
+function useRoleAccess(expectedRole: WorkspaceKind): React.ReactNode | null {
+  const session = useDemoSession();
+  const router = useRouter();
+
+  if (!session || hasWorkspaceAccess(session, expectedRole)) {
+    return null;
+  }
+
+  const currentRole = getWorkspaceKindFromRoleLabel(session.roleLabel);
+  const currentRoute = getDefaultWorkspaceRoute(currentRole);
+
+  return (
+    <ConnectedShell role={session.roleLabel} active="Tableau de bord">
+      <main className="workspace-main">
+        <section className="workspace-card workspace-empty-state">
+          <p className="section-kicker">Accès non actif</p>
+          <h1>{getWorkspaceAccessTitle(expectedRole)}</h1>
+          <p>
+            Votre session actuelle est un espace {session.roleLabel}. Pour garder une
+            séparation claire des rôles, MamiPet ne mélange pas les données propriétaire,
+            pet-sitter et administration dans le même dashboard.
+          </p>
+          {expectedRole !== "admin" ? (
+            <button
+              className="primary-button"
+              type="button"
+              onClick={() => {
+                if (expectedRole === "petSitter") {
+                  router.push("/pet-sitter/onboarding");
+                  return;
+                }
+
+                activateDemoSessionRole(expectedRole);
+                router.push(getDefaultWorkspaceRoute(expectedRole));
+              }}
+            >
+              {expectedRole === "petSitter"
+                ? "Passer les tests pet-sitter"
+                : "Activer ce rôle sur mon compte"}
+            </button>
+          ) : null}
+          <ButtonLink href={currentRoute} variant="secondary">
+            Revenir à mon espace
+          </ButtonLink>
+        </section>
+      </main>
+    </ConnectedShell>
+  );
+}
+
+function getConnectedLinks(
+  session: ReturnType<typeof useDemoSession>,
+  fallbackRole: string,
+): Array<[string, string]> {
+  const workspaceKind = session
+    ? (session.activeRole ?? getWorkspaceKindFromRoleLabel(session.roleLabel))
+    : getWorkspaceKindFromRoleLabel(fallbackRole);
+  const enabledRoles = session?.enabledRoles ?? [];
+
+  if (workspaceKind === "admin") {
+    return [["Tableau de bord", "/admin/dashboard"]];
+  }
+
+  if (workspaceKind === "petSitter") {
+    const links: Array<[string, string]> = [
+      ["Tableau de bord", "/pet-sitter/dashboard"],
+      ["Tests & profil", "/pet-sitter/onboarding"],
+      ["Recherche", "/pet-sitters"],
+    ];
+
+    if (!enabledRoles.includes("owner")) {
+      links.push(["Activer propriétaire", "/owner/animals"]);
+    }
+
+    return links;
+  }
+
+  const links: Array<[string, string]> = [
+    ["Tableau de bord", "/dashboard"],
+    ["Mes animaux", "/owner/animals"],
+    ["Recherche", "/pet-sitters"],
+    ["Réservation", "/reservations/new"],
+  ];
+
+  if (!isPetSitterProfilePublished(session)) {
+    links.push([
+      enabledRoles.includes("petSitter") ? "Finaliser profil pet-sitter" : "Devenir pet-sitter",
+      "/pet-sitter/onboarding",
+    ]);
+  }
+
+  return links;
+}
+
+function hasWorkspaceAccess(
+  session: ReturnType<typeof useDemoSession>,
+  role: WorkspaceKind,
+): boolean {
+  if (!session?.enabledRoles?.includes(role)) {
+    return false;
+  }
+
+  if (role === "petSitter") {
+    return isPetSitterProfilePublished(session);
+  }
+
+  return true;
+}
+
+function isPetSitterProfilePublished(
+  session: ReturnType<typeof useDemoSession>,
+): boolean {
+  return Boolean(
+    session?.enabledRoles?.includes("petSitter") &&
+      session.petSitterProfileStatus === "published",
+  );
+}
+
+function getWorkspaceKindFromRoleLabel(roleLabel: string): WorkspaceKind {
+  const normalizedRole = roleLabel.toLowerCase();
+
+  if (normalizedRole.includes("admin")) {
+    return "admin";
+  }
+
+  if (normalizedRole.includes("pet-sitter")) {
+    return "petSitter";
+  }
+
+  return "owner";
+}
+
+function getDefaultWorkspaceRoute(role: WorkspaceKind): string {
+  if (role === "admin") {
+    return "/admin/dashboard";
+  }
+
+  if (role === "petSitter") {
+    return "/pet-sitter/dashboard";
+  }
+
+  return "/dashboard";
+}
+
+function getWorkspaceAccessTitle(expectedRole: WorkspaceKind): string {
+  if (expectedRole === "admin") {
+    return "Cet espace est réservé à l'administration.";
+  }
+
+  if (expectedRole === "petSitter") {
+    return "Cet espace est réservé aux pet-sitters.";
+  }
+
+  return "Cet espace est réservé aux propriétaires.";
+}
+
+type SessionProfile = {
+  activeRole: WorkspaceKind;
+  enabledRoles: WorkspaceKind[];
+};
+
+async function resolveSessionProfile(preferredRole: WorkspaceKind): Promise<SessionProfile> {
+  const response = await fetch("/api/me", {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return {
+      activeRole: preferredRole,
+      enabledRoles: [preferredRole],
+    };
+  }
+
+  const payload = (await response.json()) as {
+    data?: {
+      isAdmin: boolean;
+      roles: {
+        admin?: boolean;
+        owner: boolean;
+        petSitter: boolean;
+      };
+    };
+  };
+  const enabledRoles = getEnabledRolesFromApi(payload.data);
+
+  if (enabledRoles.includes(preferredRole)) {
+    return {
+      activeRole: preferredRole,
+      enabledRoles,
+    };
+  }
+
+  return {
+    activeRole: enabledRoles[0] ?? "owner",
+    enabledRoles,
+  };
+}
+
+function getEnabledRolesFromApi(
+  data:
+    | {
+        isAdmin: boolean;
+        roles: {
+          admin?: boolean;
+          owner: boolean;
+          petSitter: boolean;
+        };
+      }
+    | undefined,
+): WorkspaceKind[] {
+  if (!data) {
+    return ["owner"];
+  }
+
+  if (data.roles.admin || data.isAdmin) {
+    return ["admin"];
+  }
+
+  const roles: WorkspaceKind[] = [];
+
+  if (data.roles.owner) {
+    roles.push("owner");
+  }
+
+  if (data.roles.petSitter) {
+    roles.push("petSitter");
+  }
+
+  return roles.length > 0 ? roles : ["owner"];
 }
 
 function getPrimaryPetSitter() {
@@ -1134,11 +1913,15 @@ function completeLocalRegistration(input: {
   firstName: string;
   role: "owner" | "petSitter";
 }) {
+  const roleKind: WorkspaceKind = input.role === "owner" ? "owner" : "petSitter";
+
   setLocalDemoSession({
-    id: `local-${input.role}-${input.email}`,
+    activeRole: roleKind,
+    enabledRoles: [roleKind],
+    id: buildLocalSessionId(roleKind, input.email),
     name: input.firstName,
-    roleLabel: input.role === "owner" ? "Propriétaire" : "Pet-sitter",
-    route: input.role === "owner" ? "/dashboard" : "/pet-sitter/dashboard",
+    roleLabel: getRoleLabelFromWorkspaceKind(roleKind),
+    route: getDefaultWorkspaceRoute(roleKind),
   });
   demoWorkspaceActions.startEmptyWorkspace();
 }
@@ -1148,23 +1931,53 @@ function completeLocalLogin(input: {
   metadata: Record<string, unknown> | undefined;
   route: string;
 }) {
-  const roleLabel = getRoleLabelFromRoute(input.route);
+  const roleKind = getWorkspaceKindFromRoute(input.route);
 
   setLocalDemoSession({
-    id: `local-${roleLabel.toLowerCase()}-${input.email}`,
+    activeRole: roleKind,
+    enabledRoles: [roleKind],
+    id: buildLocalSessionId(roleKind, input.email),
     name: getDisplayNameFromAuth(input.email, input.metadata),
-    roleLabel,
+    roleLabel: getRoleLabelFromWorkspaceKind(roleKind),
     route: input.route,
   });
   demoWorkspaceActions.ensureWorkspaceForCurrentSession();
 }
 
-function getRoleLabelFromRoute(route: string): string {
+function buildLocalSessionId(role: WorkspaceKind, email: string): string {
+  return `local-${role}-${email.toLowerCase()}`;
+}
+
+function getWorkspaceKindFromRoute(route: string): WorkspaceKind {
   if (route.startsWith("/admin")) {
-    return "Administration";
+    return "admin";
   }
 
   if (route.startsWith("/pet-sitter")) {
+    return "petSitter";
+  }
+
+  return "owner";
+}
+
+function getRoleLabelFromWorkspaceKind(role: WorkspaceKind): string {
+  if (role === "admin") {
+    return "Administration";
+  }
+
+  if (role === "petSitter") {
+    return "Pet-sitter";
+  }
+
+  return "Propriétaire";
+}
+
+function getShortRoleLabel(role: WorkspaceKind): string {
+  if (role === "admin") {
+    return "Admin";
+  }
+
+  if (role === "petSitter") {
     return "Pet-sitter";
   }
 
@@ -1233,6 +2046,10 @@ async function resolveDashboardRoute(): Promise<string> {
 
   if (payload.data?.isAdmin) {
     return "/admin/dashboard";
+  }
+
+  if (payload.data?.roles.owner) {
+    return "/dashboard";
   }
 
   if (payload.data?.roles.petSitter) {

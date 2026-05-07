@@ -1752,6 +1752,31 @@ textarea {
   font-weight: 750;
 }
 
+.connected-role-switcher {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 72%);
+}
+
+.connected-role-switcher__button {
+  min-height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.connected-role-switcher__button--active {
+  background: var(--green);
+  color: white;
+  box-shadow: 0 8px 18px rgb(49 91 72 / 18%);
+}
+
 .connected-sidebar nav {
   display: flex;
   gap: 8px;
@@ -1771,6 +1796,15 @@ textarea {
   background: var(--green);
   color: white;
   box-shadow: 0 10px 22px rgb(49 91 72 / 18%);
+}
+
+.connected-sidebar-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.connected-sidebar-actions button {
+  width: 100%;
 }
 
 .workspace-main,
@@ -1818,6 +1852,179 @@ textarea {
 .workspace-empty-state p {
   margin: 0;
   color: var(--muted);
+}
+
+.onboarding-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.onboarding-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0;
+  margin: 0 0 18px;
+  list-style: none;
+}
+
+.onboarding-stepper__item {
+  min-height: 36px;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 76%);
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.onboarding-stepper__item--active {
+  border-color: rgb(49 91 72 / 22%);
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.onboarding-panel {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.onboarding-panel--blue {
+  background:
+    linear-gradient(180deg, rgb(216 233 243 / 80%), transparent 58%),
+    white;
+}
+
+.onboarding-panel--pink {
+  background:
+    linear-gradient(145deg, rgb(255 123 173 / 14%), transparent 62%),
+    white;
+}
+
+.competency-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.competency-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 72%);
+}
+
+.competency-card--active {
+  border-color: rgb(49 91 72 / 32%);
+  background: white;
+  box-shadow: 0 10px 24px rgb(49 91 72 / 10%);
+}
+
+.competency-card button {
+  width: fit-content;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 950;
+  text-align: left;
+}
+
+.competency-card input {
+  grid-row: span 3;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.competency-card span {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.competency-card em {
+  color: var(--green);
+  font-style: normal;
+  font-weight: 850;
+}
+
+.test-answer-list,
+.onboarding-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.test-scenario {
+  padding: 14px;
+  border: 1px solid rgb(49 91 72 / 14%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 72%);
+  color: var(--text);
+  font-weight: 750;
+}
+
+.test-answer {
+  min-height: 54px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  color: var(--text);
+  font-weight: 850;
+  text-align: left;
+}
+
+.test-answer--selected {
+  border-color: rgb(49 91 72 / 42%);
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.test-feedback {
+  padding: 12px;
+  border-radius: 8px;
+  background: rgb(216 233 243 / 52%);
+  color: var(--muted);
+  font-weight: 750;
+}
+
+.test-feedback--success {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.test-feedback--warning {
+  background: rgb(255 241 229 / 88%);
+  color: #8d3c16;
+}
+
+.onboarding-summary dl {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.onboarding-summary div {
+  display: grid;
+  gap: 4px;
+}
+
+.onboarding-summary dt {
+  color: var(--muted);
+  font-weight: 850;
+}
+
+.onboarding-summary dd {
+  margin: 0;
+  color: var(--text);
+  font-weight: 850;
 }
 
 .workspace-heading {
@@ -2420,6 +2627,11 @@ textarea {
 
   .workspace-grid--four {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .onboarding-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 360px;
+    align-items: start;
   }
 
   .recommendation-row {

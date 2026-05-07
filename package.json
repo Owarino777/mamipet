@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "quality": "npm run typecheck && npm run lint && npm test && npm run build",
-    "db:apply": "node scripts/apply-supabase-sql.mjs"
+    "db:apply": "node scripts/apply-supabase-sql.mjs",
+    "db:clean:test-users": "node scripts/clean-supabase-test-users.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

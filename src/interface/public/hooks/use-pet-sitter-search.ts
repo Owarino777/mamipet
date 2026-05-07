@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { demoPetSitters, type PublicPetSitter } from "@/interface/shared/product-data";
+import { useDemoSession } from "@/interface/shared/demo-session-client";
 import {
   createViewportFromMapMove,
   filterProfilesByViewport,
@@ -77,6 +78,7 @@ export const forbiddenPublicPetSitterFields = [
 ] as const;
 
 export function usePetSitterSearch() {
+  const session = useDemoSession();
   const [city, setCity] = useState("Caen");
   const [species, setSpecies] = useState<SearchSpecies>("all");
   const [need, setNeed] = useState<SearchNeed>("all");
@@ -152,15 +154,20 @@ export function usePetSitterSearch() {
     };
   }, [city]);
 
+  const visiblePetSitters = useMemo(
+    () => mergeLocalPetSitterProfile(petSitters, session),
+    [petSitters, session],
+  );
+
   const results = useMemo(
     () =>
-      filterPublicPetSitters(petSitters, {
+      filterPublicPetSitters(visiblePetSitters, {
         activeQuickFilters,
         need,
         species,
         viewport: mapViewport,
       }),
-    [activeQuickFilters, mapViewport, need, petSitters, species],
+    [activeQuickFilters, mapViewport, need, species, visiblePetSitters],
   );
 
   return {
@@ -387,6 +394,91 @@ function mapApiPetSitter(profile: ApiPetSitterProfileDto): PublicPetSitter {
     imageAlt: "Pet-sitter avec un animal dans un intérieur lumineux",
     gallery: [],
   };
+}
+
+function mergeLocalPetSitterProfile(
+  petSitters: PublicPetSitter[],
+  session: ReturnType<typeof useDemoSession>,
+): PublicPetSitter[] {
+  if (!session?.enabledRoles?.includes("petSitter")) {
+    return petSitters;
+  }
+
+  const localProfile = createLocalPetSitterProfile(session);
+  const publicProfiles = petSitters.filter((profile) => profile.id !== localProfile.id);
+
+  return [localProfile, ...publicProfiles];
+}
+
+function createLocalPetSitterProfile(
+  session: NonNullable<ReturnType<typeof useDemoSession>>,
+): PublicPetSitter {
+  const firstName = session.name.trim().split(/\s+/)[0] ?? session.name;
+  const lastInitial = getLastInitial(session.name);
+
+  return {
+    id: `local-pet-sitter-${session.id}`,
+    firstName,
+    lastInitial,
+    city: "Caen",
+    approximateAddress: "Caen, adresse exacte masquée",
+    latitude: 49.1878,
+    longitude: -0.3526,
+    distanceLabel: "Profil local",
+    rating: 0,
+    reviewCount: 0,
+    basePriceCents: 2500,
+    priceUnit: "jour",
+    responseTime: "À compléter",
+    availabilitySummary: "Disponibilités à renseigner",
+    description:
+      "Profil pet-sitter activé depuis le parcours MamiPet. Les badges affichés correspondent aux compétences validées dans le MVP.",
+    verificationStatus: "published_unverified",
+    badges: [
+      { id: "local-profile", code: "local_profile", label: "Profil local" },
+      { id: "local-expert", code: "expert", label: "Expert test MVP" },
+    ],
+    species: [
+      { id: "dog", code: "dog", label: "Chiens" },
+      { id: "cat", code: "cat", label: "Chats" },
+    ],
+    careCapabilities: [
+      { id: "anxious", code: "anxious", label: "Anxieux" },
+      { id: "medication", code: "medication", label: "Sous traitement" },
+    ],
+    careLocations: [
+      { id: "owner-home", code: "owner_home", label: "À domicile" },
+      { id: "sitter-home", code: "sitter_home", label: "Chez le pet-sitter" },
+    ],
+    careFormats: [
+      { id: "day", code: "day", label: "Journée" },
+      { id: "drop-in", code: "drop_in", label: "Visite" },
+    ],
+    services: [
+      { id: "walk", code: "walk", label: "Promenade" },
+      { id: "photo", code: "photo", label: "Suivi photo" },
+    ],
+    imageUrl:
+      "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1600&q=82",
+    imageAlt: "Pet-sitter local avec un chien attentif",
+    gallery: [
+      {
+        url: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1600&q=82",
+        alt: "Pet-sitter local avec un chien attentif",
+      },
+      {
+        url: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=1600&q=82",
+        alt: "Chat calme gardé à domicile",
+      },
+    ],
+  };
+}
+
+function getLastInitial(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  const lastName = parts.length > 1 ? parts[parts.length - 1] : "";
+
+  return lastName ? `${lastName.charAt(0).toUpperCase()}.` : "";
 }
 
 function isKnownNeed(value: string): value is SearchNeed {

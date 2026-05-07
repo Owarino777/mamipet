@@ -4,9 +4,15 @@ import Link from "next/link";
 import type React from "react";
 import { useSyncExternalStore } from "react";
 
+export type DemoSessionRole = "owner" | "petSitter" | "admin";
+
 export type DemoSession = {
+  activeRole?: DemoSessionRole;
+  enabledRoles?: DemoSessionRole[];
   id: string;
   name: string;
+  petSitterProfileStatus?: "draft" | "published";
+  petSitterValidatedTests?: string[];
   roleLabel: string;
   route: string;
   source?: "fixture" | "local";
@@ -16,6 +22,8 @@ export const demoSessionStorageKey = "mamipet.demoSession";
 
 export const demoSessions: Record<string, DemoSession> = {
   owner: {
+    activeRole: "owner",
+    enabledRoles: ["owner"],
     id: "owner",
     name: "Olivia Carter",
     roleLabel: "Propriétaire",
@@ -23,13 +31,19 @@ export const demoSessions: Record<string, DemoSession> = {
     source: "fixture",
   },
   petSitter: {
+    activeRole: "petSitter",
+    enabledRoles: ["petSitter"],
     id: "petSitter",
     name: "Sarah Johnson",
+    petSitterProfileStatus: "published",
+    petSitterValidatedTests: ["dogs", "cats", "senior"],
     roleLabel: "Pet-sitter",
     route: "/pet-sitter/dashboard",
     source: "fixture",
   },
   admin: {
+    activeRole: "admin",
+    enabledRoles: ["admin"],
     id: "admin",
     name: "Admin MamiPet",
     roleLabel: "Administration",
@@ -47,15 +61,101 @@ export function setDemoSessionById(sessionId: keyof typeof demoSessions) {
 }
 
 export function setLocalDemoSession(session: {
+  activeRole?: DemoSessionRole;
+  enabledRoles?: DemoSessionRole[];
   id: string;
   name: string;
+  petSitterProfileStatus?: DemoSession["petSitterProfileStatus"];
+  petSitterValidatedTests?: string[];
   roleLabel: string;
   route: string;
 }) {
+  const activeRole = session.activeRole ?? getRoleFromLabel(session.roleLabel);
+  const enabledRoles = session.enabledRoles ?? [activeRole];
+
   window.localStorage.setItem(
     demoSessionStorageKey,
-    JSON.stringify({ ...session, source: "local" satisfies DemoSession["source"] }),
+    JSON.stringify({
+      ...session,
+      activeRole,
+      enabledRoles,
+      petSitterProfileStatus:
+        session.petSitterProfileStatus ??
+        (activeRole === "petSitter" ? "draft" : undefined),
+      petSitterValidatedTests: session.petSitterValidatedTests ?? [],
+      source: "local" satisfies DemoSession["source"],
+    }),
   );
+  window.dispatchEvent(new Event("mamipet-demo-session"));
+}
+
+export function switchDemoSessionRole(role: DemoSessionRole) {
+  const session = parseDemoSession(window.localStorage.getItem(demoSessionStorageKey) ?? "");
+
+  if (!session || !session.enabledRoles?.includes(role)) {
+    return;
+  }
+
+  window.localStorage.setItem(
+    demoSessionStorageKey,
+    JSON.stringify({
+      ...session,
+      activeRole: role,
+      roleLabel: getRoleLabel(role),
+      route: getRouteForRole(role),
+    }),
+  );
+  window.dispatchEvent(new Event("mamipet-demo-session"));
+}
+
+export function activateDemoSessionRole(role: DemoSessionRole) {
+  const session = parseDemoSession(window.localStorage.getItem(demoSessionStorageKey) ?? "");
+
+  if (!session) {
+    return;
+  }
+
+  const enabledRoles = Array.from(new Set([...(session.enabledRoles ?? []), role]));
+
+  window.localStorage.setItem(
+    demoSessionStorageKey,
+    JSON.stringify({
+      ...session,
+      activeRole: role,
+      enabledRoles,
+      roleLabel: getRoleLabel(role),
+      route: getRouteForRole(role),
+    }),
+  );
+  window.dispatchEvent(new Event("mamipet-demo-session"));
+}
+
+export function publishDemoPetSitterProfile(validatedTests: string[]) {
+  const session = parseDemoSession(window.localStorage.getItem(demoSessionStorageKey) ?? "");
+
+  if (!session) {
+    return;
+  }
+
+  const enabledRoles = Array.from(new Set([...(session.enabledRoles ?? []), "petSitter"]));
+
+  window.localStorage.setItem(
+    demoSessionStorageKey,
+    JSON.stringify({
+      ...session,
+      activeRole: "petSitter",
+      enabledRoles,
+      petSitterProfileStatus: "published",
+      petSitterValidatedTests: Array.from(new Set(validatedTests)),
+      roleLabel: getRoleLabel("petSitter"),
+      route: getRouteForRole("petSitter"),
+    }),
+  );
+  window.dispatchEvent(new Event("mamipet-demo-session"));
+}
+
+export function clearDemoSession() {
+  window.localStorage.removeItem(demoSessionStorageKey);
   window.dispatchEvent(new Event("mamipet-demo-session"));
 }
 
@@ -89,8 +189,7 @@ export function DemoSessionHeaderAction() {
       <button
         type="button"
         onClick={() => {
-          window.localStorage.removeItem(demoSessionStorageKey);
-          window.dispatchEvent(new Event("mamipet-demo-session"));
+          clearDemoSession();
         }}
       >
         Déconnexion
@@ -159,6 +258,44 @@ function getFirstName(name: string): string {
   return name.trim().split(/\s+/)[0] ?? name;
 }
 
+function getRoleFromLabel(roleLabel: string): DemoSessionRole {
+  const normalizedRole = roleLabel.toLowerCase();
+
+  if (normalizedRole.includes("admin")) {
+    return "admin";
+  }
+
+  if (normalizedRole.includes("pet-sitter")) {
+    return "petSitter";
+  }
+
+  return "owner";
+}
+
+function getRoleLabel(role: DemoSessionRole): string {
+  if (role === "admin") {
+    return "Administration";
+  }
+
+  if (role === "petSitter") {
+    return "Pet-sitter";
+  }
+
+  return "Propriétaire";
+}
+
+function getRouteForRole(role: DemoSessionRole): string {
+  if (role === "admin") {
+    return "/admin/dashboard";
+  }
+
+  if (role === "petSitter") {
+    return "/pet-sitter/dashboard";
+  }
+
+  return "/dashboard";
+}
+
 function subscribeToDemoSession(onStoreChange: () => void) {
   window.addEventListener("storage", onStoreChange);
   window.addEventListener("mamipet-demo-session", onStoreChange);
@@ -190,7 +327,28 @@ function parseDemoSession(rawSession: string): DemoSession | null {
       return null;
     }
 
-    return parsedSession as DemoSession;
+    const role = parsedSession.activeRole ?? getRoleFromLabel(parsedSession.roleLabel);
+
+    const source = parsedSession.source === "fixture" ? "fixture" : "local";
+    const enabledRoles =
+      Array.isArray(parsedSession.enabledRoles) && parsedSession.enabledRoles.length > 0
+        ? parsedSession.enabledRoles
+        : [role];
+
+    return {
+      ...parsedSession,
+      activeRole: role,
+      enabledRoles,
+      petSitterProfileStatus:
+        parsedSession.petSitterProfileStatus ??
+        (source === "fixture" && enabledRoles.includes("petSitter")
+          ? "published"
+          : "draft"),
+      petSitterValidatedTests: Array.isArray(parsedSession.petSitterValidatedTests)
+        ? parsedSession.petSitterValidatedTests
+        : [],
+      source,
+    } as DemoSession;
   } catch {
     return null;
   }

@@ -1,8 +1,13 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type React from "react";
-import type { PublicPetSitter, ReferenceTag } from "./product-data";
+import { demoPetSitters, type PublicPetSitter, type ReferenceTag } from "./product-data";
 import { formatEuro, formatRating } from "./format";
+import { DemoSessionHeaderAction } from "./demo-session-client";
+import { Map, Marker } from "@vis.gl/react-maplibre";
 
 type ShellProps = {
   children: React.ReactNode;
@@ -34,8 +39,9 @@ export function PublicHeader() {
         <Link href="/#devenir-pet-sitter">Devenir pet-sitter</Link>
       </nav>
       <div className="header-actions">
-        <Link className="ghost-button" href="/login">
-          Connexion
+        <DemoSessionHeaderAction />
+        <Link className="ghost-button" href="/register">
+          Inscription
         </Link>
         <Link className="primary-button primary-button--small" href="/pet-sitters">
           Rechercher
@@ -95,48 +101,68 @@ export function PublicPetSitterCard({
   petSitter: PublicPetSitter;
   layout?: "grid" | "list";
 }) {
+  const profileHref = `/pet-sitters/${petSitter.id}`;
+
   return (
     <article className={`sitter-card sitter-card--${layout}`}>
-      <PetSitterVisual petSitter={petSitter} />
-      <div className="sitter-card__content">
-        <div className="sitter-card__heading">
-          <div>
-            <h3>
-              {petSitter.firstName} {petSitter.lastInitial}
-            </h3>
-            <p>
-              {formatRating(petSitter.rating)} / 5 · {petSitter.reviewCount} avis ·{" "}
-              {petSitter.city}
-            </p>
-            <p>{petSitter.approximateAddress}</p>
+      <Link className="sitter-card__link" href={profileHref}>
+        <PetSitterVisual petSitter={petSitter} />
+        <div className="sitter-card__content">
+          <div className="sitter-card__heading">
+            <div>
+              <h3>
+                {petSitter.firstName} {petSitter.lastInitial}
+              </h3>
+              <p>
+                {formatRating(petSitter.rating)} / 5 · {petSitter.reviewCount} avis ·{" "}
+                {petSitter.city}
+              </p>
+              <p>{petSitter.approximateAddress}</p>
+            </div>
           </div>
-          <button className="icon-button" type="button" aria-label="Ajouter aux favoris">
-            <span aria-hidden="true">♡</span>
-          </button>
+          <div className="badge-row">
+            {petSitter.badges.slice(0, 3).map((badge) => (
+              <TrustBadge key={badge.id} label={badge.label} />
+            ))}
+          </div>
+          <p className="sitter-card__copy">{petSitter.description}</p>
+          <InlineTagList items={petSitter.species} limit={3} />
+          <div className="tag-row">
+            {petSitter.careCapabilities.slice(0, 3).map((tag) => (
+              <CareCapabilityTag key={tag.id} label={tag.label} />
+            ))}
+          </div>
+          <div className="sitter-card__footer">
+            <span>{petSitter.availabilitySummary}</span>
+            <strong>
+              Dès {formatEuro(petSitter.basePriceCents)} / {petSitter.priceUnit}
+            </strong>
+          </div>
+          <span className="secondary-button sitter-card__cta">Voir le profil</span>
         </div>
-        <div className="badge-row">
-          {petSitter.badges.slice(0, 3).map((badge) => (
-            <TrustBadge key={badge.id} label={badge.label} />
-          ))}
-        </div>
-        <p className="sitter-card__copy">{petSitter.description}</p>
-        <InlineTagList items={petSitter.species} limit={3} />
-        <div className="tag-row">
-          {petSitter.careCapabilities.slice(0, 3).map((tag) => (
-            <CareCapabilityTag key={tag.id} label={tag.label} />
-          ))}
-        </div>
-        <div className="sitter-card__footer">
-          <span>{petSitter.availabilitySummary}</span>
-          <strong>
-            Dès {formatEuro(petSitter.basePriceCents)} / {petSitter.priceUnit}
-          </strong>
-        </div>
-        <ButtonLink href={`/pet-sitters/${petSitter.id}`} variant="secondary">
-          Voir le profil
-        </ButtonLink>
-      </div>
+      </Link>
+      <FavoriteButton petSitterName={`${petSitter.firstName} ${petSitter.lastInitial}`} />
     </article>
+  );
+}
+
+function FavoriteButton({ petSitterName }: { petSitterName: string }) {
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  return (
+    <button
+      className={isFavorite ? "icon-button icon-button--active" : "icon-button"}
+      type="button"
+      onClick={() => setIsFavorite((current) => !current)}
+      aria-label={
+        isFavorite
+          ? `Retirer ${petSitterName} des favoris`
+          : `Ajouter ${petSitterName} aux favoris`
+      }
+      aria-pressed={isFavorite}
+    >
+      <span aria-hidden="true">{isFavorite ? "♥" : "♡"}</span>
+    </button>
   );
 }
 
@@ -172,18 +198,54 @@ export function InlineTagList({
   );
 }
 
-export function ApproximateMap({ compact = false }: { compact?: boolean }) {
+export function ApproximateMap({
+  compact = false,
+  petSitters = demoPetSitters.slice(0, 3),
+}: {
+  compact?: boolean;
+  petSitters?: PublicPetSitter[];
+}) {
+  const visiblePetSitters = petSitters.slice(0, 3);
+
   return (
     <div className={compact ? "map-preview map-preview--compact" : "map-preview"}>
-      <iframe
-        title="Carte approximative des pet-sitters"
-        src="https://www.openstreetmap.org/export/embed.html?bbox=-0.4388%2C49.1554%2C-0.3057%2C49.2102&layer=mapnik&marker=49.1829%2C-0.3707"
-        loading="lazy"
-        referrerPolicy="no-referrer"
-      />
-      <span className="map-price map-price--one">28 €</span>
-      <span className="map-price map-price--two">30 €</span>
-      <span className="map-price map-price--three">26 €</span>
+      <Map
+        initialViewState={{
+          latitude:
+            visiblePetSitters.length > 0
+              ? visiblePetSitters.reduce((s, ps) => s + ps.latitude, 0) / visiblePetSitters.length
+              : 49.18,
+          longitude:
+            visiblePetSitters.length > 0
+              ? visiblePetSitters.reduce((s, ps) => s + ps.longitude, 0) / visiblePetSitters.length
+              : -0.37,
+          zoom: 11,
+        }}
+        mapStyle="https://tiles.openfreemap.org/styles/liberty"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+        attributionControl={false}
+        dragRotate={false}
+      >
+        {visiblePetSitters.map((petSitter) => (
+          <Marker
+            key={petSitter.id}
+            latitude={petSitter.latitude}
+            longitude={petSitter.longitude}
+            anchor="bottom"
+          >
+            <Link
+              className="map-price"
+              href={`/pet-sitters/${petSitter.id}`}
+              aria-label={`Voir le profil de ${petSitter.firstName} ${petSitter.lastInitial}`}
+            >
+              {formatEuro(petSitter.basePriceCents)}
+            </Link>
+          </Marker>
+        ))}
+      </Map>
+      <Link className="map-preview__open" href="/pet-sitters">
+        Ouvrir la carte interactive
+      </Link>
       <p>Zone approximative, adresse masquée</p>
     </div>
   );

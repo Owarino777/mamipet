@@ -15,8 +15,15 @@ export function HomePage() {
     <PublicShell>
       <main>
         <section className="hero-section">
+          <Image
+            className="hero-background"
+            src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=2400&q=84"
+            alt="Pet-sitter avec un chien dans un intérieur lumineux"
+            fill
+            sizes="100vw"
+            priority
+          />
           <div className="hero-content">
-            <p className="section-kicker">Garde vérifiée pour besoins réels</p>
             <h1>Trouvez une garde fiable pour votre animal.</h1>
             <p className="hero-copy">
               MamiPet vous aide à trouver des pet-sitters vérifiés, qualifiés et
@@ -35,45 +42,37 @@ export function HomePage() {
               ))}
             </div>
           </div>
-
-          <aside className="hero-search-card" aria-label="Recherche rapide">
-            <div className="hero-visual">
-              <Image
-                src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=2400&q=84"
-                alt="Pet-sitter avec un chien dans un intérieur lumineux"
-                fill
-                sizes="(max-width: 900px) 100vw, 44vw"
-                priority
-              />
-            </div>
-            <form className="quick-search" action="/pet-sitters">
-              <label>
-                Espèce
-                <select name="species">
-                  <option>Chien</option>
-                  <option>Chat</option>
-                  <option>NAC</option>
-                </select>
-              </label>
-              <label>
-                Ville
-                <input name="city" placeholder="Caen" />
-              </label>
-              <label>
-                Besoin
-                <select name="need">
-                  <option>Sous traitement</option>
-                  <option>Animal âgé</option>
-                  <option>Anxieux</option>
-                  <option>Surveillance renforcée</option>
-                </select>
-              </label>
-              <button className="primary-button" type="submit">
-                Rechercher
-              </button>
-            </form>
-          </aside>
         </section>
+
+        <aside className="hero-search-dock" aria-label="Recherche rapide">
+          <form className="quick-search quick-search--hero" action="/pet-sitters">
+            <label>
+              Espèce
+              <select name="species" defaultValue="dog">
+                <option value="dog">Chien</option>
+                <option value="cat">Chat</option>
+                <option value="rabbit">Lapin</option>
+                <option value="small_pet">Petit mammifère</option>
+              </select>
+            </label>
+            <label>
+              Ville
+              <input name="city" defaultValue="Caen" placeholder="Caen" />
+            </label>
+            <label>
+              Besoin
+              <select name="need" defaultValue="medication">
+                <option value="medication">Sous traitement</option>
+                <option value="senior">Animal âgé</option>
+                <option value="anxious">Anxieux</option>
+                <option value="monitoring">Surveillance renforcée</option>
+              </select>
+            </label>
+            <button className="primary-button" type="submit">
+              Rechercher
+            </button>
+          </form>
+        </aside>
 
         <section className="value-section" id="fonctionnement">
           <div className="section-heading">
@@ -115,7 +114,7 @@ export function HomePage() {
                 <PublicPetSitterCard key={petSitter.id} petSitter={petSitter} />
               ))}
             </div>
-            <ApproximateMap />
+            <ApproximateMap petSitters={featuredPetSitters} />
           </div>
         </section>
 
@@ -141,7 +140,7 @@ export function HomePage() {
               documents et vos disponibilités pour recevoir des demandes adaptées.
             </p>
           </div>
-          <ButtonLink href="/login">Creer mon profil</ButtonLink>
+          <ButtonLink href="/login">Créer mon profil</ButtonLink>
         </section>
       </main>
     </PublicShell>

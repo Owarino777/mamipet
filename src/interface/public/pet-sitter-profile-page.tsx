@@ -15,15 +15,18 @@ import {
 } from "@/interface/shared/product-ui";
 import { demoPetSitters, type PublicPetSitter } from "@/interface/shared/product-data";
 import { formatEuro, formatRating } from "@/interface/shared/format";
+import { useDemoSession } from "@/interface/shared/demo-session-client";
 
 type ProfilePageProps = {
   petSitterId: string;
 };
 
 export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
+  const session = useDemoSession();
   const [petSitter, setPetSitter] = useState<PublicPetSitter>(() =>
     findInitialProfile(petSitterId),
   );
+  const bookingHref = session ? "/reservations/new" : "/login";
 
   useEffect(() => {
     const controller = new AbortController();
@@ -115,7 +118,7 @@ export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
                 ))}
               </select>
             </label>
-            <ButtonLink href="/login">Vérifier les disponibilités</ButtonLink>
+            <ButtonLink href={bookingHref}>Vérifier les disponibilités</ButtonLink>
             <small>Vous ne serez pas facturé avant acceptation.</small>
           </aside>
         </section>
@@ -184,7 +187,7 @@ export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
             </strong>
             <span>Réservation encadrée après acceptation</span>
           </div>
-          <ButtonLink href="/login">Demander une réservation</ButtonLink>
+          <ButtonLink href={bookingHref}>Demander une réservation</ButtonLink>
         </div>
       </main>
     </PublicShell>

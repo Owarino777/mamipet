@@ -180,8 +180,8 @@ export function mapPetSitterPublicProfileRow(
     description: privateProfile.description,
     city: privateProfile.city,
     country: privateProfile.country,
-    latitude: privateProfile.latitude,
-    longitude: privateProfile.longitude,
+    latitude: toApproximateCoordinate(privateProfile.latitude),
+    longitude: toApproximateCoordinate(privateProfile.longitude),
     basePriceCents: privateProfile.basePriceCents,
     interventionRadiusKm: privateProfile.interventionRadiusKm,
     verificationStatus: privateProfile.verificationStatus,
@@ -190,6 +190,14 @@ export function mapPetSitterPublicProfileRow(
     createdAt: privateProfile.createdAt,
     updatedAt: null,
   };
+}
+
+function toApproximateCoordinate(value: number | null): number | null {
+  if (value === null) {
+    return null;
+  }
+
+  return Math.round(value * 100) / 100;
 }
 
 function mapPetSitterOffer(row: PetSitterProfileRow): PetSitterPrivateProfileDto["offer"] {

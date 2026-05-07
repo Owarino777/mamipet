@@ -9,9 +9,10 @@ export type DemoSession = {
   name: string;
   roleLabel: string;
   route: string;
+  source?: "fixture" | "local";
 };
 
-const storageKey = "mamipet.demoSession";
+export const demoSessionStorageKey = "mamipet.demoSession";
 
 export const demoSessions: Record<string, DemoSession> = {
   owner: {
@@ -19,23 +20,42 @@ export const demoSessions: Record<string, DemoSession> = {
     name: "Olivia Carter",
     roleLabel: "Propriétaire",
     route: "/dashboard",
+    source: "fixture",
   },
   petSitter: {
     id: "petSitter",
     name: "Sarah Johnson",
     roleLabel: "Pet-sitter",
     route: "/pet-sitter/dashboard",
+    source: "fixture",
   },
   admin: {
     id: "admin",
     name: "Admin MamiPet",
     roleLabel: "Administration",
     route: "/admin/dashboard",
+    source: "fixture",
   },
 };
 
 export function setDemoSessionById(sessionId: keyof typeof demoSessions) {
-  window.localStorage.setItem(storageKey, JSON.stringify(demoSessions[sessionId]));
+  window.localStorage.setItem(
+    demoSessionStorageKey,
+    JSON.stringify(demoSessions[sessionId]),
+  );
+  window.dispatchEvent(new Event("mamipet-demo-session"));
+}
+
+export function setLocalDemoSession(session: {
+  id: string;
+  name: string;
+  roleLabel: string;
+  route: string;
+}) {
+  window.localStorage.setItem(
+    demoSessionStorageKey,
+    JSON.stringify({ ...session, source: "local" satisfies DemoSession["source"] }),
+  );
   window.dispatchEvent(new Event("mamipet-demo-session"));
 }
 
@@ -69,7 +89,7 @@ export function DemoSessionHeaderAction() {
       <button
         type="button"
         onClick={() => {
-          window.localStorage.removeItem(storageKey);
+          window.localStorage.removeItem(demoSessionStorageKey);
           window.dispatchEvent(new Event("mamipet-demo-session"));
         }}
       >
@@ -150,7 +170,7 @@ function subscribeToDemoSession(onStoreChange: () => void) {
 }
 
 function getDemoSessionSnapshot(): string {
-  return window.localStorage.getItem(storageKey) ?? "";
+  return window.localStorage.getItem(demoSessionStorageKey) ?? "";
 }
 
 function parseDemoSession(rawSession: string): DemoSession | null {

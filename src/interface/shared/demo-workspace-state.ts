@@ -74,6 +74,13 @@ export type CreateBookingCommand = {
   insuranceLevel: "standard" | "premium";
 };
 
+export const emptyDemoWorkspaceState: DemoWorkspaceState = {
+  pets: [],
+  bookings: [],
+  documents: [],
+  reports: [],
+};
+
 export const initialDemoWorkspaceState: DemoWorkspaceState = {
   pets: [
     {

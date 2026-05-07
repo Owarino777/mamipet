@@ -89,14 +89,10 @@ export function SearchPage() {
 
           <aside className="map-column" aria-label="Carte synchronisée">
             <PetSitterMap
-              activeAreaId={search.activeArea.id}
-              areas={search.areas}
-              orderedAreaIds={search.orderedAreaIds}
               petSitters={search.results}
               selectedPetSitterId={search.selectedPetSitterId}
               viewport={search.mapViewport}
               zoomLevel={search.zoomLevel}
-              onAreaChange={search.applyArea}
               onMoveEnd={search.registerMapMove}
               onPetSitterSelect={search.setSelectedPetSitterId}
               onSearchArea={search.commitPendingViewport}

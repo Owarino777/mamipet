@@ -220,12 +220,13 @@ export function ApproximateMap({
   petSitters?: PublicPetSitter[];
 }) {
   const visiblePetSitters = petSitters.slice(0, 3);
+  const mapCenter = getApproximateMapCenter(visiblePetSitters);
 
   return (
     <div className={compact ? "map-preview map-preview--compact" : "map-preview"}>
       <iframe
         title="Carte approximative des pet-sitters"
-        src="https://www.openstreetmap.org/export/embed.html?bbox=-0.4388%2C49.1554%2C-0.3057%2C49.2102&layer=mapnik&marker=49.1829%2C-0.3707"
+        src={getApproximateMapSrc(mapCenter)}
         loading="lazy"
         referrerPolicy="no-referrer"
       />
@@ -245,4 +246,41 @@ export function ApproximateMap({
       <p>Zone approximative, adresse masquée</p>
     </div>
   );
+}
+
+function getApproximateMapCenter(petSitters: PublicPetSitter[]): {
+  latitude: number;
+  longitude: number;
+} {
+  if (petSitters.length === 0) {
+    return { latitude: 49.1829, longitude: -0.3698 };
+  }
+
+  return {
+    latitude:
+      petSitters.reduce((sum, petSitter) => sum + petSitter.latitude, 0) /
+      petSitters.length,
+    longitude:
+      petSitters.reduce((sum, petSitter) => sum + petSitter.longitude, 0) /
+      petSitters.length,
+  };
+}
+
+function getApproximateMapSrc(center: {
+  latitude: number;
+  longitude: number;
+}): string {
+  const latitudeDelta = 0.055;
+  const longitudeDelta = 0.08;
+  const west = center.longitude - longitudeDelta;
+  const south = center.latitude - latitudeDelta;
+  const east = center.longitude + longitudeDelta;
+  const north = center.latitude + latitudeDelta;
+  const params = new URLSearchParams({
+    bbox: `${west},${south},${east},${north}`,
+    layer: "mapnik",
+    marker: `${center.latitude},${center.longitude}`,
+  });
+
+  return `https://www.openstreetmap.org/export/embed.html?${params}`;
 }

@@ -8,44 +8,31 @@ import {
   Marker,
   NavigationControl,
 } from "@vis.gl/react-maplibre";
-import {
-  Popup,
-} from "@vis.gl/react-maplibre";
 import Link from "next/link";
 import Image from "next/image";
 import { formatEuro } from "@/interface/shared/format";
 import type { PublicPetSitter } from "@/interface/shared/product-data";
 import {
   mapConfig,
-  type MapArea,
-  type MapAreaId,
   type MapMove,
   type MapViewport,
 } from "../hooks/use-map-viewport";
 
 type PetSitterMapProps = {
-  activeAreaId: MapAreaId;
-  areas: Record<MapAreaId, MapArea>;
-  orderedAreaIds: MapAreaId[];
   petSitters: PublicPetSitter[];
   selectedPetSitterId: string | null;
   viewport: MapViewport;
   zoomLevel: number;
-  onAreaChange: (areaId: MapAreaId) => void;
   onMoveEnd: (move: MapMove) => void;
   onPetSitterSelect: (petSitterId: string | null) => void;
   onSearchArea: () => void;
 };
 
 export function PetSitterMap({
-  activeAreaId,
-  areas,
-  orderedAreaIds,
   petSitters,
   selectedPetSitterId,
   viewport,
   zoomLevel,
-  onAreaChange,
   onMoveEnd,
   onPetSitterSelect,
   onSearchArea,
@@ -159,6 +146,7 @@ export function PetSitterMap({
           event.target.scrollZoom.setZoomRate(1 / 120);
           setIsMapReady(true);
         }}
+        onClick={() => onPetSitterSelect(null)}
         onMoveEnd={handleMoveEnd}
       >
         <NavigationControl position="bottom-right" visualizePitch={false} />
@@ -177,11 +165,12 @@ export function PetSitterMap({
                   : "maplibre-price-marker"
               }
               type="button"
-              onClick={() =>
+              onClick={(event) => {
+                event.stopPropagation();
                 onPetSitterSelect(
                   selectedPetSitterId === petSitter.id ? null : petSitter.id,
-                )
-              }
+                );
+              }}
               onFocus={() => onPetSitterSelect(petSitter.id)}
               aria-label={`Sélectionner ${petSitter.firstName} ${petSitter.lastInitial}`}
             >
@@ -189,147 +178,115 @@ export function PetSitterMap({
             </button>
           </Marker>
         ))}
-        {selectedPetSitter ? (
-          <Popup
-            latitude={selectedPetSitter.latitude}
-            longitude={selectedPetSitter.longitude}
-            anchor="bottom"
-            offset={[0, -36]}
-            maxWidth="380px"
-            closeButton={false}
-            closeOnClick={false}
-            closeOnMove={false}
-          >
-            <article className="map-floating-card map-floating-card--in-popup" aria-live="polite">
-              <div className="map-floating-card__media">
-                {activeImage ? (
-                  <Image
-                    src={activeImage.url}
-                    alt={activeImage.alt}
-                    fill
-                    sizes="380px"
-                  />
-                ) : null}
-                {selectedImages.length > 1 ? (
-                  <>
-                    <button
-                      className="map-floating-card__nav map-floating-card__nav--prev"
-                      type="button"
-                      aria-label="Image précédente"
-                      onClick={() =>
-                        setGalleryState((current) => ({
-                          petSitterId: selectedPetSitter.id,
-                          index:
-                            current.petSitterId !== selectedPetSitter.id ||
-                            current.index === 0
-                              ? selectedImages.length - 1
-                              : current.index - 1,
-                        }))
-                      }
-                    >
-                      ‹
-                    </button>
-                    <button
-                      className="map-floating-card__nav map-floating-card__nav--next"
-                      type="button"
-                      aria-label="Image suivante"
-                      onClick={() =>
-                        setGalleryState((current) => ({
-                          petSitterId: selectedPetSitter.id,
-                          index:
-                            current.petSitterId !== selectedPetSitter.id ||
-                            current.index === selectedImages.length - 1
-                              ? 0
-                              : current.index + 1,
-                        }))
-                      }
-                    >
-                      ›
-                    </button>
-                  </>
-                ) : null}
-                <button
-                  className={
-                    favoriteIds.has(selectedPetSitter.id)
-                      ? "map-floating-card__favorite map-floating-card__favorite--active"
-                      : "map-floating-card__favorite"
-                  }
-                  type="button"
-                  aria-label={
-                    favoriteIds.has(selectedPetSitter.id)
-                      ? `Retirer ${selectedPetSitter.firstName} des favoris`
-                      : `Ajouter ${selectedPetSitter.firstName} aux favoris`
-                  }
-                  aria-pressed={favoriteIds.has(selectedPetSitter.id)}
-                  onClick={() =>
-                    setFavoriteIds((current) => {
-                      const next = new Set(current);
-                      if (next.has(selectedPetSitter.id)) {
-                        next.delete(selectedPetSitter.id);
-                      } else {
-                        next.add(selectedPetSitter.id);
-                      }
-                      return next;
-                    })
-                  }
-                >
-                  {favoriteIds.has(selectedPetSitter.id) ? "♥" : "♡"}
-                </button>
-              </div>
-              <span className="map-floating-card__body">
-                <strong>
-                  {selectedPetSitter.firstName} {selectedPetSitter.lastInitial}
-                </strong>
-                <small>
-                  {selectedPetSitter.city} · {selectedPetSitter.distanceLabel}
-                </small>
-                <span className="map-floating-card__tags">
-                  {selectedPetSitter.badges.slice(0, 2).map((badge) => (
-                    <em key={badge.id}>{badge.label}</em>
-                  ))}
-                </span>
-                <b>
-                  Dès {formatEuro(selectedPetSitter.basePriceCents)} /{" "}
-                  {selectedPetSitter.priceUnit}
-                </b>
-                <Link
-                  className="map-floating-card__profile-link"
-                  href={`/pet-sitters/${selectedPetSitter.id}`}
-                >
-                  Voir profil
-                </Link>
-              </span>
-              <button
-                type="button"
-                onClick={() => onPetSitterSelect(null)}
-                aria-label="Fermer la fiche"
-              >
-                ×
-              </button>
-            </article>
-          </Popup>
-        ) : null}
       </Map>
-      <div className="map-area-controls" aria-label="Déplacer la carte">
-        {orderedAreaIds.map((areaId) => {
-          const area = areas[areaId];
-
-          return (
+      {selectedPetSitter ? (
+        <article
+          className="map-floating-card map-floating-card--anchored"
+          aria-live="polite"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="map-floating-card__media">
+            {activeImage ? (
+              <Image src={activeImage.url} alt={activeImage.alt} fill sizes="380px" />
+            ) : null}
+            {selectedImages.length > 1 ? (
+              <>
+                <button
+                  className="map-floating-card__nav map-floating-card__nav--prev"
+                  type="button"
+                  aria-label="Image précédente"
+                  onClick={() =>
+                    setGalleryState((current) => ({
+                      petSitterId: selectedPetSitter.id,
+                      index:
+                        current.petSitterId !== selectedPetSitter.id ||
+                        current.index === 0
+                          ? selectedImages.length - 1
+                          : current.index - 1,
+                    }))
+                  }
+                >
+                  ‹
+                </button>
+                <button
+                  className="map-floating-card__nav map-floating-card__nav--next"
+                  type="button"
+                  aria-label="Image suivante"
+                  onClick={() =>
+                    setGalleryState((current) => ({
+                      petSitterId: selectedPetSitter.id,
+                      index:
+                        current.petSitterId !== selectedPetSitter.id ||
+                        current.index === selectedImages.length - 1
+                          ? 0
+                          : current.index + 1,
+                    }))
+                  }
+                >
+                  ›
+                </button>
+              </>
+            ) : null}
             <button
               className={
-                area.id === activeAreaId
-                  ? "map-area-button map-area-button--active"
-                  : "map-area-button"
+                favoriteIds.has(selectedPetSitter.id)
+                  ? "map-floating-card__favorite map-floating-card__favorite--active"
+                  : "map-floating-card__favorite"
               }
               type="button"
-              key={area.id}
-              onClick={() => onAreaChange(area.id)}
+              aria-label={
+                favoriteIds.has(selectedPetSitter.id)
+                  ? `Retirer ${selectedPetSitter.firstName} des favoris`
+                  : `Ajouter ${selectedPetSitter.firstName} aux favoris`
+              }
+              aria-pressed={favoriteIds.has(selectedPetSitter.id)}
+              onClick={() =>
+                setFavoriteIds((current) => {
+                  const next = new Set(current);
+                  if (next.has(selectedPetSitter.id)) {
+                    next.delete(selectedPetSitter.id);
+                  } else {
+                    next.add(selectedPetSitter.id);
+                  }
+                  return next;
+                })
+              }
             >
-              {area.label}
+              {favoriteIds.has(selectedPetSitter.id) ? "♥" : "♡"}
             </button>
-          );
-        })}
-      </div>
+          </div>
+          <span className="map-floating-card__body">
+            <strong>
+              {selectedPetSitter.firstName} {selectedPetSitter.lastInitial}
+            </strong>
+            <small>
+              {selectedPetSitter.city} · {selectedPetSitter.distanceLabel}
+            </small>
+            <span className="map-floating-card__tags">
+              {selectedPetSitter.badges.slice(0, 2).map((badge) => (
+                <em key={badge.id}>{badge.label}</em>
+              ))}
+            </span>
+            <b>
+              Dès {formatEuro(selectedPetSitter.basePriceCents)} /{" "}
+              {selectedPetSitter.priceUnit}
+            </b>
+            <Link
+              className="map-floating-card__profile-link"
+              href={`/pet-sitters/${selectedPetSitter.id}`}
+            >
+              Voir profil
+            </Link>
+          </span>
+          <button
+            type="button"
+            onClick={() => onPetSitterSelect(null)}
+            aria-label="Fermer la fiche"
+          >
+            ×
+          </button>
+        </article>
+      ) : null}
       <button className="map-search-button" type="button" onClick={onSearchArea}>
         Rechercher dans cette zone
       </button>

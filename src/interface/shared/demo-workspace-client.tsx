@@ -6,6 +6,7 @@ import {
   addPet,
   completeBooking,
   createBooking,
+  emptyDemoWorkspaceState,
   initialDemoWorkspaceState,
   payBooking,
   openReport,
@@ -18,8 +19,9 @@ import {
   type DemoReview,
   type DemoWorkspaceState,
 } from "./demo-workspace-state";
+import { demoSessionStorageKey, type DemoSession } from "./demo-session-client";
 
-const workspaceStorageKey = "mamipet.demoWorkspaceState";
+const workspaceStorageKeyPrefix = "mamipet.demoWorkspaceState";
 const workspaceEventName = "mamipet-demo-workspace";
 
 export function useDemoWorkspace() {
@@ -34,7 +36,19 @@ export function useDemoWorkspace() {
 
 export const demoWorkspaceActions = {
   reset() {
-    saveWorkspaceState(initialDemoWorkspaceState);
+    saveWorkspaceState(getInitialWorkspaceForCurrentSession());
+  },
+
+  startEmptyWorkspace() {
+    saveWorkspaceState(emptyDemoWorkspaceState);
+  },
+
+  ensureWorkspaceForCurrentSession() {
+    const key = getCurrentWorkspaceStorageKey();
+
+    if (!window.localStorage.getItem(key)) {
+      saveWorkspaceState(getInitialWorkspaceForCurrentSession());
+    }
   },
 
   addPet(pet: Omit<DemoPet, "id" | "medicalRecordStatus">) {
@@ -85,7 +99,7 @@ function applyWorkspaceUpdate(
 }
 
 function saveWorkspaceState(state: DemoWorkspaceState) {
-  window.localStorage.setItem(workspaceStorageKey, JSON.stringify(state));
+  window.localStorage.setItem(getCurrentWorkspaceStorageKey(), JSON.stringify(state));
   window.dispatchEvent(new Event(workspaceEventName));
 }
 
@@ -96,18 +110,61 @@ function readWorkspaceState(): DemoWorkspaceState {
 function subscribeToWorkspace(onStoreChange: () => void) {
   window.addEventListener("storage", onStoreChange);
   window.addEventListener(workspaceEventName, onStoreChange);
+  window.addEventListener("mamipet-demo-session", onStoreChange);
 
   return () => {
     window.removeEventListener("storage", onStoreChange);
     window.removeEventListener(workspaceEventName, onStoreChange);
+    window.removeEventListener("mamipet-demo-session", onStoreChange);
   };
 }
 
 function getWorkspaceSnapshot(): string {
   return (
-    window.localStorage.getItem(workspaceStorageKey) ??
-    JSON.stringify(initialDemoWorkspaceState)
+    window.localStorage.getItem(getCurrentWorkspaceStorageKey()) ??
+    JSON.stringify(getInitialWorkspaceForCurrentSession())
   );
+}
+
+function getCurrentWorkspaceStorageKey(): string {
+  const session = readDemoSession();
+
+  if (!session) {
+    return `${workspaceStorageKeyPrefix}:anonymous`;
+  }
+
+  return `${workspaceStorageKeyPrefix}:${session.source ?? "fixture"}:${session.id}`;
+}
+
+function getInitialWorkspaceForCurrentSession(): DemoWorkspaceState {
+  const session = readDemoSession();
+
+  return session?.source === "local" ? emptyDemoWorkspaceState : initialDemoWorkspaceState;
+}
+
+function readDemoSession(): DemoSession | null {
+  try {
+    const rawSession = window.localStorage.getItem(demoSessionStorageKey);
+
+    if (!rawSession) {
+      return null;
+    }
+
+    const session = JSON.parse(rawSession) as Partial<DemoSession>;
+
+    if (
+      typeof session.id !== "string" ||
+      typeof session.name !== "string" ||
+      typeof session.roleLabel !== "string" ||
+      typeof session.route !== "string"
+    ) {
+      return null;
+    }
+
+    return session as DemoSession;
+  } catch {
+    return null;
+  }
 }
 
 function parseWorkspaceState(rawState: string): DemoWorkspaceState {

@@ -176,7 +176,7 @@ export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
           </div>
           <div className="profile-card">
             <h2>Zone approximative</h2>
-            <ApproximateMap compact />
+            <ApproximateMap compact petSitters={[petSitter]} />
           </div>
         </section>
 

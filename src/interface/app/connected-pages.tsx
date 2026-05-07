@@ -9,6 +9,7 @@ import { demoPetSitters } from "@/interface/shared/product-data";
 import {
   ConnectedShellIdentity,
   DemoSessionGreeting,
+  setLocalDemoSession,
   useDemoSession,
 } from "@/interface/shared/demo-session-client";
 import {
@@ -92,11 +93,20 @@ export function OwnerDashboardPage() {
               <h2>Mes animaux</h2>
               <Link href="/owner/animals">Voir tout</Link>
             </div>
-            <div className="pet-mini-grid">
-              {workspace.pets.map((pet) => (
-                <PetMiniCard key={pet.id} pet={pet} />
-              ))}
-            </div>
+            {workspace.pets.length > 0 ? (
+              <div className="pet-mini-grid">
+                {workspace.pets.map((pet) => (
+                  <PetMiniCard key={pet.id} pet={pet} />
+                ))}
+              </div>
+            ) : (
+              <div className="workspace-empty-state">
+                <p>Aucun animal enregistré pour le moment.</p>
+                <ButtonLink href="/owner/animals" variant="secondary">
+                  Ajouter mon premier animal
+                </ButtonLink>
+              </div>
+            )}
           </article>
         </section>
 
@@ -233,27 +243,37 @@ export function OwnerAnimalsPage() {
           </form>
         ) : null}
         {statusMessage ? <p className="workspace-status">{statusMessage}</p> : null}
-        <section className="workspace-grid">
-          {workspace.pets.map((pet) => (
-            <article className="workspace-card animal-detail-card" key={pet.id}>
-              <PetMiniCard pet={pet} />
-              <h2>Dossier médical {pet.name}</h2>
-              <div className="tag-row">
-                {pet.needs.map((need) => (
-                  <CareCapabilityTag key={need} label={need} />
-                ))}
-              </div>
-              <TrustBadge
-                label={
-                  pet.medicalRecordStatus === "complete"
-                    ? "Dossier complet"
-                    : "Dossier à compléter"
-                }
-              />
-              <SensitiveDataNotice />
-            </article>
-          ))}
-        </section>
+        {workspace.pets.length > 0 ? (
+          <section className="workspace-grid">
+            {workspace.pets.map((pet) => (
+              <article className="workspace-card animal-detail-card" key={pet.id}>
+                <PetMiniCard pet={pet} />
+                <h2>Dossier médical {pet.name}</h2>
+                <div className="tag-row">
+                  {pet.needs.map((need) => (
+                    <CareCapabilityTag key={need} label={need} />
+                  ))}
+                </div>
+                <TrustBadge
+                  label={
+                    pet.medicalRecordStatus === "complete"
+                      ? "Dossier complet"
+                      : "Dossier à compléter"
+                  }
+                />
+                <SensitiveDataNotice />
+              </article>
+            ))}
+          </section>
+        ) : (
+          <section className="workspace-card workspace-empty-state">
+            <h2>Votre espace est vide</h2>
+            <p>
+              Ajoutez votre premier animal pour préparer une réservation avec ses
+              besoins, consignes et informations de soin.
+            </p>
+          </section>
+        )}
       </main>
     </ConnectedShell>
   );
@@ -292,25 +312,34 @@ export function BookingFlowPage() {
         <div className="booking-layout">
           <section className="workspace-card booking-form-card">
             <h1>Quels animaux seront gardés ?</h1>
-            <div className="pet-mini-grid">
-              {workspace.pets.map((pet) => (
-                <label className="selectable-pet" key={pet.id}>
-                  <input
-                    type="checkbox"
-                    checked={selectedPetIds.includes(pet.id)}
-                    onChange={(event) => {
-                      setSelectedPetIds((currentIds) =>
-                        event.target.checked
-                          ? [...currentIds, pet.id]
-                          : currentIds.filter((id) => id !== pet.id),
-                      );
-                      setRequestStatus(null);
-                    }}
-                  />
-                  <PetMiniCard pet={pet} />
-                </label>
-              ))}
-            </div>
+            {workspace.pets.length > 0 ? (
+              <div className="pet-mini-grid">
+                {workspace.pets.map((pet) => (
+                  <label className="selectable-pet" key={pet.id}>
+                    <input
+                      type="checkbox"
+                      checked={selectedPetIds.includes(pet.id)}
+                      onChange={(event) => {
+                        setSelectedPetIds((currentIds) =>
+                          event.target.checked
+                            ? [...currentIds, pet.id]
+                            : currentIds.filter((id) => id !== pet.id),
+                        );
+                        setRequestStatus(null);
+                      }}
+                    />
+                    <PetMiniCard pet={pet} />
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <div className="workspace-empty-state">
+                <p>Ajoutez d&apos;abord un animal pour lancer une demande de garde.</p>
+                <ButtonLink href="/owner/animals" variant="secondary">
+                  Ajouter un animal
+                </ButtonLink>
+              </div>
+            )}
             <div className="inline-workspace-form inline-workspace-form--compact">
               <label>
                 Début
@@ -589,6 +618,12 @@ export function LoginPage() {
                 }
 
                 const dashboardRoute = await resolveDashboardRoute();
+                const { data } = await supabase.auth.getUser();
+                completeLocalLogin({
+                  email,
+                  metadata: data.user?.user_metadata,
+                  route: dashboardRoute,
+                });
                 router.push(dashboardRoute);
                 return;
               } catch (error) {
@@ -689,6 +724,16 @@ export function RegisterPage() {
                 });
 
                 if (error) {
+                  if (isAuthRateLimitError(error)) {
+                    completeLocalRegistration({
+                      email,
+                      firstName,
+                      role,
+                    });
+                    router.push(role === "owner" ? "/dashboard" : "/pet-sitter/dashboard");
+                    return;
+                  }
+
                   setRegisterError(error.message);
                   return;
                 }
@@ -697,16 +742,31 @@ export function RegisterPage() {
                   setRegisterSuccess(
                     "Compte créé. Vérifiez votre email puis connectez-vous pour continuer.",
                   );
+                  completeLocalRegistration({
+                    email,
+                    firstName,
+                    role,
+                  });
                   router.push("/login");
                   return;
                 }
 
                 if (role === "owner") {
+                  completeLocalRegistration({
+                    email,
+                    firstName,
+                    role,
+                  });
                   await ensureOwnerProfile({ firstName, city });
                   router.push("/dashboard");
                   return;
                 }
 
+                completeLocalRegistration({
+                  email,
+                  firstName,
+                  role,
+                });
                 await ensurePetSitterProfile({ firstName, city });
                 router.push("/pet-sitter/dashboard");
               } catch (error) {
@@ -1067,6 +1127,81 @@ function formatAdminStatus(status: DemoAdminTask["status"]): string {
 
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "Action impossible.";
+}
+
+function completeLocalRegistration(input: {
+  email: string;
+  firstName: string;
+  role: "owner" | "petSitter";
+}) {
+  setLocalDemoSession({
+    id: `local-${input.role}-${input.email}`,
+    name: input.firstName,
+    roleLabel: input.role === "owner" ? "Propriétaire" : "Pet-sitter",
+    route: input.role === "owner" ? "/dashboard" : "/pet-sitter/dashboard",
+  });
+  demoWorkspaceActions.startEmptyWorkspace();
+}
+
+function completeLocalLogin(input: {
+  email: string;
+  metadata: Record<string, unknown> | undefined;
+  route: string;
+}) {
+  const roleLabel = getRoleLabelFromRoute(input.route);
+
+  setLocalDemoSession({
+    id: `local-${roleLabel.toLowerCase()}-${input.email}`,
+    name: getDisplayNameFromAuth(input.email, input.metadata),
+    roleLabel,
+    route: input.route,
+  });
+  demoWorkspaceActions.ensureWorkspaceForCurrentSession();
+}
+
+function getRoleLabelFromRoute(route: string): string {
+  if (route.startsWith("/admin")) {
+    return "Administration";
+  }
+
+  if (route.startsWith("/pet-sitter")) {
+    return "Pet-sitter";
+  }
+
+  return "Propriétaire";
+}
+
+function getDisplayNameFromAuth(
+  email: string,
+  metadata: Record<string, unknown> | undefined,
+): string {
+  const firstName = metadata?.firstName;
+  const fullName = metadata?.full_name ?? metadata?.name;
+
+  if (typeof firstName === "string" && firstName.trim()) {
+    return firstName.trim();
+  }
+
+  if (typeof fullName === "string" && fullName.trim()) {
+    return fullName.trim();
+  }
+
+  const emailName = email.split("@")[0] ?? "Compte MamiPet";
+
+  return emailName
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function isAuthRateLimitError(error: {
+  message?: string | undefined;
+  status?: number | undefined;
+}): boolean {
+  const message = error.message?.toLowerCase() ?? "";
+
+  return error.status === 429 || message.includes("rate limit");
 }
 
 type ApiFailure = {

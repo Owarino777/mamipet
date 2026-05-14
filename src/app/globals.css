@@ -2066,32 +2066,135 @@ textarea {
   gap: 12px;
 }
 
+.assessment-list {
+  display: grid;
+  gap: 12px;
+}
+
+.assessment-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 76%);
+}
+
+.assessment-card strong {
+  color: var(--text);
+}
+
+.assessment-card p {
+  margin-top: 4px;
+}
+
+.assessment-card span {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--green);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.assessment-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: clamp(14px, 3vw, 36px);
+  background: rgb(22 28 48 / 58%);
+  backdrop-filter: blur(10px);
+}
+
+.assessment-modal {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  width: min(100%, 980px);
+  max-height: min(92vh, 860px);
+  overflow: hidden;
+  border: 1px solid rgb(212 220 244 / 88%);
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 28px 80px rgb(22 28 48 / 32%);
+}
+
+.assessment-modal__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: start;
+  padding: clamp(18px, 4vw, 30px);
+  border-bottom: 1px solid var(--border);
+  background:
+    linear-gradient(135deg, rgb(233 239 255 / 96%), rgb(253 241 251 / 78%)),
+    white;
+}
+
+.assessment-modal__header h2 {
+  font-size: clamp(1.9rem, 4vw, 3.1rem);
+}
+
+.assessment-modal__header p:not(.section-kicker) {
+  max-width: 720px;
+  margin-top: 8px;
+}
+
+.assessment-progress {
+  height: 8px;
+  background: var(--green-soft);
+}
+
+.assessment-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--coral));
+  transition: width 180ms ease;
+}
+
+.assessment-modal__body {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+  overflow-y: auto;
+  padding: clamp(18px, 4vw, 34px);
+}
+
+.assessment-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .test-progress {
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--green);
   margin-bottom: 4px;
 }
 
 .test-scenario {
-  padding: 14px;
+  padding: clamp(16px, 3vw, 24px);
   border: 1px solid rgb(49 91 72 / 14%);
   border-radius: 8px;
   background: rgb(255 255 255 / 72%);
   color: var(--text);
-  font-weight: 750;
+  font-size: clamp(1.02rem, 2vw, 1.18rem);
+  font-weight: 850;
 }
 
 .test-answer {
-  min-height: 54px;
-  padding: 12px 14px;
+  min-height: 68px;
+  padding: 16px 18px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: white;
   color: var(--text);
+  cursor: pointer;
   font-weight: 850;
+  line-height: 1.45;
   text-align: left;
 }
 
@@ -2271,6 +2374,20 @@ textarea {
 .pet-mini-card span {
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.pet-image-preview {
+  position: relative;
+  width: 100%;
+  min-height: 150px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--green-soft);
+}
+
+.pet-image-preview img {
+  object-fit: cover;
 }
 
 .mini-sitter-card {
@@ -2850,6 +2967,11 @@ textarea {
 
   .journey-list--horizontal {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .assessment-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
   }
 }
 

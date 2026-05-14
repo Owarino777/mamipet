@@ -154,6 +154,28 @@ export function publishDemoPetSitterProfile(validatedTests: string[]) {
   window.dispatchEvent(new Event("mamipet-demo-session"));
 }
 
+export function saveDemoPetSitterValidatedTests(validatedTests: string[]) {
+  const session = parseDemoSession(window.localStorage.getItem(demoSessionStorageKey) ?? "");
+
+  if (!session) {
+    return;
+  }
+
+  window.localStorage.setItem(
+    demoSessionStorageKey,
+    JSON.stringify({
+      ...session,
+      activeRole: "petSitter",
+      enabledRoles: Array.from(new Set([...(session.enabledRoles ?? []), "petSitter"])),
+      petSitterProfileStatus: session.petSitterProfileStatus ?? "draft",
+      petSitterValidatedTests: Array.from(new Set(validatedTests)),
+      roleLabel: getRoleLabel("petSitter"),
+      route: getRouteForRole("petSitter"),
+    }),
+  );
+  window.dispatchEvent(new Event("mamipet-demo-session"));
+}
+
 export function clearDemoSession() {
   window.localStorage.removeItem(demoSessionStorageKey);
   window.dispatchEvent(new Event("mamipet-demo-session"));

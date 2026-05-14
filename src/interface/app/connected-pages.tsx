@@ -12,6 +12,7 @@ import {
   ConnectedShellIdentity,
   DemoSessionGreeting,
   publishDemoPetSitterProfile,
+  saveDemoPetSitterValidatedTests,
   type DemoSessionRole,
   setLocalDemoSession,
   switchDemoSessionRole,
@@ -37,6 +38,9 @@ import {
 } from "@/interface/shared/product-ui";
 import { calculatePaymentBreakdown } from "@/modules/payments/domain/platform-commission";
 import { createSupabaseBrowserClient } from "@/shared/supabase/browser-client";
+
+const defaultPetImageUrl =
+  "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=82";
 
 export function OwnerDashboardPage() {
   const workspace = useDemoWorkspace();
@@ -223,6 +227,7 @@ export function OwnerAnimalsPage() {
   const workspace = useDemoWorkspace();
   const [isAddingPet, setIsAddingPet] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [petImagePreview, setPetImagePreview] = useState(defaultPetImageUrl);
 
   const blockedContent = useRoleAccess("owner");
   if (blockedContent) {
@@ -257,6 +262,7 @@ export function OwnerAnimalsPage() {
               const name = String(formData.get("name") ?? "").trim();
               const species = String(formData.get("species") ?? "").trim();
               const age = String(formData.get("age") ?? "").trim();
+              const imageUrl = String(formData.get("imageUrl") ?? "").trim();
               const needs = String(formData.get("needs") ?? "")
                 .split(",")
                 .map((need) => need.trim())
@@ -268,11 +274,13 @@ export function OwnerAnimalsPage() {
                   species,
                   age,
                   needs: needs.length > 0 ? needs : ["Consignes à compléter"],
-                  image:
-                    "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=82",
+                  image: imageUrl.startsWith("https://images.unsplash.com/")
+                    ? imageUrl
+                    : petImagePreview,
                 });
                 setStatusMessage(`${name} a été ajouté au dossier propriétaire.`);
                 event.currentTarget.reset();
+                setPetImagePreview(defaultPetImageUrl);
                 setIsAddingPet(false);
               } catch (error) {
                 setStatusMessage(getErrorMessage(error));
@@ -295,6 +303,44 @@ export function OwnerAnimalsPage() {
               Besoins, séparés par des virgules
               <input name="needs" placeholder="Sous traitement, anxieux" />
             </label>
+            <label>
+              Photo de l&apos;animal
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+
+                  if (!file) {
+                    return;
+                  }
+
+                  if (file.size > 900_000) {
+                    setStatusMessage(
+                      "Image trop lourde pour la démo locale. Utilisez une image de moins de 900 Ko.",
+                    );
+                    event.target.value = "";
+                    return;
+                  }
+
+                  const reader = new FileReader();
+                  reader.addEventListener("load", () => {
+                    if (typeof reader.result === "string") {
+                      setPetImagePreview(reader.result);
+                      setStatusMessage(null);
+                    }
+                  });
+                  reader.readAsDataURL(file);
+                }}
+              />
+            </label>
+            <label>
+              URL Unsplash optionnelle
+              <input name="imageUrl" placeholder="https://images.unsplash.com/..." />
+            </label>
+            <div className="pet-image-preview" aria-label="Aperçu de la photo">
+              <Image src={petImagePreview} alt="Aperçu de l'animal" fill sizes="180px" />
+            </div>
             <button className="primary-button" type="submit">
               Enregistrer l&apos;animal
             </button>
@@ -1431,7 +1477,9 @@ const petSitterCompetencyTests: CompetencyTrack[] = [
 export function PetSitterOnboardingPage() {
   const router = useRouter();
   const session = useDemoSession();
-  const [selectedTests, setSelectedTests] = useState<string[]>(["dogs", "cats"]);
+  const [selectedTests, setSelectedTests] = useState<string[]>(() =>
+    Array.from(new Set(["dogs", "cats", ...(session?.petSitterValidatedTests ?? [])])),
+  );
   const [activeTestId, setActiveTestId] = useState("dogs");
   const [validatedTestIds, setValidatedTestIds] = useState<string[]>(
     session?.petSitterValidatedTests ?? [],
@@ -1439,6 +1487,7 @@ export function PetSitterOnboardingPage() {
   const [questionIndices, setQuestionIndices] = useState<Record<string, number>>({});
   const [selectedAnswerLabel, setSelectedAnswerLabel] = useState<string | null>(null);
   const [correctCounts, setCorrectCounts] = useState<Record<string, number>>({});
+  const [isTestModalOpen, setIsTestModalOpen] = useState(false);
 
   const activeTest =
     petSitterCompetencyTests.find((test) => test.id === activeTestId) ??
@@ -1471,6 +1520,35 @@ export function PetSitterOnboardingPage() {
   ).length;
   const canActivateProfile =
     selectedTests.length > 0 && selectedTests.every((testId) => validatedTestIds.includes(testId));
+  const activeTestScore = correctCounts[activeTestId] ?? 0;
+  const activeTestThreshold = Math.ceil(totalQuestions * 0.6);
+  const activeTestProgressPercent = Math.min((qIdx / totalQuestions) * 100, 100);
+
+  useEffect(() => {
+    if (!isTestModalOpen) {
+      return;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsTestModalOpen(false);
+      }
+    }
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isTestModalOpen]);
+
+  function openTest(testId: string) {
+    setActiveTestId(testId);
+    setSelectedAnswerLabel(null);
+    setIsTestModalOpen(true);
+  }
 
   function handleNextQuestion() {
     const wasCorrect = selectedAnswer?.isCorrect ?? false;
@@ -1481,9 +1559,15 @@ export function PetSitterOnboardingPage() {
       setQuestionIndices((prev) => ({ ...prev, [activeTestId]: totalQuestions }));
       const threshold = Math.ceil(totalQuestions * 0.6);
       if (newCount >= threshold) {
-        setValidatedTestIds((current) =>
-          current.includes(activeTestId) ? current : [...current, activeTestId],
-        );
+        setValidatedTestIds((current) => {
+          const nextValidatedTests = current.includes(activeTestId)
+            ? current
+            : [...current, activeTestId];
+
+          saveDemoPetSitterValidatedTests(nextValidatedTests);
+
+          return nextValidatedTests;
+        });
       }
     } else {
       setQuestionIndices((prev) => ({ ...prev, [activeTestId]: qIdx + 1 }));
@@ -1494,7 +1578,13 @@ export function PetSitterOnboardingPage() {
   function handleRetryTest() {
     setQuestionIndices((prev) => ({ ...prev, [activeTestId]: 0 }));
     setCorrectCounts((prev) => ({ ...prev, [activeTestId]: 0 }));
-    setValidatedTestIds((current) => current.filter((id) => id !== activeTestId));
+    setValidatedTestIds((current) => {
+      const nextValidatedTests = current.filter((id) => id !== activeTestId);
+
+      saveDemoPetSitterValidatedTests(nextValidatedTests);
+
+      return nextValidatedTests;
+    });
     setSelectedAnswerLabel(null);
   }
 
@@ -1560,11 +1650,17 @@ export function PetSitterOnboardingPage() {
                         : selectedTests.filter((testId) => testId !== test.id);
 
                       setSelectedTests(nextSelectedTests);
-                      setValidatedTestIds((current) =>
-                        nextSelectedTests.includes(test.id)
+                      setValidatedTestIds((current) => {
+                        const nextValidatedTests = nextSelectedTests.includes(test.id)
                           ? current
-                          : current.filter((testId) => testId !== test.id),
-                      );
+                          : current.filter((testId) => testId !== test.id);
+
+                        if (nextValidatedTests.length !== current.length) {
+                          saveDemoPetSitterValidatedTests(nextValidatedTests);
+                        }
+
+                        return nextValidatedTests;
+                      });
                       if (event.target.checked) {
                         setActiveTestId(test.id);
                       }
@@ -1598,79 +1694,45 @@ export function PetSitterOnboardingPage() {
 
           <article className="workspace-card onboarding-panel onboarding-panel--pink">
             <p className="section-kicker">Étape 2 sur 4</p>
-            <h2>Test {activeTest.label.toLowerCase()}</h2>
+            <h2>Évaluations de compétence</h2>
+            <p>
+              Chaque questionnaire s&apos;ouvre en plein écran pour éviter les réponses
+              rapides et garder le candidat concentré sur le cas pratique.
+            </p>
+            <div className="assessment-list">
+              {selectedTracks.length > 0 ? (
+                selectedTracks.map((test) => {
+                  const isValidated = validatedTestIds.includes(test.id);
+                  const currentIndex = questionIndices[test.id] ?? 0;
 
-            {testCompleted ? (
-              <>
-                <p className="test-scenario">
-                  Test terminé —{" "}
-                  <strong>
-                    {correctCounts[activeTestId] ?? 0} / {totalQuestions}
-                  </strong>{" "}
-                  bonne(s) réponse(s).
+                  return (
+                    <article className="assessment-card" key={test.id}>
+                      <div>
+                        <strong>{test.publicBadge}</strong>
+                        <p>{test.detail}</p>
+                        <span>
+                          {isValidated
+                            ? "Validé et conservé dans la session"
+                            : `${Math.min(currentIndex + 1, test.questions.length)} / ${test.questions.length} questions`}
+                        </span>
+                      </div>
+                      <button
+                        className={isValidated ? "secondary-button" : "primary-button"}
+                        type="button"
+                        onClick={() => openTest(test.id)}
+                      >
+                        {isValidated ? "Revoir le test" : "Démarrer le questionnaire"}
+                      </button>
+                    </article>
+                  );
+                })
+              ) : (
+                <p className="workspace-status">
+                  Sélectionnez au moins une famille d&apos;animaux pour préparer un
+                  questionnaire.
                 </p>
-                {validatedTestIds.includes(activeTestId) ? (
-                  <p className="test-feedback test-feedback--success">
-                    Badge « {activeTest.publicBadge} » validé ! Passez à l&apos;espèce suivante ou activez votre profil.
-                  </p>
-                ) : (
-                  <>
-                    <p className="test-feedback test-feedback--warning">
-                      Score insuffisant — il faut au moins {Math.ceil(totalQuestions * 0.6)}{" "}
-                      bonne(s) réponse(s) sur {totalQuestions} pour valider le badge.
-                    </p>
-                    <button className="secondary-button" type="button" onClick={handleRetryTest}>
-                      Réessayer le test
-                    </button>
-                  </>
-                )}
-              </>
-            ) : (
-              <>
-                <p className="test-progress">
-                  Question {qIdx + 1} / {totalQuestions}
-                </p>
-                <p className="test-scenario">{currentQuestion?.scenario}</p>
-                <div className="test-answer-list">
-                  {currentQuestion?.answers.map((answer) => (
-                    <button
-                      className={
-                        selectedAnswerLabel === answer.label
-                          ? "test-answer test-answer--selected"
-                          : "test-answer"
-                      }
-                      type="button"
-                      key={answer.label}
-                      onClick={() => {
-                        setSelectedAnswerLabel(answer.label);
-                      }}
-                    >
-                      {answer.label}
-                    </button>
-                  ))}
-                </div>
-                {selectedAnswer ? (
-                  <>
-                    <p
-                      className={
-                        selectedAnswer.isCorrect
-                          ? "test-feedback test-feedback--success"
-                          : "test-feedback test-feedback--warning"
-                      }
-                    >
-                      {selectedAnswer.feedback}
-                    </p>
-                    <button className="primary-button" type="button" onClick={handleNextQuestion}>
-                      {isLastQuestion ? "Terminer le test" : "Question suivante →"}
-                    </button>
-                  </>
-                ) : (
-                  <p className="test-feedback">
-                    Sélectionnez la réponse la plus sûre. Vous pourrez passer à la question suivante après avoir répondu.
-                  </p>
-                )}
-              </>
-            )}
+              )}
+            </div>
           </article>
 
           <aside className="workspace-card onboarding-summary">
@@ -1720,6 +1782,143 @@ export function PetSitterOnboardingPage() {
             ) : null}
           </aside>
         </section>
+
+        {isTestModalOpen ? (
+          <div
+            className="assessment-modal-backdrop"
+            role="presentation"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) {
+                setIsTestModalOpen(false);
+              }
+            }}
+          >
+            <section
+              className="assessment-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="assessment-modal-title"
+            >
+              <div className="assessment-modal__header">
+                <div>
+                  <p className="section-kicker">Évaluation MamiPet</p>
+                  <h2 id="assessment-modal-title">
+                    {activeTest.publicBadge} · cas pratiques
+                  </h2>
+                  <p>
+                    Score minimum : {activeTestThreshold} bonne(s) réponse(s) sur{" "}
+                    {totalQuestions}. Une validation réussie reste enregistrée même
+                    si vous quittez cette page.
+                  </p>
+                </div>
+                <button
+                  className="icon-button"
+                  type="button"
+                  onClick={() => setIsTestModalOpen(false)}
+                  aria-label="Fermer le questionnaire"
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+
+              <div className="assessment-progress" aria-hidden="true">
+                <span style={{ width: `${activeTestProgressPercent}%` }} />
+              </div>
+
+              {testCompleted ? (
+                <div className="assessment-modal__body">
+                  <p className="test-scenario">
+                    Questionnaire terminé :{" "}
+                    <strong>
+                      {activeTestScore} / {totalQuestions}
+                    </strong>{" "}
+                    bonne(s) réponse(s).
+                  </p>
+                  {validatedTestIds.includes(activeTestId) ? (
+                    <p className="test-feedback test-feedback--success">
+                      Badge « {activeTest.publicBadge} » validé et enregistré. Vous
+                      pouvez changer de page sans devoir refaire ce questionnaire.
+                    </p>
+                  ) : (
+                    <p className="test-feedback test-feedback--warning">
+                      Score insuffisant. Reprenez le questionnaire pour afficher ce
+                      badge sur votre profil public.
+                    </p>
+                  )}
+                  <div className="assessment-modal__actions">
+                    {!validatedTestIds.includes(activeTestId) ? (
+                      <button
+                        className="secondary-button"
+                        type="button"
+                        onClick={handleRetryTest}
+                      >
+                        Recommencer
+                      </button>
+                    ) : null}
+                    <button
+                      className="primary-button"
+                      type="button"
+                      onClick={() => setIsTestModalOpen(false)}
+                    >
+                      Revenir au profil
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="assessment-modal__body">
+                  <p className="test-progress">
+                    Question {qIdx + 1} / {totalQuestions} · score actuel{" "}
+                    {activeTestScore}
+                  </p>
+                  <p className="test-scenario">{currentQuestion?.scenario}</p>
+                  <div className="test-answer-list">
+                    {currentQuestion?.answers.map((answer) => (
+                      <button
+                        className={
+                          selectedAnswerLabel === answer.label
+                            ? "test-answer test-answer--selected"
+                            : "test-answer"
+                        }
+                        type="button"
+                        key={answer.label}
+                        onClick={() => {
+                          setSelectedAnswerLabel(answer.label);
+                        }}
+                      >
+                        {answer.label}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedAnswer ? (
+                    <>
+                      <p
+                        className={
+                          selectedAnswer.isCorrect
+                            ? "test-feedback test-feedback--success"
+                            : "test-feedback test-feedback--warning"
+                        }
+                      >
+                        {selectedAnswer.feedback}
+                      </p>
+                      <button
+                        className="primary-button"
+                        type="button"
+                        onClick={handleNextQuestion}
+                      >
+                        {isLastQuestion ? "Terminer et enregistrer" : "Question suivante"}
+                      </button>
+                    </>
+                  ) : (
+                    <p className="test-feedback">
+                      Sélectionnez la réponse la plus prudente et la plus conforme aux
+                      consignes transmises par le propriétaire.
+                    </p>
+                  )}
+                </div>
+              )}
+            </section>
+          </div>
+        ) : null}
       </main>
     </ConnectedShell>
   );

@@ -26,7 +26,7 @@ export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
   const [petSitter, setPetSitter] = useState<PublicPetSitter>(() =>
     findInitialProfile(petSitterId),
   );
-  const bookingHref = session ? "/reservations/new" : "/login";
+  const bookingHref = session ? `/reservations/new?sitter=${petSitterId}` : "/login";
 
   useEffect(() => {
     const controller = new AbortController();

@@ -1961,6 +1961,15 @@ textarea {
   gap: 12px;
 }
 
+.test-progress {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
 .test-scenario {
   padding: 14px;
   border: 1px solid rgb(49 91 72 / 14%);

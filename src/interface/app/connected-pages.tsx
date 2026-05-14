@@ -35,6 +35,7 @@ import {
   SensitiveDataNotice,
   TrustBadge,
 } from "@/interface/shared/product-ui";
+import { calculatePaymentBreakdown } from "@/modules/payments/domain/platform-commission";
 import { createSupabaseBrowserClient } from "@/shared/supabase/browser-client";
 
 export function OwnerDashboardPage() {
@@ -96,6 +97,48 @@ export function OwnerDashboardPage() {
                 Trouver un pet-sitter
               </ButtonLink>
             )}
+          </article>
+
+          <article className="workspace-card journey-card">
+            <div className="card-heading-row">
+              <h2>Parcours recommandé</h2>
+              <Link href="/pet-sitters">Rechercher</Link>
+            </div>
+            <ol className="journey-list" aria-label="Parcours propriétaire">
+              <li className="journey-list__item journey-list__item--done">
+                <span>1</span>
+                <div>
+                  <strong>Compléter les animaux</strong>
+                  <p>Besoins, tempérament et informations médicales restent prêts.</p>
+                </div>
+              </li>
+              <li
+                className={
+                  nextBooking
+                    ? "journey-list__item journey-list__item--done"
+                    : "journey-list__item journey-list__item--active"
+                }
+              >
+                <span>2</span>
+                <div>
+                  <strong>Comparer les profils</strong>
+                  <p>Ville, badges, disponibilités et types de garde en premier.</p>
+                </div>
+              </li>
+              <li
+                className={
+                  nextBooking
+                    ? "journey-list__item journey-list__item--active"
+                    : "journey-list__item"
+                }
+              >
+                <span>3</span>
+                <div>
+                  <strong>Envoyer une demande claire</strong>
+                  <p>Le paiement arrive seulement après acceptation du pet-sitter.</p>
+                </div>
+              </li>
+            </ol>
           </article>
 
           <article className="workspace-card">
@@ -306,6 +349,9 @@ export function BookingFlowPage() {
   const [startDate, setStartDate] = useState("2026-05-24");
   const [endDate, setEndDate] = useState("2026-05-26");
   const [careType, setCareType] = useState("Garde chez le pet-sitter");
+  const [instructions, setInstructions] = useState(
+    "Luna devient anxieuse pendant les orages. Milo doit rester à l'intérieur.",
+  );
   const [insuranceLevel, setInsuranceLevel] = useState<"standard" | "premium">(
     "standard",
   );
@@ -314,6 +360,11 @@ export function BookingFlowPage() {
     selectedPets.length > 0
       ? 7600 + selectedPets.length * 1500 + (insuranceLevel === "premium" ? 900 : 0)
       : 0;
+  const paymentBreakdown =
+    estimatedTotalCents > 0 ? calculatePaymentBreakdown(estimatedTotalCents) : null;
+  const hasInvalidDates = endDate < startDate;
+  const canSubmitRequest = selectedPets.length > 0 && !hasInvalidDates;
+  const bookingStepIndex = selectedPets.length === 0 ? 0 : hasInvalidDates ? 1 : 3;
 
   const blockedContent = useRoleAccess("owner");
   if (blockedContent) {
@@ -325,7 +376,12 @@ export function BookingFlowPage() {
       <main className="booking-workspace">
         <section className="booking-steps" aria-label="Étapes de réservation">
           {["Animaux", "Garde", "Consignes", "Vérification"].map((step, index) => (
-            <span className={index === 0 ? "step-pill step-pill--active" : "step-pill"} key={step}>
+            <span
+              className={
+                index <= bookingStepIndex ? "step-pill step-pill--active" : "step-pill"
+              }
+              key={step}
+            >
               {index + 1}. {step}
             </span>
           ))}
@@ -333,7 +389,14 @@ export function BookingFlowPage() {
 
         <div className="booking-layout">
           <section className="workspace-card booking-form-card">
-            <h1>Quels animaux seront gardés ?</h1>
+            <div className="booking-form-card__header">
+              <p className="section-kicker">Demande directe</p>
+              <h1>Préparez une demande claire pour {sitter.firstName}.</h1>
+              <p>
+                Les informations sensibles servent uniquement à vérifier la faisabilité
+                de la garde. Le paiement test sera proposé après acceptation.
+              </p>
+            </div>
             {workspace.pets.length > 0 ? (
               <div className="pet-mini-grid">
                 {workspace.pets.map((pet) => (
@@ -350,7 +413,10 @@ export function BookingFlowPage() {
                         setRequestStatus(null);
                       }}
                     />
-                    <PetMiniCard pet={pet} />
+                    <div>
+                      <PetMiniCard pet={pet} />
+                      <p>{pet.needs.join(" · ")}</p>
+                    </div>
                   </label>
                 ))}
               </div>
@@ -368,7 +434,10 @@ export function BookingFlowPage() {
                 <input
                   type="date"
                   value={startDate}
-                  onChange={(event) => setStartDate(event.target.value)}
+                  onChange={(event) => {
+                    setStartDate(event.target.value);
+                    setRequestStatus(null);
+                  }}
                 />
               </label>
               <label>
@@ -376,14 +445,20 @@ export function BookingFlowPage() {
                 <input
                   type="date"
                   value={endDate}
-                  onChange={(event) => setEndDate(event.target.value)}
+                  onChange={(event) => {
+                    setEndDate(event.target.value);
+                    setRequestStatus(null);
+                  }}
                 />
               </label>
               <label>
                 Type de garde
                 <select
                   value={careType}
-                  onChange={(event) => setCareType(event.target.value)}
+                  onChange={(event) => {
+                    setCareType(event.target.value);
+                    setRequestStatus(null);
+                  }}
                 >
                   <option>Garde chez le pet-sitter</option>
                   <option>Garde à domicile</option>
@@ -395,9 +470,10 @@ export function BookingFlowPage() {
                 Assurance
                 <select
                   value={insuranceLevel}
-                  onChange={(event) =>
-                    setInsuranceLevel(event.target.value as "standard" | "premium")
-                  }
+                  onChange={(event) => {
+                    setInsuranceLevel(event.target.value as "standard" | "premium");
+                    setRequestStatus(null);
+                  }}
                 >
                   <option value="standard">Standard</option>
                   <option value="premium">Premium</option>
@@ -409,9 +485,19 @@ export function BookingFlowPage() {
               <textarea
                 name="instructions"
                 rows={5}
+                value={instructions}
+                onChange={(event) => {
+                  setInstructions(event.target.value);
+                  setRequestStatus(null);
+                }}
                 placeholder="Traitement, alimentation, comportement, urgence..."
               />
             </label>
+            {hasInvalidDates ? (
+              <p className="workspace-status workspace-status--warning">
+                La date de fin doit être identique ou postérieure à la date de début.
+              </p>
+            ) : null}
             <SensitiveDataNotice />
           </section>
 
@@ -433,19 +519,30 @@ export function BookingFlowPage() {
                 <dd>{selectedPets.map((pet) => pet.name).join(", ") || "Aucun animal"}</dd>
               </div>
               <div>
+                <dt>Type</dt>
+                <dd>{careType}</dd>
+              </div>
+              <div>
                 <dt>Total estimé</dt>
-                <dd>{formatEuro(estimatedTotalCents)}</dd>
+                <dd>{formatEuro(paymentBreakdown?.totalAmountCents ?? 0)}</dd>
+              </div>
+              <div>
+                <dt>Commission MamiPet</dt>
+                <dd>{formatEuro(paymentBreakdown?.platformCommissionCents ?? 0)}</dd>
               </div>
             </dl>
+            <div className="booking-next-step-note">
+              <strong>Après envoi</strong>
+              <p>
+                {sitter.firstName} accepte ou refuse. En cas d&apos;acceptation, le
+                créneau est bloqué et vous confirmez par paiement test.
+              </p>
+            </div>
             <button
               className="primary-button"
               type="button"
-              disabled={selectedPets.length === 0}
+              disabled={!canSubmitRequest}
               onClick={() => {
-                const instructions = document.querySelector<HTMLTextAreaElement>(
-                  "textarea[name='instructions']",
-                );
-
                 try {
                   demoWorkspaceActions.createBooking({
                     petIds: selectedPetIds,
@@ -454,7 +551,7 @@ export function BookingFlowPage() {
                     startDate,
                     endDate,
                     careType,
-                    instructions: instructions?.value ?? "",
+                    instructions,
                     baseAmountCents: estimatedTotalCents,
                     insuranceLevel,
                   });
@@ -468,7 +565,7 @@ export function BookingFlowPage() {
             >
               Envoyer la demande
             </button>
-            <small>Paiement uniquement après acceptation.</small>
+            <small>Demande gratuite. Paiement uniquement après acceptation.</small>
             {requestStatus ? <p className="workspace-status">{requestStatus}</p> : null}
           </aside>
         </div>
@@ -510,6 +607,35 @@ export function PetSitterDashboardPage() {
           <MetricCard title="Statut" value="Vérifiée" detail="Identité validée" />
           <MetricCard title="Réponse" value="98 %" detail="Temps moyen : 1 h" />
           <MetricCard title="Demandes actives" value={String(activeRequests.length)} detail={`${acceptedCount} acceptée(s)`} />
+        </section>
+        <section className="workspace-card pet-sitter-workflow">
+          <div>
+            <p className="section-kicker">Parcours pet-sitter</p>
+            <h2>Priorisez les demandes qui correspondent vraiment à vos compétences.</h2>
+          </div>
+          <ol className="journey-list journey-list--horizontal" aria-label="Parcours pet-sitter">
+            <li className="journey-list__item journey-list__item--active">
+              <span>1</span>
+              <div>
+                <strong>Lire besoins et consignes</strong>
+                <p>Espèces, dates, soins et contexte avant toute réponse.</p>
+              </div>
+            </li>
+            <li className="journey-list__item">
+              <span>2</span>
+              <div>
+                <strong>Accepter uniquement si faisable</strong>
+                <p>Une acceptation bloque le créneau dans le parcours MVP.</p>
+              </div>
+            </li>
+            <li className="journey-list__item">
+              <span>3</span>
+              <div>
+                <strong>Suivre paiement et contrat</strong>
+                <p>Le récapitulatif encadre parties, tarif, assurance et consignes.</p>
+              </div>
+            </li>
+          </ol>
         </section>
         <section className="workspace-grid">
           <article className="workspace-card">

@@ -634,6 +634,40 @@ textarea {
   -webkit-line-clamp: 2;
 }
 
+.sitter-card__signals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.sitter-card__signals div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid rgb(142 165 231 / 42%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 72%);
+}
+
+.sitter-card__signals dt {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.sitter-card__signals dd {
+  margin: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .sitter-card__footer {
   justify-content: space-between;
   gap: 12px;
@@ -821,6 +855,27 @@ textarea {
   width: 100%;
   padding: 0;
   background: var(--page);
+}
+
+.search-journey-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 12px clamp(18px, 3vw, 48px);
+  border-bottom: 1px solid var(--border);
+  background: rgb(255 255 255 / 82%);
+}
+
+.search-journey-strip span {
+  min-height: 34px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: white;
+  color: var(--muted);
+  font-size: 0.83rem;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .search-bar-panel {
@@ -1626,10 +1681,55 @@ textarea {
   padding: 18px;
 }
 
+.booking-panel__proofs {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--green-soft);
+}
+
+.booking-panel__proofs span {
+  color: var(--green);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
 .booking-panel small,
 .booking-summary-card small {
   color: var(--muted);
   text-align: center;
+}
+
+.profile-confidence-row {
+  display: grid;
+  gap: 12px;
+}
+
+.profile-confidence-row article {
+  display: grid;
+  gap: 8px;
+  min-height: 170px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  box-shadow: var(--shadow);
+}
+
+.profile-confidence-row span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--green);
+  color: white;
+  font-weight: 900;
+}
+
+.profile-confidence-row h2 {
+  font-size: 1.25rem;
 }
 
 .profile-card {
@@ -1832,6 +1932,11 @@ textarea {
   background: var(--green-soft);
   color: var(--green);
   font-weight: 850;
+}
+
+.workspace-status--warning {
+  background: rgb(255 241 229 / 88%);
+  color: #8d3c16;
 }
 
 .workspace-empty-state {
@@ -2051,6 +2156,71 @@ textarea {
   margin-bottom: 18px;
 }
 
+.journey-card {
+  align-content: start;
+}
+
+.journey-list {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.journey-list__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 62%);
+}
+
+.journey-list__item>span {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.journey-list__item strong {
+  color: var(--text);
+}
+
+.journey-list__item p {
+  margin-top: 2px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.journey-list__item--active {
+  border-color: rgb(49 93 207 / 28%);
+  background: var(--green-soft);
+}
+
+.journey-list__item--active>span,
+.journey-list__item--done>span {
+  background: var(--green);
+  color: white;
+}
+
+.journey-list__item--done {
+  border-color: rgb(47 107 63 / 22%);
+}
+
+.pet-sitter-workflow {
+  display: grid;
+  gap: 16px;
+  margin: 18px 0;
+}
+
 .upcoming-card {
   display: grid;
   align-content: start;
@@ -2173,10 +2343,20 @@ textarea {
   gap: 18px;
 }
 
+.booking-form-card__header {
+  display: grid;
+  gap: 8px;
+}
+
+.booking-form-card__header h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+}
+
 .selectable-pet {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
+  gap: 10px;
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -2192,6 +2372,23 @@ textarea {
   display: grid;
   gap: 14px;
   align-content: start;
+}
+
+.booking-next-step-note {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgb(255 248 239 / 92%);
+}
+
+.booking-next-step-note strong {
+  color: var(--text);
+}
+
+.booking-next-step-note p {
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .booking-action-panel,
@@ -2600,6 +2797,10 @@ textarea {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
+  .profile-confidence-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .profile-detail-layout {
     grid-template-columns: minmax(0, 1fr) 460px;
   }
@@ -2644,6 +2845,10 @@ textarea {
   }
 
   .recommendation-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .journey-list--horizontal {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

@@ -139,6 +139,20 @@ export function PublicPetSitterCard({
               <TrustBadge key={badge.id} label={badge.label} />
             ))}
           </div>
+          <dl className="sitter-card__signals">
+            <div>
+              <dt>Réponse</dt>
+              <dd>{petSitter.responseTime}</dd>
+            </div>
+            <div>
+              <dt>Distance</dt>
+              <dd>{petSitter.distanceLabel}</dd>
+            </div>
+            <div>
+              <dt>Dispo</dt>
+              <dd>{petSitter.availabilitySummary}</dd>
+            </div>
+          </dl>
           <p className="sitter-card__copy">{petSitter.description}</p>
           <InlineTagList items={petSitter.species} limit={3} />
           <div className="tag-row">

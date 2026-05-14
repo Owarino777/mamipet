@@ -30,6 +30,13 @@ export function SearchPage() {
   return (
     <PublicShell compact>
       <main className="search-page">
+        <section className="search-journey-strip" aria-label="Parcours de recherche">
+          <span>1. Filtrer selon l&apos;animal</span>
+          <span>2. Comparer badges, distance et tarif</span>
+          <span>3. Ouvrir un profil rassurant</span>
+          <span>4. Envoyer une demande sans paiement immédiat</span>
+        </section>
+
         <PetSitterSearchFilters
           city={search.city}
           need={search.need}

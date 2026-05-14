@@ -102,6 +102,11 @@ export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
             <p>
               Dès {formatEuro(petSitter.basePriceCents)} / {petSitter.priceUnit}
             </p>
+            <div className="booking-panel__proofs">
+              <span>Réponse moyenne : {petSitter.responseTime}</span>
+              <span>{petSitter.availabilitySummary}</span>
+              <span>Adresse exacte masquée avant réservation</span>
+            </div>
             <label>
               Début
               <input type="date" />
@@ -121,6 +126,33 @@ export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
             <ButtonLink href={bookingHref}>Vérifier les disponibilités</ButtonLink>
             <small>Vous ne serez pas facturé avant acceptation.</small>
           </aside>
+        </section>
+
+        <section className="profile-confidence-row" aria-label="Garanties avant réservation">
+          <article>
+            <span>1</span>
+            <h2>Vérifier l&apos;adéquation</h2>
+            <p>
+              Les espèces, modes de garde, badges et capacités sensibles sont visibles
+              avant d&apos;envoyer une demande.
+            </p>
+          </article>
+          <article>
+            <span>2</span>
+            <h2>Partager le nécessaire</h2>
+            <p>
+              Les consignes détaillées de l&apos;animal sont transmises dans le cadre de
+              la demande, sans rendre publiques les données médicales.
+            </p>
+          </article>
+          <article>
+            <span>3</span>
+            <h2>Payer après acceptation</h2>
+            <p>
+              Le paiement test et le récapitulatif contractuel arrivent seulement
+              lorsque le pet-sitter confirme la faisabilité.
+            </p>
+          </article>
         </section>
 
         <section className="profile-grid">

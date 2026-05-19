@@ -2654,6 +2654,48 @@ textarea {
   gap: 6px;
 }
 
+.auth-back-button {
+  position: fixed;
+  right: clamp(1rem, 5vw, 1.6rem);
+  bottom: calc(env(safe-area-inset-bottom) + clamp(1rem, 5vw, 1.6rem));
+  z-index: 40;
+  display: inline-flex;
+  min-height: clamp(2.7rem, 11vw, 3.15rem);
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0 clamp(0.95rem, 4vw, 1.2rem);
+  border-radius: 999px;
+  background: rgb(255 253 246 / 86%);
+  color: #0340cf;
+  cursor: pointer;
+  font-size: clamp(0.9rem, 3.8vw, 1rem);
+  font-weight: 950;
+  box-shadow:
+    0 0.8rem 1.5rem rgb(39 49 79 / 12%),
+    inset 0 0 0 0.08rem rgb(3 64 207 / 12%);
+  backdrop-filter: blur(14px);
+  transition:
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.auth-back-button::before {
+  display: block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-bottom: 0.16rem solid currentColor;
+  border-left: 0.16rem solid currentColor;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.auth-back-button:hover {
+  box-shadow:
+    0 1rem 1.7rem rgb(39 49 79 / 16%),
+    inset 0 0 0 0.08rem rgb(3 64 207 / 18%);
+  transform: translateY(-0.08rem);
+}
+
 .login-screen {
   position: relative;
   display: grid;
@@ -2938,12 +2980,20 @@ textarea {
 }
 
 @media (min-width: 760px) {
+  .auth-back-button {
+    top: calc(env(safe-area-inset-top) + clamp(1.1rem, 2.4vw, 1.8rem));
+    right: auto;
+    bottom: auto;
+    left: clamp(1.1rem, 2.4vw, 1.8rem);
+  }
+
   .login-panel {
     padding-top: clamp(3.9rem, 7.2vh, 5.4rem);
   }
 }
 
 .register-screen {
+  position: relative;
   display: grid;
   min-height: 100vh;
   min-height: 100dvh;
@@ -2953,6 +3003,8 @@ textarea {
 }
 
 .register-panel {
+  position: relative;
+  z-index: 1;
   display: grid;
   width: min(100%, clamp(22rem, 100vw, 30.5rem));
   min-height: 100vh;
@@ -2961,6 +3013,18 @@ textarea {
   justify-items: center;
   padding: clamp(2.2rem, 7vh, 5.8rem) clamp(1.65rem, 8vw, 3rem)
     clamp(3rem, 8vh, 5rem);
+}
+
+.register-animal {
+  position: absolute;
+  z-index: 0;
+  display: none;
+  pointer-events: none;
+}
+
+.register-animal img {
+  object-fit: contain;
+  filter: drop-shadow(0 1.4rem 1.8rem rgb(3 64 207 / 10%));
 }
 
 .register-panel h1 {
@@ -2988,13 +3052,16 @@ textarea {
 
 .register-role-tab {
   min-height: clamp(2.35rem, 9.1vw, 2.8rem);
+  border: 0.1rem solid rgb(3 64 207 / 18%);
   border-radius: 999px;
-  background: #fffdf6;
-  color: #c2d7f3;
+  background: rgb(255 253 246 / 94%);
+  color: #0340cf;
   cursor: pointer;
   font-size: clamp(1rem, 4.1vw, 1.18rem);
   font-weight: 950;
+  box-shadow: 0 0.45rem 0.9rem rgb(39 49 79 / 8%);
   transition:
+    border-color 220ms ease,
     background-color 220ms ease,
     box-shadow 220ms ease,
     color 220ms ease,
@@ -3002,6 +3069,7 @@ textarea {
 }
 
 .register-role-tab.is-active {
+  border-color: #0340cf;
   background: #0340cf;
   color: white;
   box-shadow: 0 0.7rem 1.2rem rgb(3 64 207 / 16%);
@@ -3012,6 +3080,8 @@ textarea {
 }
 
 .register-card {
+  display: grid;
+  align-content: center;
   width: min(100%, clamp(20rem, 87vw, 25.5rem));
   margin-top: clamp(1.35rem, 5.3vw, 1.75rem);
   padding: clamp(2rem, 7.5vw, 2.55rem) clamp(1.8rem, 7.6vw, 2.45rem)
@@ -3179,6 +3249,95 @@ textarea {
   .register-panel {
     padding-top: clamp(2.8rem, 5.8vh, 4.6rem);
     padding-bottom: clamp(2.8rem, 5.8vh, 4.6rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .register-panel {
+    width: min(100%, clamp(40rem, 45vw, 50rem));
+    min-height: 100vh;
+    align-content: start;
+    padding-top: clamp(2.8rem, 4.9vh, 4.05rem);
+    padding-bottom: clamp(1.5rem, 2.8vh, 2.2rem);
+  }
+
+  .register-role-tabs {
+    width: min(100%, clamp(25rem, 31vw, 33rem));
+    margin-top: clamp(1.65rem, 2.8vh, 2.25rem);
+  }
+
+  .register-card {
+    width: min(100%, clamp(34rem, 41vw, 43rem));
+    min-height: min(68vh, 38.5rem);
+    margin-top: clamp(2rem, 3.3vh, 2.75rem);
+    padding: clamp(2.7rem, 4.4vh, 3.6rem) clamp(3rem, 3.9vw, 4.25rem)
+      clamp(3.1rem, 5.4vh, 4.6rem);
+  }
+
+  .register-panel h1 {
+    font-size: clamp(2.45rem, 2.9vw, 3.2rem);
+  }
+
+  .register-form {
+    width: min(100%, 35.5rem);
+    justify-self: center;
+    gap: clamp(1.2rem, 2.15vh, 1.65rem);
+  }
+
+  .register-kind-fieldset {
+    gap: clamp(0.5rem, 1vh, 0.8rem);
+  }
+
+  .register-form-grid {
+    gap: clamp(0.78rem, 1.2vh, 1rem) clamp(1.2rem, 1.4vw, 1.55rem);
+  }
+
+  .register-form-grid input {
+    min-height: clamp(2.35rem, 4.4vh, 2.7rem);
+    font-size: clamp(0.9rem, 0.95vw, 1rem);
+  }
+
+  .register-form-grid label {
+    gap: 0.25rem;
+    font-size: clamp(0.7rem, 0.8vw, 0.78rem);
+  }
+
+  .register-chip span {
+    min-height: clamp(1.9rem, 3.5vh, 2.3rem);
+  }
+
+  .register-kind-fieldset legend {
+    font-size: clamp(0.88rem, 0.95vw, 1rem);
+  }
+
+  .register-password-field {
+    width: min(100%, 70%);
+  }
+
+  .register-submit {
+    width: min(100%, clamp(18rem, 22vw, 24rem));
+    min-height: clamp(2.65rem, 4.9vh, 3rem);
+    margin-top: clamp(0.2rem, 0.6vh, 0.45rem);
+    font-size: clamp(0.95rem, 1vw, 1.08rem);
+  }
+
+  .register-animal {
+    display: block;
+    width: clamp(17rem, 25vw, 31rem);
+    aspect-ratio: 1;
+    opacity: 0.88;
+  }
+
+  .register-animal--left {
+    top: clamp(7rem, 15vh, 11rem);
+    left: clamp(2rem, 7vw, 10rem);
+    transform: scaleX(-1) rotate(8deg);
+  }
+
+  .register-animal--right {
+    right: clamp(2rem, 7vw, 10rem);
+    bottom: clamp(3rem, 7vh, 7rem);
+    transform: rotate(8deg);
   }
 }
 

@@ -1957,6 +1957,9 @@ export function LoginPage() {
 
   return (
     <main className="login-screen">
+      <button className="auth-back-button" type="button" onClick={() => navigateBack(router, "/")}>
+        <span>Retour</span>
+      </button>
       <div className="login-device-notch" aria-hidden="true" />
       <section className="login-panel" aria-labelledby="login-title">
         <Link className="login-logo" href="/" aria-label="Accueil MamiPet" id="login-title">
@@ -2084,6 +2087,12 @@ export function RegisterPage() {
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  function selectRole(nextRole: "owner" | "petSitter") {
+    setRole(nextRole);
+    setRegisterError(null);
+    setRegisterSuccess(null);
+  }
+
   const kinshipOptions =
     role === "petSitter"
       ? ["Mamipet", "Papipet", "Amipet"]
@@ -2091,6 +2100,29 @@ export function RegisterPage() {
 
   return (
     <main className="register-screen">
+      <button
+        className="auth-back-button"
+        type="button"
+        onClick={() => navigateBack(router, "/login")}
+      >
+        <span>Retour</span>
+      </button>
+      <div className="register-animal register-animal--left" aria-hidden="true">
+        <Image
+          alt=""
+          fill
+          sizes="(min-width: 1024px) 30vw, 0px"
+          src="/figma/register-pet-left.avif"
+        />
+      </div>
+      <div className="register-animal register-animal--right" aria-hidden="true">
+        <Image
+          alt=""
+          fill
+          sizes="(min-width: 1024px) 30vw, 0px"
+          src="/figma/register-pet-right.avif"
+        />
+      </div>
       <section className="register-panel" aria-labelledby="register-title">
         <h1 id="register-title">
           Rejoindre
@@ -2102,11 +2134,11 @@ export function RegisterPage() {
             className={role === "petSitter" ? "register-role-tab is-active" : "register-role-tab"}
             type="button"
             aria-pressed={role === "petSitter"}
-            onClick={() => {
-              setRole("petSitter");
-              setRegisterError(null);
-              setRegisterSuccess(null);
+            onPointerDown={(event) => {
+              event.preventDefault();
+              selectRole("petSitter");
             }}
+            onClick={() => selectRole("petSitter")}
           >
             Petsitter
           </button>
@@ -2114,11 +2146,11 @@ export function RegisterPage() {
             className={role === "owner" ? "register-role-tab is-active" : "register-role-tab"}
             type="button"
             aria-pressed={role === "owner"}
-            onClick={() => {
-              setRole("owner");
-              setRegisterError(null);
-              setRegisterSuccess(null);
+            onPointerDown={(event) => {
+              event.preventDefault();
+              selectRole("owner");
             }}
+            onClick={() => selectRole("owner")}
           >
             Propriétaire
           </button>
@@ -2131,9 +2163,13 @@ export function RegisterPage() {
               event.preventDefault();
               const formData = new FormData(event.currentTarget);
               const firstName = String(formData.get("firstName") ?? "").trim();
+              const lastName = String(formData.get("lastName") ?? "").trim();
               const email = String(formData.get("email") ?? "").trim().toLowerCase();
               const password = String(formData.get("password") ?? "");
+              const age = String(formData.get("age") ?? "").trim();
               const city = String(formData.get("city") ?? "").trim() || "Caen";
+              const postalCode = String(formData.get("postalCode") ?? "").trim();
+              const identityKind = String(formData.get("identityKind") ?? "").trim();
 
               setRegisterError(null);
               setRegisterSuccess(null);
@@ -2152,7 +2188,12 @@ export function RegisterPage() {
                   password,
                   options: {
                     data: {
+                      age,
                       firstName,
+                      identityKind,
+                      lastName,
+                      postalCode,
+                      role,
                       city,
                     },
                   },
@@ -2192,7 +2233,7 @@ export function RegisterPage() {
                     firstName,
                     role,
                   });
-                  await ensureOwnerProfile({ firstName, city });
+                  await ensureOwnerProfile({ firstName, city, postalCode });
                   router.push("/dashboard");
                   return;
                 }
@@ -2202,7 +2243,7 @@ export function RegisterPage() {
                   firstName,
                   role,
                 });
-                await ensurePetSitterProfile({ firstName, city });
+                await ensurePetSitterProfile({ firstName, city, postalCode });
                 router.push("/pet-sitter/onboarding");
               } catch (error) {
                 setRegisterError(getErrorMessage(error));
@@ -2284,6 +2325,10 @@ export function RegisterPage() {
       </section>
     </main>
   );
+}
+
+function navigateBack(router: ReturnType<typeof useRouter>, fallbackHref: string) {
+  router.push(fallbackHref);
 }
 
 function BookingActionPanel({ booking }: { booking: DemoBooking }) {
@@ -3064,7 +3109,11 @@ async function resolveDashboardRoute(): Promise<string> {
   return "/dashboard";
 }
 
-async function ensureOwnerProfile(input: { firstName: string; city: string }) {
+async function ensureOwnerProfile(input: {
+  firstName: string;
+  city: string;
+  postalCode: string;
+}) {
   const response = await fetch("/api/profiles/owner", {
     method: "POST",
     headers: {
@@ -3074,6 +3123,7 @@ async function ensureOwnerProfile(input: { firstName: string; city: string }) {
     body: JSON.stringify({
       firstName: input.firstName,
       city: input.city,
+      postalCode: input.postalCode || null,
       country: "France",
     }),
   });
@@ -3086,7 +3136,11 @@ async function ensureOwnerProfile(input: { firstName: string; city: string }) {
   throw new Error(payload.error?.message ?? "Impossible de créer le profil propriétaire.");
 }
 
-async function ensurePetSitterProfile(input: { firstName: string; city: string }) {
+async function ensurePetSitterProfile(input: {
+  firstName: string;
+  city: string;
+  postalCode: string;
+}) {
   const response = await fetch("/api/profiles/pet-sitter", {
     method: "POST",
     headers: {
@@ -3096,6 +3150,7 @@ async function ensurePetSitterProfile(input: { firstName: string; city: string }
     body: JSON.stringify({
       firstName: input.firstName,
       city: input.city,
+      postalCode: input.postalCode || null,
       country: "France",
       basePriceCents: 2800,
       interventionRadiusKm: 15,

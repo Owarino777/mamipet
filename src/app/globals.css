@@ -3253,6 +3253,15 @@ textarea {
 }
 
 @media (min-width: 1024px) {
+  .register-screen {
+    --register-card-width: min(100%, clamp(34rem, 41vw, 43rem));
+    --register-animal-size: clamp(17rem, 25vw, 31rem);
+    --register-animal-side-offset: max(
+      clamp(1rem, 2.2vw, 3rem),
+      calc((100vw - var(--register-card-width)) / 4 - var(--register-animal-size) / 2)
+    );
+  }
+
   .register-panel {
     width: min(100%, clamp(40rem, 45vw, 50rem));
     min-height: 100vh;
@@ -3267,7 +3276,7 @@ textarea {
   }
 
   .register-card {
-    width: min(100%, clamp(34rem, 41vw, 43rem));
+    width: var(--register-card-width);
     min-height: min(68vh, 38.5rem);
     margin-top: clamp(2rem, 3.3vh, 2.75rem);
     padding: clamp(2.7rem, 4.4vh, 3.6rem) clamp(3rem, 3.9vw, 4.25rem)
@@ -3323,21 +3332,21 @@ textarea {
 
   .register-animal {
     display: block;
-    width: clamp(17rem, 25vw, 31rem);
+    width: var(--register-animal-size);
     aspect-ratio: 1;
     opacity: 0.88;
   }
 
   .register-animal--left {
-    top: clamp(7rem, 15vh, 11rem);
-    left: clamp(2rem, 7vw, 10rem);
-    transform: scaleX(-1) rotate(8deg);
+    top: 50%;
+    left: var(--register-animal-side-offset);
+    transform: translateY(-50%) scaleX(-1) rotate(8deg);
   }
 
   .register-animal--right {
-    right: clamp(2rem, 7vw, 10rem);
-    bottom: clamp(3rem, 7vh, 7rem);
-    transform: rotate(8deg);
+    right: var(--register-animal-side-offset);
+    top: 50%;
+    transform: translateY(calc(-50% + clamp(1.2rem, 3vh, 2.1rem))) rotate(8deg);
   }
 }
 

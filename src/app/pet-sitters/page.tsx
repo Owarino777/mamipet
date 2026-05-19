@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import { SearchPage } from "@/interface/public/search-page";
 
 export const metadata: Metadata = {
-  title: "Trouver un pet-sitter | MamiPet",
+  title: "Trouver un pet-sitter",
   description:
     "Comparez des pet-sitters verifies selon les besoins reels de votre animal.",
+  alternates: {
+    canonical: "/pet-sitters",
+  },
 };
 
 export default SearchPage;

@@ -32,7 +32,6 @@ import { formatEuro, formatRating } from "@/interface/shared/format";
 import {
   ButtonLink,
   CareCapabilityTag,
-  PublicShell,
   SensitiveDataNotice,
   TrustBadge,
 } from "@/interface/shared/product-ui";
@@ -1559,15 +1558,12 @@ export function PetSitterOnboardingPage() {
       setQuestionIndices((prev) => ({ ...prev, [activeTestId]: totalQuestions }));
       const threshold = Math.ceil(totalQuestions * 0.6);
       if (newCount >= threshold) {
-        setValidatedTestIds((current) => {
-          const nextValidatedTests = current.includes(activeTestId)
-            ? current
-            : [...current, activeTestId];
+        const nextValidatedTests = validatedTestIds.includes(activeTestId)
+          ? validatedTestIds
+          : [...validatedTestIds, activeTestId];
 
-          saveDemoPetSitterValidatedTests(nextValidatedTests);
-
-          return nextValidatedTests;
-        });
+        setValidatedTestIds(nextValidatedTests);
+        saveDemoPetSitterValidatedTests(nextValidatedTests);
       }
     } else {
       setQuestionIndices((prev) => ({ ...prev, [activeTestId]: qIdx + 1 }));
@@ -1578,13 +1574,10 @@ export function PetSitterOnboardingPage() {
   function handleRetryTest() {
     setQuestionIndices((prev) => ({ ...prev, [activeTestId]: 0 }));
     setCorrectCounts((prev) => ({ ...prev, [activeTestId]: 0 }));
-    setValidatedTestIds((current) => {
-      const nextValidatedTests = current.filter((id) => id !== activeTestId);
+    const nextValidatedTests = validatedTestIds.filter((id) => id !== activeTestId);
 
-      saveDemoPetSitterValidatedTests(nextValidatedTests);
-
-      return nextValidatedTests;
-    });
+    setValidatedTestIds(nextValidatedTests);
+    saveDemoPetSitterValidatedTests(nextValidatedTests);
     setSelectedAnswerLabel(null);
   }
 
@@ -1650,17 +1643,14 @@ export function PetSitterOnboardingPage() {
                         : selectedTests.filter((testId) => testId !== test.id);
 
                       setSelectedTests(nextSelectedTests);
-                      setValidatedTestIds((current) => {
-                        const nextValidatedTests = nextSelectedTests.includes(test.id)
-                          ? current
-                          : current.filter((testId) => testId !== test.id);
+                      if (!nextSelectedTests.includes(test.id)) {
+                        const nextValidatedTests = validatedTestIds.filter(
+                          (testId) => testId !== test.id,
+                        );
 
-                        if (nextValidatedTests.length !== current.length) {
-                          saveDemoPetSitterValidatedTests(nextValidatedTests);
-                        }
-
-                        return nextValidatedTests;
-                      });
+                        setValidatedTestIds(nextValidatedTests);
+                        saveDemoPetSitterValidatedTests(nextValidatedTests);
+                      }
                       if (event.target.checked) {
                         setActiveTestId(test.id);
                       }
@@ -1961,128 +1951,182 @@ export function AdminDashboardPage() {
 
 export function LoginPage() {
   const router = useRouter();
+  const [mode, setMode] = useState<"choice" | "login">("choice");
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
-    <PublicShell compact>
-      <main className="auth-page">
-        <section className="auth-card">
-          <Link className="brand-mark" href="/">
-            <span className="brand-symbol" aria-hidden="true">
-              M
-            </span>
-            <span>
-              Mami<span>Pet</span>
-            </span>
-          </Link>
-          <div>
-            <p className="section-kicker">Accès sécurisé</p>
-            <h1>Connectez-vous pour réserver ou gérer vos gardes.</h1>
-          </div>
-          <form
-            className="auth-form"
-            onSubmit={async (event) => {
-              event.preventDefault();
-              const formData = new FormData(event.currentTarget);
-              const email = String(formData.get("email") ?? "").toLowerCase();
-              const password = String(formData.get("password") ?? "");
+    <main className="login-screen">
+      <div className="login-device-notch" aria-hidden="true" />
+      <section className="login-panel" aria-labelledby="login-title">
+        <Link className="login-logo" href="/" aria-label="Accueil MamiPet" id="login-title">
+          <Image
+            alt=""
+            height={294}
+            priority
+            src="/figma/login-logo-mamipet.avif"
+            width={294}
+          />
+        </Link>
 
-              if (!email || !password) {
-                setLoginError("Renseignez un email pour accéder à votre espace.");
-                return;
-              }
+        <div
+          className={
+            mode === "choice" ? "login-action-card" : "login-action-card login-action-card--form"
+          }
+        >
+          {mode === "choice" ? (
+            <>
+              <Link className="login-primary-action" href="/register">
+                S&rsquo;inscrire
+              </Link>
+              <button
+                className="login-secondary-action"
+                type="button"
+                onClick={() => {
+                  setLoginError(null);
+                  setMode("login");
+                }}
+              >
+                Se Connecter
+              </button>
+              <button className="login-forgot-action" type="button">
+                Mot de passe oublié ?
+              </button>
+            </>
+          ) : (
+            <form
+              className="login-form"
+              onSubmit={async (event) => {
+                event.preventDefault();
+                const formData = new FormData(event.currentTarget);
+                const email = String(formData.get("email") ?? "").trim().toLowerCase();
+                const password = String(formData.get("password") ?? "");
 
-              setIsSubmitting(true);
-              setLoginError(null);
-
-              try {
-                const supabase = createSupabaseBrowserClient();
-                const { error } = await supabase.auth.signInWithPassword({
-                  email,
-                  password,
-                });
-
-                if (error) {
-                  setLoginError(error.message);
+                if (!email || !password) {
+                  setLoginError("Renseigne ton email et ton mot de passe.");
                   return;
                 }
 
-                const dashboardRoute = await resolveDashboardRoute();
-                const { data } = await supabase.auth.getUser();
-                completeLocalLogin({
-                  email,
-                  metadata: data.user?.user_metadata,
-                  route: dashboardRoute,
-                });
-                router.push(dashboardRoute);
-                return;
-              } catch (error) {
-                setLoginError(getErrorMessage(error));
-              } finally {
-                setIsSubmitting(false);
-              }
-            }}
-          >
-            <label>
-              Email
-              <input name="email" type="email" placeholder="olivia.owner@mamipet.test" />
-            </label>
-            <label>
-              Mot de passe
-              <input name="password" type="password" placeholder="••••••••" />
-            </label>
-            <button className="primary-button" type="submit" disabled={isSubmitting}>
-              Continuer
-            </button>
-            {loginError ? <p className="workspace-status">{loginError}</p> : null}
-          </form>
-        </section>
-      </main>
-    </PublicShell>
+                setIsSubmitting(true);
+                setLoginError(null);
+
+                try {
+                  const supabase = createSupabaseBrowserClient();
+                  const { error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                  });
+
+                  if (error) {
+                    setLoginError(error.message);
+                    return;
+                  }
+
+                  const dashboardRoute = await resolveDashboardRoute();
+                  const { data } = await supabase.auth.getUser();
+                  completeLocalLogin({
+                    email,
+                    metadata: data.user?.user_metadata,
+                    route: dashboardRoute,
+                  });
+                  router.push(dashboardRoute);
+                  return;
+                } catch (error) {
+                  setLoginError(getErrorMessage(error));
+                } finally {
+                  setIsSubmitting(false);
+                }
+              }}
+            >
+              <label>
+                Email
+                <input
+                  autoComplete="email"
+                  name="email"
+                  placeholder="margo.mamipet@gmail.com"
+                  type="email"
+                />
+              </label>
+              <label>
+                Mot de passe
+                <input
+                  autoComplete="current-password"
+                  name="password"
+                  placeholder="********"
+                  type="password"
+                />
+              </label>
+              <button className="login-primary-action" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Connexion..." : "Se connecter"}
+              </button>
+              {loginError ? <p className="workspace-status">{loginError}</p> : null}
+              <button
+                className="login-forgot-action"
+                type="button"
+                onClick={() => setMode("choice")}
+              >
+                Retour
+              </button>
+            </form>
+          )}
+          <Link className="login-close-action" href="/" aria-label="Fermer">
+            <span aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
+    </main>
   );
 }
 
 export function RegisterPage() {
   const router = useRouter();
-  const [role, setRole] = useState<"owner" | "petSitter">("owner");
+  const [role, setRole] = useState<"owner" | "petSitter">("petSitter");
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const kinshipOptions =
+    role === "petSitter"
+      ? ["Mamipet", "Papipet", "Amipet"]
+      : ["Maman", "Papa", "Ami"];
 
   return (
-    <PublicShell compact>
-      <main className="auth-page">
-        <section className="auth-card">
-          <Link className="brand-mark" href="/">
-            <span className="brand-symbol" aria-hidden="true">M</span>
-            <span>Mami<span>Pet</span></span>
-          </Link>
-          <div>
-            <p className="section-kicker">Créer un compte</p>
-            <h1>
-              Rejoignez MamiPet en tant que{" "}
-              {role === "owner" ? "propriétaire" : "pet-sitter"}.
-            </h1>
-          </div>
-          <div className="role-picker">
-            <button
-              className={role === "owner" ? "secondary-button role-button--active" : "secondary-button"}
-              type="button"
-              onClick={() => setRole("owner")}
-            >
-              🐾 Je suis propriétaire
-            </button>
-            <button
-              className={role === "petSitter" ? "secondary-button role-button--active" : "secondary-button"}
-              type="button"
-              onClick={() => setRole("petSitter")}
-            >
-              🏠 Je suis pet-sitter
-            </button>
-          </div>
+    <main className="register-screen">
+      <section className="register-panel" aria-labelledby="register-title">
+        <h1 id="register-title">
+          Rejoindre
+          <span>en tant que...</span>
+        </h1>
+
+        <div className="register-role-tabs" aria-label="Choisir un type de compte">
+          <button
+            className={role === "petSitter" ? "register-role-tab is-active" : "register-role-tab"}
+            type="button"
+            aria-pressed={role === "petSitter"}
+            onClick={() => {
+              setRole("petSitter");
+              setRegisterError(null);
+              setRegisterSuccess(null);
+            }}
+          >
+            Petsitter
+          </button>
+          <button
+            className={role === "owner" ? "register-role-tab is-active" : "register-role-tab"}
+            type="button"
+            aria-pressed={role === "owner"}
+            onClick={() => {
+              setRole("owner");
+              setRegisterError(null);
+              setRegisterSuccess(null);
+            }}
+          >
+            Propriétaire
+          </button>
+        </div>
+
+        <section className="register-card" key={role}>
           <form
-            className="auth-form"
+            className="register-form"
             onSubmit={async (event) => {
               event.preventDefault();
               const formData = new FormData(event.currentTarget);
@@ -2167,70 +2211,78 @@ export function RegisterPage() {
               }
             }}
           >
-            <label>
-              Prénom
-              <input name="firstName" type="text" placeholder="Olivia" required />
-            </label>
-            <label>
-              Nom
-              <input name="lastName" type="text" placeholder="Martin" required />
-            </label>
-            <label>
-              Email
-              <input name="email" type="email" placeholder="olivia@example.com" required />
-            </label>
-            <label>
-              Mot de passe
-              <input name="password" type="password" placeholder="••••••••" minLength={8} required />
-            </label>
-            <label>
-              Ville
-              <input name="city" type="text" placeholder="Caen" />
-            </label>
-            {role === "petSitter" ? (
-              <>
-                <label>
-                  Type de garde proposée
-                  <select name="serviceType">
-                    <option value="home">Garde à domicile</option>
-                    <option value="onsite">Garde sur place (chez moi)</option>
-                    <option value="walk">Promenades</option>
-                  </select>
-                </label>
-                <label>
-                  Soins spéciaux possibles
-                  <select name="specialCare">
-                    <option value="none">Aucun</option>
-                    <option value="medication">Administration de médicaments</option>
-                    <option value="senior">Animaux âgés</option>
-                    <option value="anxious">Animaux anxieux</option>
-                  </select>
-                </label>
-              </>
-            ) : (
+            <fieldset className="register-kind-fieldset">
+              <legend>Je suis...</legend>
+              <div className="register-kind-options">
+                {kinshipOptions.map((option, index) => (
+                  <label className="register-chip" key={option}>
+                    <input
+                      defaultChecked={index === 0}
+                      name="identityKind"
+                      type="radio"
+                      value={option}
+                    />
+                    <span>{option}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <div className="register-form-grid">
               <label>
-                Type d&apos;animal
-                <select name="animalType">
-                  <option value="dog">Chien</option>
-                  <option value="cat">Chat</option>
-                  <option value="rabbit">Lapin</option>
-                  <option value="other">Autre</option>
-                </select>
+                Prénom
+                <input name="firstName" type="text" placeholder="Margo" required />
               </label>
-            )}
-            <button className="primary-button" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Création en cours..." : "Créer mon compte"}
+              <label>
+                Nom
+                <input name="lastName" type="text" placeholder="Da Silva" required />
+              </label>
+              <label className="register-field-wide">
+                Adresse mail
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="margo.mamipet@gmail.com"
+                  required
+                />
+              </label>
+              <label>
+                Âge
+                <input name="age" type="number" min="16" placeholder="24" />
+              </label>
+              <label>
+                Ville
+                <input name="city" type="text" placeholder="Caen" />
+              </label>
+              <label>
+                Code postale
+                <input name="postalCode" type="text" inputMode="numeric" placeholder="14000" />
+              </label>
+              <label className="register-password-field">
+                Mot de passe
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="********"
+                  minLength={8}
+                  required
+                />
+              </label>
+            </div>
+
+            <button className="register-submit" type="submit" disabled={isSubmitting}>
+              {isSubmitting
+                ? "Création en cours..."
+                : role === "petSitter"
+                  ? "Devenir mamipet"
+                  : "Créer mon compte"}
             </button>
           </form>
           {registerError ? <p className="workspace-status">{registerError}</p> : null}
           {registerSuccess ? <p className="workspace-status">{registerSuccess}</p> : null}
-          <p>
-            Déjà un compte ?{" "}
-            <Link href="/login">Se connecter</Link>
-          </p>
         </section>
-      </main>
-    </PublicShell>
+      </section>
+    </main>
   );
 }
 

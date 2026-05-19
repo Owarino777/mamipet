@@ -8,9 +8,13 @@ type PetSitterPageProps = {
 };
 
 export const metadata: Metadata = {
-  title: "Profil pet-sitter | MamiPet",
+  title: "Profil pet-sitter",
   description:
     "Consultez les garanties, services et disponibilites publiques d'un pet-sitter MamiPet.",
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default async function PublicPetSitterProfileRoute({

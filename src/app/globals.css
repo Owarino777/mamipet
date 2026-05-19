@@ -116,6 +116,37 @@ img {
   display: block;
 }
 
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes panel-swap {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.login-screen,
+.register-screen,
+.public-shell,
+.connected-shell {
+  animation: page-enter 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
 label {
   display: grid;
   gap: 7px;
@@ -2621,6 +2652,552 @@ textarea {
 .admin-list {
   display: grid;
   gap: 6px;
+}
+
+.login-screen {
+  position: relative;
+  display: grid;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  place-items: stretch center;
+  background-color: #fffdf6;
+  background-image:
+    radial-gradient(circle at 50% 45%, rgb(255 207 237 / 20%), transparent 32rem),
+    image-set(
+      url("/figma/login-floral-bg.avif") type("image/avif"),
+      url("/figma/login-floral-bg.webp") type("image/webp")
+    );
+  background-position:
+    center,
+    center center;
+  background-repeat:
+    no-repeat,
+    no-repeat;
+  background-size:
+    cover,
+    cover;
+}
+
+.login-screen::before,
+.login-screen::after {
+  position: absolute;
+  top: -12%;
+  bottom: -12%;
+  z-index: 0;
+  width: clamp(18rem, 38vw, 46rem);
+  content: "";
+  background-image: image-set(
+    url("/figma/login-floral-bg.avif") type("image/avif"),
+    url("/figma/login-floral-bg.webp") type("image/webp")
+  );
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.34;
+  pointer-events: none;
+}
+
+.login-screen::before {
+  left: clamp(-22rem, -18vw, -6rem);
+  transform: scaleX(-1) rotate(-3deg);
+}
+
+.login-screen::after {
+  right: clamp(-22rem, -18vw, -6rem);
+  transform: rotate(4deg);
+}
+
+.login-device-notch {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 31px);
+  left: 50%;
+  z-index: 2;
+  display: none;
+  width: 106px;
+  height: 31px;
+  border-radius: 999px;
+  background: #020202;
+  box-shadow: inset -15px 0 0 rgb(255 255 255 / 3%);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.login-device-notch::after {
+  position: absolute;
+  top: 8px;
+  right: 18px;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 60% 45%, #162861 0 18%, #05070d 58%);
+  content: "";
+}
+
+.login-panel {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(100%, clamp(20rem, 100vw, 31rem));
+  min-height: 100vh;
+  min-height: 100dvh;
+  align-content: start;
+  justify-items: center;
+  padding: clamp(5.8rem, 10.9vh, 7.3rem) clamp(1.6rem, 6.7vw, 3rem)
+    clamp(3rem, 8vh, 4.5rem);
+}
+
+.login-logo {
+  display: block;
+  width: clamp(15.1rem, 74vw, 22.5rem);
+  filter: drop-shadow(0 0.28rem 0.15rem rgb(3 64 207 / 6%));
+}
+
+.login-logo img {
+  width: 100%;
+  height: auto;
+}
+
+.login-action-card {
+  position: relative;
+  display: grid;
+  width: min(100%, clamp(18.6rem, 81vw, 25.2rem));
+  min-height: clamp(18.8rem, 81.7vw, 25.2rem);
+  justify-items: center;
+  gap: clamp(1.25rem, 5vw, 1.55rem);
+  margin-top: clamp(-5.15rem, -18.7vw, -3.35rem);
+  padding: clamp(2.45rem, 9.85vw, 3.1rem) clamp(2.45rem, 9.7vw, 3.15rem)
+    clamp(3rem, 11.25vw, 3.75rem);
+  border-radius: clamp(1.35rem, 5.6vw, 1.8rem);
+  background:
+    radial-gradient(circle at 18% 12%, rgb(255 255 255 / 20%), transparent 34%),
+    #ffcfed;
+  box-shadow:
+    0 1.25rem 2.5rem rgb(102 27 50 / 10%),
+    inset 0 0.08rem 0 rgb(255 255 255 / 45%);
+}
+
+.login-action-card::after {
+  position: absolute;
+  bottom: clamp(-3.9rem, -11.35vw, -2.95rem);
+  left: 50%;
+  width: clamp(5.95rem, 23.2vw, 7.1rem);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: #ffcfed;
+  content: "";
+  box-shadow: 0 1.25rem 1.8rem rgb(102 27 50 / 8%);
+  transform: translateX(-50%);
+}
+
+.login-action-card--form {
+  width: min(100%, clamp(19.5rem, 82vw, 24rem));
+  min-height: 0;
+  gap: clamp(0.8rem, 3.5vw, 1rem);
+  margin-top: clamp(-3.7rem, -14vw, -2.4rem);
+  padding: clamp(1.75rem, 7vw, 2.3rem) clamp(1.9rem, 7.45vw, 2.5rem)
+    clamp(2.5rem, 9.95vw, 3.1rem);
+}
+
+.login-primary-action,
+.login-secondary-action {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  width: min(100%, clamp(14.9rem, 71.7vw, 18.6rem));
+  min-height: clamp(3.75rem, 14.95vw, 4.35rem);
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: clamp(1.04rem, 4.98vw, 1.28rem);
+  font-weight: 950;
+  letter-spacing: 0;
+  transition:
+    box-shadow 160ms ease,
+    transform 160ms ease,
+    background-color 160ms ease;
+}
+
+.login-primary-action {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 11%), transparent 42%),
+    #0340cf;
+  color: white;
+  box-shadow:
+    0 0.75rem 1.15rem rgb(3 64 207 / 19%),
+    inset 0 -0.08rem 0 rgb(0 0 0 / 14%);
+}
+
+.login-primary-action:hover,
+.login-secondary-action:hover {
+  transform: translateY(-0.08rem);
+}
+
+.login-primary-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.login-secondary-action {
+  background:
+    linear-gradient(180deg, white, #fffdf6);
+  color: #050505;
+  box-shadow:
+    0 0.7rem 1.2rem rgb(102 27 50 / 8%),
+    inset 0 0 0 0.08rem rgb(255 255 255 / 70%);
+}
+
+.login-forgot-action {
+  position: relative;
+  z-index: 1;
+  min-height: clamp(1.7rem, 7vw, 2rem);
+  padding: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #17121a;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: clamp(0.9rem, 3.75vw, 1rem);
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.login-close-action {
+  position: absolute;
+  bottom: clamp(-1.45rem, -4.7vw, -1.2rem);
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  width: clamp(2.65rem, 10.9vw, 3.2rem);
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, white, #fffdf6);
+  box-shadow:
+    0 0.65rem 1.1rem rgb(102 27 50 / 11%),
+    inset 0 0 0 0.06rem rgb(255 255 255 / 90%);
+  transform: translateX(-50%);
+}
+
+.login-close-action::before,
+.login-close-action::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 52%;
+  height: clamp(0.17rem, 0.68vw, 0.22rem);
+  border-radius: 999px;
+  background: #0340cf;
+  content: "";
+  transform-origin: center;
+}
+
+.login-close-action::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.login-close-action::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.login-close-action span {
+  display: none;
+}
+
+.login-form {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  gap: clamp(0.7rem, 3vw, 0.9rem);
+}
+
+.login-form label {
+  color: #111;
+  font-size: clamp(0.78rem, 3vw, 0.9rem);
+  font-weight: 900;
+}
+
+.login-form input {
+  min-height: clamp(2.68rem, 10.7vw, 3rem);
+  border: 1px solid #9f9f9f;
+  border-radius: clamp(0.5rem, 2vw, 0.7rem);
+  background: white;
+  color: #111;
+}
+
+.login-form .workspace-status {
+  color: #8a122a;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+}
+
+@media (min-width: 760px) {
+  .login-panel {
+    padding-top: clamp(3.9rem, 7.2vh, 5.4rem);
+  }
+}
+
+.register-screen {
+  display: grid;
+  min-height: 100vh;
+  min-height: 100dvh;
+  place-items: center;
+  overflow: hidden auto;
+  background: #c2d7f3;
+}
+
+.register-panel {
+  display: grid;
+  width: min(100%, clamp(22rem, 100vw, 30.5rem));
+  min-height: 100vh;
+  min-height: 100dvh;
+  align-content: center;
+  justify-items: center;
+  padding: clamp(2.2rem, 7vh, 5.8rem) clamp(1.65rem, 8vw, 3rem)
+    clamp(3rem, 8vh, 5rem);
+}
+
+.register-panel h1 {
+  display: grid;
+  color: #0340cf;
+  font-family: var(--font-ui);
+  font-size: clamp(2.05rem, 8.4vw, 2.85rem);
+  font-weight: 950;
+  letter-spacing: 0;
+  line-height: 0.86;
+  text-align: center;
+}
+
+.register-panel h1 span {
+  display: block;
+}
+
+.register-role-tabs {
+  display: grid;
+  width: min(100%, clamp(17.5rem, 76vw, 23rem));
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(0.8rem, 3.5vw, 1.2rem);
+  margin-top: clamp(1.55rem, 5.2vw, 2rem);
+}
+
+.register-role-tab {
+  min-height: clamp(2.35rem, 9.1vw, 2.8rem);
+  border-radius: 999px;
+  background: #fffdf6;
+  color: #c2d7f3;
+  cursor: pointer;
+  font-size: clamp(1rem, 4.1vw, 1.18rem);
+  font-weight: 950;
+  transition:
+    background-color 220ms ease,
+    box-shadow 220ms ease,
+    color 220ms ease,
+    transform 220ms ease;
+}
+
+.register-role-tab.is-active {
+  background: #0340cf;
+  color: white;
+  box-shadow: 0 0.7rem 1.2rem rgb(3 64 207 / 16%);
+}
+
+.register-role-tab:hover {
+  transform: translateY(-0.08rem);
+}
+
+.register-card {
+  width: min(100%, clamp(20rem, 87vw, 25.5rem));
+  margin-top: clamp(1.35rem, 5.3vw, 1.75rem);
+  padding: clamp(2rem, 7.5vw, 2.55rem) clamp(1.8rem, 7.6vw, 2.45rem)
+    clamp(2.25rem, 8.5vw, 2.85rem);
+  border-radius: clamp(1.2rem, 5.4vw, 1.65rem);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 98%), rgb(255 255 255 / 95%)),
+    #fffdf6;
+  box-shadow:
+    0 1rem 1.8rem rgb(39 49 79 / 14%),
+    inset 0 0.06rem 0 rgb(255 255 255 / 90%);
+  animation: panel-swap 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.register-form {
+  display: grid;
+  gap: clamp(1.35rem, 4.8vw, 1.75rem);
+}
+
+.register-kind-fieldset {
+  display: grid;
+  gap: clamp(0.75rem, 3vw, 1rem);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.register-kind-fieldset legend {
+  width: 100%;
+  color: #050505;
+  font-size: clamp(0.95rem, 3.8vw, 1.1rem);
+  font-weight: 950;
+  text-align: center;
+}
+
+.register-kind-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.55rem, 2.4vw, 0.8rem);
+}
+
+.register-chip {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+
+.register-chip:nth-child(3) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(52%, 9.5rem);
+}
+
+.register-chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.register-chip span {
+  display: grid;
+  min-height: clamp(2.05rem, 7.4vw, 2.35rem);
+  place-items: center;
+  border: 0.12rem solid #9c9c9c;
+  border-radius: 999px;
+  background: white;
+  color: #111;
+  font-size: clamp(0.95rem, 3.8vw, 1.08rem);
+  line-height: 1;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.register-chip input:checked + span {
+  border-color: #0340cf;
+  box-shadow: inset 0 0 0 0.08rem #0340cf;
+}
+
+.register-chip input:focus-visible + span {
+  outline: 3px solid rgb(3 64 207 / 28%);
+  outline-offset: 3px;
+}
+
+.register-form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(4.5rem, 0.6fr);
+  gap: clamp(0.75rem, 3vw, 0.95rem) clamp(0.8rem, 3.2vw, 1.05rem);
+}
+
+.register-form-grid label {
+  gap: clamp(0.28rem, 1.1vw, 0.4rem);
+  color: #111;
+  font-size: clamp(0.72rem, 2.6vw, 0.82rem);
+  font-weight: 950;
+}
+
+.register-form-grid input {
+  min-height: clamp(2.3rem, 8.8vw, 2.75rem);
+  border: 0.08rem solid #7f7f7f;
+  border-radius: clamp(0.55rem, 2.4vw, 0.78rem);
+  background: white;
+  color: #111;
+  padding-inline: clamp(0.72rem, 2.8vw, 0.95rem);
+  font-size: clamp(0.85rem, 3.3vw, 0.98rem);
+}
+
+.register-field-wide {
+  min-width: 0;
+}
+
+.register-password-field {
+  grid-column: 1 / -1;
+  width: min(100%, 70%);
+}
+
+.register-submit {
+  justify-self: center;
+  width: min(100%, clamp(12.5rem, 53vw, 17rem));
+  min-height: clamp(2.75rem, 10.2vw, 3.25rem);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 18%), transparent 48%),
+    #ff97fd;
+  color: white;
+  cursor: pointer;
+  font-size: clamp(1rem, 4vw, 1.15rem);
+  font-weight: 950;
+  box-shadow: 0 0.8rem 1.3rem rgb(255 151 253 / 18%);
+  transition:
+    box-shadow 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.register-submit:hover {
+  transform: translateY(-0.08rem);
+  box-shadow: 0 0.95rem 1.45rem rgb(255 151 253 / 24%);
+}
+
+.register-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.register-card .workspace-status {
+  margin-top: 0.9rem;
+  color: #661b32;
+  font-size: 0.88rem;
+  font-weight: 850;
+  line-height: 1.35;
+  text-align: center;
+}
+
+@media (min-width: 760px) {
+  .register-screen {
+    background:
+      radial-gradient(circle at 12% 22%, rgb(255 207 237 / 24%), transparent 22rem),
+      radial-gradient(circle at 86% 68%, rgb(255 253 246 / 28%), transparent 24rem),
+      #c2d7f3;
+  }
+
+  .register-panel {
+    padding-top: clamp(2.8rem, 5.8vh, 4.6rem);
+    padding-bottom: clamp(2.8rem, 5.8vh, 4.6rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-screen,
+  .register-screen,
+  .public-shell,
+  .connected-shell,
+  .register-card {
+    animation: none;
+  }
+
+  .login-primary-action,
+  .login-secondary-action,
+  .register-role-tab,
+  .register-chip span,
+  .register-submit {
+    transition: none;
+  }
 }
 
 .auth-page {

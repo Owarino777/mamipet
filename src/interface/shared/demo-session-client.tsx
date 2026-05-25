@@ -3,6 +3,10 @@
 import Link from "next/link";
 import type React from "react";
 import { useSyncExternalStore } from "react";
+import type {
+  PetSitterAnimalOptionId,
+  PetSitterCareOptionId,
+} from "@/modules/pet-sitters/domain/pet-sitter-onboarding-preferences";
 
 export type DemoSessionRole = "owner" | "petSitter" | "admin";
 
@@ -12,6 +16,10 @@ export type DemoSession = {
   id: string;
   name: string;
   petSitterProfileStatus?: "draft" | "published";
+  petSitterSetupPreferences?: {
+    animalOptionIds: PetSitterAnimalOptionId[];
+    careOptionIds: PetSitterCareOptionId[];
+  };
   petSitterValidatedTests?: string[];
   roleLabel: string;
   route: string;
@@ -169,6 +177,34 @@ export function saveDemoPetSitterValidatedTests(validatedTests: string[]) {
       enabledRoles: Array.from(new Set([...(session.enabledRoles ?? []), "petSitter"])),
       petSitterProfileStatus: session.petSitterProfileStatus ?? "draft",
       petSitterValidatedTests: Array.from(new Set(validatedTests)),
+      roleLabel: getRoleLabel("petSitter"),
+      route: getRouteForRole("petSitter"),
+    }),
+  );
+  window.dispatchEvent(new Event("mamipet-demo-session"));
+}
+
+export function saveDemoPetSitterSetupPreferences(input: {
+  animalOptionIds: PetSitterAnimalOptionId[];
+  careOptionIds: PetSitterCareOptionId[];
+}) {
+  const session = parseDemoSession(window.localStorage.getItem(demoSessionStorageKey) ?? "");
+
+  if (!session) {
+    return;
+  }
+
+  window.localStorage.setItem(
+    demoSessionStorageKey,
+    JSON.stringify({
+      ...session,
+      activeRole: "petSitter",
+      enabledRoles: Array.from(new Set([...(session.enabledRoles ?? []), "petSitter"])),
+      petSitterProfileStatus: session.petSitterProfileStatus ?? "draft",
+      petSitterSetupPreferences: {
+        animalOptionIds: Array.from(new Set(input.animalOptionIds)),
+        careOptionIds: Array.from(new Set(input.careOptionIds)),
+      },
       roleLabel: getRoleLabel("petSitter"),
       route: getRouteForRole("petSitter"),
     }),
@@ -366,6 +402,9 @@ function parseDemoSession(rawSession: string): DemoSession | null {
         (source === "fixture" && enabledRoles.includes("petSitter")
           ? "published"
           : "draft"),
+      petSitterSetupPreferences: normalizeSetupPreferences(
+        parsedSession.petSitterSetupPreferences,
+      ),
       petSitterValidatedTests: Array.isArray(parsedSession.petSitterValidatedTests)
         ? parsedSession.petSitterValidatedTests
         : [],
@@ -374,4 +413,21 @@ function parseDemoSession(rawSession: string): DemoSession | null {
   } catch {
     return null;
   }
+}
+
+function normalizeSetupPreferences(
+  value: Partial<DemoSession>["petSitterSetupPreferences"],
+): DemoSession["petSitterSetupPreferences"] {
+  if (!value) {
+    return undefined;
+  }
+
+  return {
+    animalOptionIds: Array.isArray(value.animalOptionIds)
+      ? Array.from(new Set(value.animalOptionIds))
+      : [],
+    careOptionIds: Array.isArray(value.careOptionIds)
+      ? Array.from(new Set(value.careOptionIds))
+      : [],
+  };
 }

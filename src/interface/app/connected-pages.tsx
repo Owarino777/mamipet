@@ -12,6 +12,7 @@ import {
   ConnectedShellIdentity,
   DemoSessionGreeting,
   publishDemoPetSitterProfile,
+  saveDemoPetSitterSetupPreferences,
   saveDemoPetSitterValidatedTests,
   type DemoSessionRole,
   setLocalDemoSession,
@@ -36,6 +37,14 @@ import {
   TrustBadge,
 } from "@/interface/shared/product-ui";
 import { calculatePaymentBreakdown } from "@/modules/payments/domain/platform-commission";
+import {
+  PetSitterOnboardingPreferences,
+  petSitterAnimalOptions,
+  petSitterCareOptions,
+  type PetSitterAnimalOptionId,
+  type PetSitterCareOptionId,
+  type PetSitterOfferReferenceCodes,
+} from "@/modules/pet-sitters/domain/pet-sitter-onboarding-preferences";
 import { createSupabaseBrowserClient } from "@/shared/supabase/browser-client";
 
 const defaultPetImageUrl =
@@ -1476,17 +1485,49 @@ const petSitterCompetencyTests: CompetencyTrack[] = [
 export function PetSitterOnboardingPage() {
   const router = useRouter();
   const session = useDemoSession();
-  const [selectedTests, setSelectedTests] = useState<string[]>(() =>
-    Array.from(new Set(["dogs", "cats", ...(session?.petSitterValidatedTests ?? [])])),
-  );
+  const [localOnboardingPhase, setLocalOnboardingPhase] = useState<
+    "setup" | "tests" | null
+  >(null);
+  const [localCareOptionIds, setLocalCareOptionIds] = useState<
+    PetSitterCareOptionId[] | null
+  >(null);
+  const [localAnimalOptionIds, setLocalAnimalOptionIds] = useState<
+    PetSitterAnimalOptionId[] | null
+  >(null);
+  const [setupError, setSetupError] = useState<string | null>(null);
+  const [isSyncingOffer, setIsSyncingOffer] = useState(false);
+  const [localSelectedTests, setLocalSelectedTests] = useState<string[] | null>(null);
   const [activeTestId, setActiveTestId] = useState("dogs");
-  const [validatedTestIds, setValidatedTestIds] = useState<string[]>(
-    session?.petSitterValidatedTests ?? [],
+  const [localValidatedTestIds, setLocalValidatedTestIds] = useState<string[] | null>(
+    null,
   );
   const [questionIndices, setQuestionIndices] = useState<Record<string, number>>({});
   const [selectedAnswerLabel, setSelectedAnswerLabel] = useState<string | null>(null);
   const [correctCounts, setCorrectCounts] = useState<Record<string, number>>({});
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+  const selectedCareOptionIds =
+    localCareOptionIds ?? session?.petSitterSetupPreferences?.careOptionIds ?? [];
+  const selectedAnimalOptionIds =
+    localAnimalOptionIds ?? session?.petSitterSetupPreferences?.animalOptionIds ?? [];
+  const setupSelectedTests =
+    selectedCareOptionIds.length > 0 && selectedAnimalOptionIds.length > 0
+      ? PetSitterOnboardingPreferences.create({
+          animalOptionIds: selectedAnimalOptionIds,
+          careOptionIds: selectedCareOptionIds,
+        }).getCompetencyTrackIds()
+      : [];
+  const sessionValidatedTests = session?.petSitterValidatedTests ?? [];
+  const selectedTests =
+    localSelectedTests ??
+    (sessionValidatedTests.length > 0 ? sessionValidatedTests : setupSelectedTests);
+  const validatedTestIds = localValidatedTestIds ?? sessionValidatedTests;
+  const resolvedOnboardingPhase =
+    session?.petSitterProfileStatus === "published" ||
+    sessionValidatedTests.length > 0 ||
+    setupSelectedTests.length > 0
+      ? "tests"
+      : "setup";
+  const onboardingPhase = localOnboardingPhase ?? resolvedOnboardingPhase;
 
   const activeTest =
     petSitterCompetencyTests.find((test) => test.id === activeTestId) ??
@@ -1519,6 +1560,9 @@ export function PetSitterOnboardingPage() {
   ).length;
   const canActivateProfile =
     selectedTests.length > 0 && selectedTests.every((testId) => validatedTestIds.includes(testId));
+  const selectedCareLabels = petSitterCareOptions
+    .filter((option) => selectedCareOptionIds.includes(option.id))
+    .map((option) => option.label);
   const activeTestScore = correctCounts[activeTestId] ?? 0;
   const activeTestThreshold = Math.ceil(totalQuestions * 0.6);
   const activeTestProgressPercent = Math.min((qIdx / totalQuestions) * 100, 100);
@@ -1549,6 +1593,93 @@ export function PetSitterOnboardingPage() {
     setIsTestModalOpen(true);
   }
 
+  async function handleStartTests() {
+    const preferences = PetSitterOnboardingPreferences.create({
+      animalOptionIds: selectedAnimalOptionIds,
+      careOptionIds: selectedCareOptionIds,
+    });
+
+    try {
+      preferences.assertReadyForTests();
+    } catch (error) {
+      setSetupError(getErrorMessage(error));
+      return;
+    }
+
+    const nextSelectedTests = preferences.getCompetencyTrackIds();
+    saveDemoPetSitterSetupPreferences({
+      animalOptionIds: preferences.getAnimalOptionIds(),
+      careOptionIds: preferences.getCareOptionIds(),
+    });
+    setLocalSelectedTests(nextSelectedTests);
+    setActiveTestId(nextSelectedTests[0] ?? "dogs");
+    setSetupError(null);
+    setIsSyncingOffer(true);
+
+    try {
+      await syncPetSitterOfferSelection(preferences.toOfferReferenceCodes());
+    } catch {
+      // The local demo must stay usable when the API is unavailable or unauthenticated.
+    } finally {
+      setIsSyncingOffer(false);
+      setLocalOnboardingPhase("tests");
+    }
+  }
+
+  function toggleCareOption(optionId: PetSitterCareOptionId, checked: boolean) {
+    setLocalCareOptionIds((currentIds) => {
+      const nextCurrentIds = currentIds ?? selectedCareOptionIds;
+
+      return checked
+        ? Array.from(new Set([...nextCurrentIds, optionId]))
+        : nextCurrentIds.filter((id) => id !== optionId);
+    });
+    setLocalOnboardingPhase("setup");
+    setSetupError(null);
+  }
+
+  function toggleAnimalOption(optionId: PetSitterAnimalOptionId, checked: boolean) {
+    setLocalAnimalOptionIds((currentIds) => {
+      const nextCurrentIds = currentIds ?? selectedAnimalOptionIds;
+
+      return checked
+        ? Array.from(new Set([...nextCurrentIds, optionId]))
+        : nextCurrentIds.filter((id) => id !== optionId);
+    });
+    setLocalOnboardingPhase("setup");
+    setSetupError(null);
+  }
+
+  function toggleSelectedTest(testId: string, checked: boolean) {
+    setLocalSelectedTests((currentIds) => {
+      const nextCurrentIds = currentIds ?? selectedTests;
+
+      return checked
+        ? Array.from(new Set([...nextCurrentIds, testId]))
+        : nextCurrentIds.filter((id) => id !== testId);
+    });
+  }
+
+  function replaceValidatedTests(testIds: string[]) {
+    setLocalValidatedTestIds(testIds);
+    saveDemoPetSitterValidatedTests(testIds);
+  }
+
+  function removeValidatedTest(testId: string) {
+    const nextValidatedTests = validatedTestIds.filter((id) => id !== testId);
+
+    replaceValidatedTests(nextValidatedTests);
+  }
+
+  function ensureTestSelectionStillActive(testId: string, nextSelectedTests: string[]) {
+    if (nextSelectedTests.includes(testId)) {
+      setActiveTestId(testId);
+      return;
+    }
+
+    setActiveTestId(nextSelectedTests[0] ?? "dogs");
+  }
+
   function handleNextQuestion() {
     const wasCorrect = selectedAnswer?.isCorrect ?? false;
     const newCount = (correctCounts[activeTestId] ?? 0) + (wasCorrect ? 1 : 0);
@@ -1562,8 +1693,7 @@ export function PetSitterOnboardingPage() {
           ? validatedTestIds
           : [...validatedTestIds, activeTestId];
 
-        setValidatedTestIds(nextValidatedTests);
-        saveDemoPetSitterValidatedTests(nextValidatedTests);
+        replaceValidatedTests(nextValidatedTests);
       }
     } else {
       setQuestionIndices((prev) => ({ ...prev, [activeTestId]: qIdx + 1 }));
@@ -1576,9 +1706,82 @@ export function PetSitterOnboardingPage() {
     setCorrectCounts((prev) => ({ ...prev, [activeTestId]: 0 }));
     const nextValidatedTests = validatedTestIds.filter((id) => id !== activeTestId);
 
-    setValidatedTestIds(nextValidatedTests);
-    saveDemoPetSitterValidatedTests(nextValidatedTests);
+    replaceValidatedTests(nextValidatedTests);
     setSelectedAnswerLabel(null);
+  }
+
+  if (onboardingPhase === "setup") {
+    return (
+      <main className="pet-sitter-setup-screen">
+        <section className="pet-sitter-setup-frame" aria-labelledby="pet-sitter-setup-title">
+          <form
+            className="pet-sitter-setup-card"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void handleStartTests();
+            }}
+          >
+            <fieldset className="pet-sitter-setup-group">
+              <legend id="pet-sitter-setup-title">
+                Quelles gardes
+                <span>souhaites-tu faire ?</span>
+              </legend>
+              <div className="pet-sitter-setup-options">
+                {petSitterCareOptions.map((option) => (
+                  <label className="pet-sitter-setup-check" key={option.id}>
+                    <input
+                      type="checkbox"
+                      checked={selectedCareOptionIds.includes(option.id)}
+                      onChange={(event) =>
+                        toggleCareOption(option.id, event.target.checked)
+                      }
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset className="pet-sitter-setup-group">
+              <legend>
+                Quels animaux
+                <span>souhaites-tu garder ?</span>
+              </legend>
+              <div className="pet-sitter-setup-options pet-sitter-setup-options--animals">
+                {[petSitterAnimalOptions.slice(0, 7), petSitterAnimalOptions.slice(7)].map(
+                  (column, columnIndex) => (
+                    <div className="pet-sitter-setup-column" key={columnIndex}>
+                      {column.map((option) => (
+                        <label className="pet-sitter-setup-check" key={option.id}>
+                          <input
+                            type="checkbox"
+                            checked={selectedAnimalOptionIds.includes(option.id)}
+                            onChange={(event) =>
+                              toggleAnimalOption(option.id, event.target.checked)
+                            }
+                          />
+                          <span>{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  ),
+                )}
+              </div>
+            </fieldset>
+
+            {setupError ? (
+              <p className="pet-sitter-setup-error" role="alert">
+                {setupError}
+              </p>
+            ) : null}
+
+            <button className="pet-sitter-setup-submit" type="submit" disabled={isSyncingOffer}>
+              Passer les tests
+            </button>
+          </form>
+        </section>
+      </main>
+    );
   }
 
   return (
@@ -1593,7 +1796,7 @@ export function PetSitterOnboardingPage() {
 
         <ol className="onboarding-stepper" aria-label="Étapes d'activation pet-sitter">
           <li className="onboarding-stepper__item onboarding-stepper__item--active">
-            Espèces
+            Configuration
           </li>
           <li
             className={
@@ -1642,20 +1845,15 @@ export function PetSitterOnboardingPage() {
                         ? Array.from(new Set([...selectedTests, test.id]))
                         : selectedTests.filter((testId) => testId !== test.id);
 
-                      setSelectedTests(nextSelectedTests);
+                      toggleSelectedTest(test.id, event.target.checked);
                       if (!nextSelectedTests.includes(test.id)) {
-                        const nextValidatedTests = validatedTestIds.filter(
-                          (testId) => testId !== test.id,
-                        );
-
-                        setValidatedTestIds(nextValidatedTests);
-                        saveDemoPetSitterValidatedTests(nextValidatedTests);
+                        removeValidatedTest(test.id);
                       }
                       if (event.target.checked) {
                         setActiveTestId(test.id);
                       }
                       if (!event.target.checked && activeTestId === test.id) {
-                        setActiveTestId(nextSelectedTests[0] ?? "dogs");
+                        ensureTestSelectionStillActive(test.id, nextSelectedTests);
                       }
                       setSelectedAnswerLabel(null);
                     }}
@@ -1738,6 +1936,10 @@ export function PetSitterOnboardingPage() {
                 <dd>{session?.name ?? "Compte MamiPet"}</dd>
               </div>
               <div>
+                <dt>Gardes sélectionnées</dt>
+                <dd>{selectedCareLabels.join(", ") || "Aucune"}</dd>
+              </div>
+              <div>
                 <dt>Espèces sélectionnées</dt>
                 <dd>{selectedTestLabels.join(", ") || "Aucun"}</dd>
               </div>
@@ -1750,6 +1952,16 @@ export function PetSitterOnboardingPage() {
                 <dd>Classique 0 € · Pro préparé après justificatif</dd>
               </div>
             </dl>
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={() => {
+                setLocalOnboardingPhase("setup");
+                setSetupError(null);
+              }}
+            >
+              Modifier mes choix
+            </button>
             <button
               className="primary-button"
               type="button"
@@ -2215,15 +2427,18 @@ export function RegisterPage() {
                 }
 
                 if (!data.session) {
-                  setRegisterSuccess(
-                    "Compte créé. Vérifiez votre email puis connectez-vous pour continuer.",
-                  );
                   completeLocalRegistration({
                     email,
                     firstName,
                     role,
                   });
-                  router.push("/login");
+                  if (role === "petSitter") {
+                    router.push("/pet-sitter/onboarding");
+                    return;
+                  }
+
+                  setRegisterSuccess("Compte créé. Votre espace propriétaire est prêt.");
+                  router.push("/dashboard");
                   return;
                 }
 
@@ -3165,4 +3380,74 @@ async function ensurePetSitterProfile(input: {
 
   const payload = (await response.json()) as ApiFailure;
   throw new Error(payload.error?.message ?? "Impossible de créer le profil pet-sitter.");
+}
+
+type ReferenceItem = {
+  code: string;
+  id: string;
+  label: string;
+};
+
+async function syncPetSitterOfferSelection(codes: PetSitterOfferReferenceCodes) {
+  const [
+    species,
+    careCapabilities,
+    careLocations,
+    careFormats,
+    additionalServices,
+  ] = await Promise.all([
+    fetchReferenceItems("/api/reference-data/species"),
+    fetchReferenceItems("/api/reference-data/care-capabilities"),
+    fetchReferenceItems("/api/reference-data/care-locations"),
+    fetchReferenceItems("/api/reference-data/care-formats"),
+    fetchReferenceItems("/api/reference-data/additional-services"),
+  ]);
+
+  const response = await fetch("/api/profiles/pet-sitter/me/offer", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      additionalServiceIds: resolveReferenceIds(additionalServices, codes.additionalServiceCodes),
+      careCapabilityIds: resolveReferenceIds(careCapabilities, codes.careCapabilityCodes),
+      careFormatIds: resolveReferenceIds(careFormats, codes.careFormatCodes),
+      careLocationIds: resolveReferenceIds(careLocations, codes.careLocationCodes),
+      speciesIds: resolveReferenceIds(species, codes.speciesCodes),
+    }),
+  });
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as ApiFailure | null;
+    throw new Error(
+      payload?.error?.message ?? "Impossible d'enregistrer les choix pet-sitter.",
+    );
+  }
+}
+
+async function fetchReferenceItems(endpoint: string): Promise<ReferenceItem[]> {
+  const response = await fetch(endpoint, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Impossible de charger les références pet-sitter.");
+  }
+
+  const payload = (await response.json()) as { data?: ReferenceItem[] };
+
+  return payload.data ?? [];
+}
+
+function resolveReferenceIds(items: ReferenceItem[], codes: string[]): string[] {
+  const itemByCode = new Map(items.map((item) => [item.code, item.id]));
+
+  return codes.flatMap((code) => {
+    const id = itemByCode.get(code);
+
+    return id ? [id] : [];
+  });
 }

@@ -1,0 +1,14 @@
+.pet-sitter-expert-badge--asset {
+  width: min(72vw, 318px);
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.pet-sitter-expert-badge--asset img {
+  display: block;
+  width: 100%;
+  height: auto;
+}

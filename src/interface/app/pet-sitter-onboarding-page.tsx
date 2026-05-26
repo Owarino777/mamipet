@@ -20,16 +20,13 @@ import {
 } from "@/modules/pet-sitters/domain/pet-sitter-onboarding-preferences";
 import {
   petSitterCompetencyTests,
-  type CompetencyTrack,
 } from "@/modules/pet-sitters/domain/pet-sitter-competency-tests";
 import { AuthBackButton } from "@/interface/shared/auth-back-button";
-
-
-type AssessmentOutcome = {
-  card: PetSitterAnimalAssessmentCard;
-  status: "success" | "failure";
-  track: CompetencyTrack;
-};
+import { AnimalAssessmentIcon } from "@/interface/app/pet-sitter-assessment-icons";
+import {
+  AssessmentOutcomeScreen,
+  type AssessmentOutcome,
+} from "@/interface/app/pet-sitter-assessment-outcome";
 
 export function PetSitterOnboardingPage() {
   const router = useRouter();
@@ -441,75 +438,6 @@ export function PetSitterOnboardingPage() {
   );
 }
 
-function AnimalAssessmentIcon({
-  animalId,
-}: {
-  animalId: PetSitterAnimalOptionId;
-}) {
-  return (
-    <span className="pet-sitter-test-icon" aria-hidden="true">
-      {renderAnimalAssessmentIcon(animalId)}
-    </span>
-  );
-}
-
-function AssessmentOutcomeScreen({
-  onBack,
-  onFinish,
-  onOpenTraining,
-  onSuccessConfirm,
-  outcome,
-}: {
-  onBack: () => void;
-  onFinish: () => void;
-  onOpenTraining: () => void;
-  onSuccessConfirm: () => void;
-  outcome: AssessmentOutcome;
-}) {
-  if (outcome.status === "success") {
-    return (
-      <main className="pet-sitter-outcome pet-sitter-outcome--success">
-        <AuthBackButton onClick={onBack} />
-        <div className="pet-sitter-outcome-copy">
-          <h1>Félicitation&nbsp;!</h1>
-          <p>Tu as obtenues le badge “{getExpertBadgeLabel(outcome.card)}”</p>
-        </div>
-        <div className="pet-sitter-expert-badge" aria-hidden="true">
-          <AnimalAssessmentIcon animalId={outcome.card.animalOptionId} />
-          <span>EXPERT</span>
-        </div>
-        <button
-          aria-label="Continuer"
-          className="pet-sitter-outcome-check"
-          onClick={onSuccessConfirm}
-          type="button"
-        >
-          ✓
-        </button>
-      </main>
-    );
-  }
-
-  return (
-    <main className="pet-sitter-outcome pet-sitter-outcome--failure">
-      <AuthBackButton onClick={onBack} />
-      <div className="pet-sitter-failure-seal">MINCE</div>
-      <div className="pet-sitter-failure-copy">
-        <p>Tu n’as pas réussi à obtenir le badge “{getExpertBadgeLabel(outcome.card)}”</p>
-        <strong>Retente ta chance dans 7 jours&nbsp;!</strong>
-      </div>
-      <div className="pet-sitter-failure-actions">
-        <button className="pet-sitter-training-button" onClick={onOpenTraining} type="button">
-          Voir les formations
-        </button>
-        <button className="pet-sitter-finish-button" onClick={onFinish} type="button">
-          Terminer
-        </button>
-      </div>
-    </main>
-  );
-}
-
 function getAssessmentTheme(card: PetSitterAnimalAssessmentCard): string {
   const themes: Record<PetSitterAnimalOptionId, string> = {
     amphibian: "green",
@@ -529,59 +457,8 @@ function getAssessmentTheme(card: PetSitterAnimalAssessmentCard): string {
   return themes[card.animalOptionId];
 }
 
-function getExpertBadgeLabel(card: PetSitterAnimalAssessmentCard): string {
-  return `Expert ${card.label.toLowerCase()}`;
-}
-
 function hasPassedAssessment(score: number, questionCount: number): boolean {
   return score === questionCount;
-}
-
-function renderAnimalAssessmentIcon(animalId: PetSitterAnimalOptionId): React.ReactNode {
-  if (animalId === "cat" || animalId === "sick_animals") {
-    return (
-      <svg viewBox="0 0 48 48" focusable="false">
-        <path d="M15 19 12 10c-.4-1.2 1-2.2 2-1.4l6.2 5.1a18 18 0 0 1 7.6 0L34 8.6c1-.8 2.4.2 2 1.4l-3 9" />
-        <path d="M11 26c0-8 5.8-13 13-13s13 5 13 13-5.8 13-13 13-13-5-13-13Z" />
-        <path d="M19 24h.1M29 24h.1M22 30c1.1 1 2.9 1 4 0M15 29l-5 1.5M15 33l-4 3M33 29l5 1.5M33 33l4 3" />
-      </svg>
-    );
-  }
-
-  if (animalId === "dog") {
-    return (
-      <svg viewBox="0 0 48 48" focusable="false">
-        <path d="M13 17c2.8-4.2 7-6 11-6s8.2 1.8 11 6" />
-        <path d="M13 17c-4 1.8-6.2 5.9-5.4 10.6.4 2.3 3.2 2.8 4.4.8l3.1-5.3" />
-        <path d="M35 17c4 1.8 6.2 5.9 5.4 10.6-.4 2.3-3.2 2.8-4.4.8l-3.1-5.3" />
-        <path d="M12.5 26.5C12.5 34 17.5 39 24 39s11.5-5 11.5-12.5" />
-        <path d="M19 25h.1M29 25h.1M21 32c1.7 1.5 4.3 1.5 6 0" />
-      </svg>
-    );
-  }
-
-  if (
-    animalId === "reptile" ||
-    animalId === "amphibian" ||
-    animalId === "fish" ||
-    animalId === "insect" ||
-    animalId === "invertebrate"
-  ) {
-    return (
-      <svg viewBox="0 0 48 48" focusable="false">
-        <path d="M31 9c-8 0-9 7-4 10l4 2c7 3 6 12-3 12H14" />
-        <path d="M17 39c8 0 9-7 4-10l-4-2c-7-3-6-12 3-12h10" />
-        <path d="M33 11h.1" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 48 48" focusable="false">
-      <path d="M24 11c8 0 14 5.8 14 13s-6 13-14 13-14-5.8-14-13 6-13 14-13Z" />
-      <path d="M19 24h.1M29 24h.1M21 30c1.6 1.2 4.4 1.2 6 0" />
-    </svg>
-  );
 }
 
 function hasSameStringSet(left: string[], right: string[]): boolean {

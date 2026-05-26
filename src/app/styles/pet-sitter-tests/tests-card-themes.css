@@ -1,0 +1,37 @@
+.pet-sitter-test-tab--coral,
+.pet-sitter-test-card--coral {
+  --pet-sitter-test-surface: #fb6f4b;
+
+  background: var(--pet-sitter-test-surface);
+}
+
+.pet-sitter-test-tab--blue,
+.pet-sitter-test-card--blue {
+  --pet-sitter-test-surface: #bed6f4;
+
+  background: var(--pet-sitter-test-surface);
+}
+
+.pet-sitter-test-tab--green,
+.pet-sitter-test-card--green {
+  --pet-sitter-test-surface: #9ba63a;
+
+  background: var(--pet-sitter-test-surface);
+}
+
+.pet-sitter-test-tab--pink,
+.pet-sitter-test-card--pink {
+  --pet-sitter-test-surface: #ffc2ec;
+
+  background: var(--pet-sitter-test-surface);
+}
+
+.pet-sitter-test-icon .pet-sitter-icon-fill {
+  fill: currentColor;
+  stroke: none;
+}
+
+.pet-sitter-test-icon .pet-sitter-icon-cutout {
+  fill: var(--pet-sitter-test-surface);
+  stroke: none;
+}

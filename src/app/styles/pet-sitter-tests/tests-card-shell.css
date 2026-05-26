@@ -12,26 +12,6 @@
   box-shadow: 4px 5px 12.9px rgb(0 0 0 / 25%);
 }
 
-.pet-sitter-test-tab--coral,
-.pet-sitter-test-card--coral {
-  background: #fb6f4b;
-}
-
-.pet-sitter-test-tab--blue,
-.pet-sitter-test-card--blue {
-  background: #bed6f4;
-}
-
-.pet-sitter-test-tab--green,
-.pet-sitter-test-card--green {
-  background: #9ba63a;
-}
-
-.pet-sitter-test-tab--pink,
-.pet-sitter-test-card--pink {
-  background: #ffc2ec;
-}
-
 .pet-sitter-test-icon {
   position: absolute;
   top: -33px;

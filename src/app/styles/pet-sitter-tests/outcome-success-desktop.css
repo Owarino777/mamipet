@@ -29,6 +29,11 @@
     height: clamp(18rem, 27vw, 25rem);
   }
 
+  .pet-sitter-expert-badge--asset {
+    width: clamp(18rem, 24vw, 23rem);
+    height: auto;
+  }
+
   .pet-sitter-outcome-check {
     grid-area: action;
     justify-self: center;

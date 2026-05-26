@@ -1,0 +1,36 @@
+@media (min-width: 768px) {
+  .pet-sitter-outcome {
+    padding: 6rem clamp(3rem, 8vw, 8rem);
+  }
+
+  .pet-sitter-outcome--success {
+    grid-template-columns: minmax(18rem, 26rem) minmax(20rem, 28rem);
+    grid-template-areas:
+      "copy badge"
+      "copy action";
+    justify-content: center;
+    align-content: center;
+    gap: 1.8rem clamp(4rem, 8vw, 8rem);
+  }
+
+  .pet-sitter-outcome-copy {
+    grid-area: copy;
+    align-self: center;
+    text-align: left;
+  }
+
+  .pet-sitter-outcome-copy h1 {
+    font-size: clamp(2.7rem, 4.4vw, 4.4rem);
+  }
+
+  .pet-sitter-expert-badge {
+    grid-area: badge;
+    width: clamp(18rem, 27vw, 25rem);
+    height: clamp(18rem, 27vw, 25rem);
+  }
+
+  .pet-sitter-outcome-check {
+    grid-area: action;
+    justify-self: center;
+  }
+}

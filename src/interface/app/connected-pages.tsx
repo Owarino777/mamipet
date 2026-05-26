@@ -33,6 +33,7 @@ import {
   SensitiveDataNotice,
   TrustBadge,
 } from "@/interface/shared/product-ui";
+import { AuthBackButton } from "@/interface/shared/auth-back-button";
 import { calculatePaymentBreakdown } from "@/modules/payments/domain/platform-commission";
 import { createSupabaseBrowserClient } from "@/shared/supabase/browser-client";
 
@@ -777,9 +778,7 @@ export function LoginPage() {
 
   return (
     <main className="login-screen">
-      <button className="auth-back-button" type="button" onClick={() => navigateBack(router, "/")}>
-        <span>Retour</span>
-      </button>
+      <AuthBackButton onClick={() => navigateBack(router, "/")} />
       <div className="login-device-notch" aria-hidden="true" />
       <section className="login-panel" aria-labelledby="login-title">
         <Link className="login-logo" href="/" aria-label="Accueil MamiPet" id="login-title">
@@ -920,13 +919,7 @@ export function RegisterPage() {
 
   return (
     <main className="register-screen">
-      <button
-        className="auth-back-button"
-        type="button"
-        onClick={() => navigateBack(router, "/login")}
-      >
-        <span>Retour</span>
-      </button>
+      <AuthBackButton onClick={() => navigateBack(router, "/login")} />
       <div className="register-animal register-animal--left" aria-hidden="true">
         <Image
           alt=""

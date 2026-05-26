@@ -1,0 +1,45 @@
+.pet-sitter-failure-copy {
+  display: grid;
+  gap: 1.35rem;
+  color: white;
+  font-size: 1.32rem;
+  line-height: 1.05;
+}
+
+.pet-sitter-failure-copy p {
+  color: white;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.pet-sitter-failure-copy strong {
+  color: #ffc2ec;
+  font-size: 1.25rem;
+  line-height: 1.05;
+}
+
+.pet-sitter-failure-actions {
+  display: grid;
+  width: min(100%, 170px);
+  gap: 0.95rem;
+}
+
+.pet-sitter-training-button,
+.pet-sitter-finish-button {
+  min-height: 31px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.86rem;
+  font-weight: 950;
+}
+
+.pet-sitter-training-button {
+  border: 1px solid white;
+  background: transparent;
+  color: white;
+}
+
+.pet-sitter-finish-button {
+  background: #ff8efa;
+  color: white;
+}

@@ -1,0 +1,62 @@
+.pet-sitter-expert-badge {
+  height: 250px;
+  place-items: center;
+  border: 10px solid white;
+  border-radius: 999px;
+  background: #0340cf;
+  color: white;
+  box-shadow: 0 0 0 18px #0340cf;
+}
+
+.pet-sitter-expert-badge .pet-sitter-test-icon {
+  position: static;
+  width: 116px;
+  height: 116px;
+  border: 0;
+  background: transparent;
+  transform: none;
+}
+
+.pet-sitter-expert-badge .pet-sitter-test-icon svg {
+  width: 108px;
+  height: 108px;
+}
+
+.pet-sitter-expert-badge span {
+  font-family: var(--font-title);
+  font-size: 2rem;
+  font-weight: 950;
+}
+
+.pet-sitter-outcome-check {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 999px;
+  background: #ff8efa;
+  color: white;
+  cursor: pointer;
+  font-size: 2rem;
+  font-weight: 950;
+}
+
+.pet-sitter-outcome--failure {
+  align-content: center;
+  gap: 4.3rem;
+  background: #0340cf;
+  color: white;
+}
+
+.pet-sitter-failure-seal {
+  display: grid;
+  width: 136px;
+  height: 136px;
+  place-items: center;
+  border-radius: 999px;
+  background: #ffc2ec;
+  color: #0340cf;
+  font-size: 2rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}

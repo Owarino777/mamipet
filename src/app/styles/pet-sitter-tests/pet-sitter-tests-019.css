@@ -1,0 +1,28 @@
+@media (min-width: 900px) {
+  .pet-sitter-outcome--failure {
+    grid-template-columns: minmax(12rem, 16rem) minmax(22rem, 32rem);
+    grid-template-areas:
+      "seal copy"
+      "seal actions";
+    justify-content: center;
+    align-content: center;
+    gap: 2rem clamp(4rem, 8vw, 8rem);
+  }
+
+  .pet-sitter-failure-seal {
+    grid-area: seal;
+    width: clamp(10rem, 16vw, 14rem);
+    height: clamp(10rem, 16vw, 14rem);
+  }
+
+  .pet-sitter-failure-copy {
+    grid-area: copy;
+    max-width: 28rem;
+    text-align: left;
+  }
+
+  .pet-sitter-failure-actions {
+    grid-area: actions;
+    width: min(100%, 15rem);
+  }
+}

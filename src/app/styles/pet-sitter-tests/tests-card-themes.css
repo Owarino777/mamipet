@@ -35,3 +35,20 @@
   fill: var(--pet-sitter-test-surface);
   stroke: none;
 }
+
+.pet-sitter-test-icon .dog-assessment-head__fur {
+  fill: var(--pet-sitter-test-surface);
+  stroke: none;
+}
+
+.pet-sitter-test-icon .dog-assessment-head__white {
+  fill: white;
+  paint-order: stroke fill;
+  stroke: white;
+  stroke-width: 0.75px;
+}
+
+.pet-sitter-test-icon .dog-assessment-head {
+  width: 34px;
+  height: 24px;
+}

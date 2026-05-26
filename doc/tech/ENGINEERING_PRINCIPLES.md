@@ -617,7 +617,68 @@ Livrer par increments testables :
 9. admin ;
 10. stabilisation.
 
-## 11. Noyau dur permanent
+## 11. Architecture CSS — Frontend
+
+Le CSS de l'application suit les mêmes principes d'ingénierie que le backend.
+
+### Règle appliquée : SRP + Separation of Concerns
+
+Un seul fichier CSS monolithique (`globals.css`) n'est pas acceptable pour un projet de cette taille. Le CSS doit être découpé par domaine fonctionnel, exactement comme le code TypeScript.
+
+### Structure retenue
+
+```
+src/app/
+  globals.css                  # Variables CSS, reset, typographie de base uniquement
+  styles/
+    shell.css                  # Header public, nav, boutons partagés
+    home.css                   # Hero, sections landing, sitter cards, carte
+    search.css                 # Page recherche, filtres, carte MapLibre
+    profile.css                # Profil pet-sitter, booking panel
+    dashboard.css              # Shell connecté, dashboard, admin
+    login.css                  # Page connexion, auth-back-button
+    register.css               # Page inscription
+    pet-sitter-setup.css       # Onboarding setup animaux
+    pet-sitter-tests/          # Quiz d'évaluation (sous-dossier dédié)
+      tests-stage.css          # Layout de la pile de cartes
+      tests-card-shell.css     # Structure des cartes active/tab
+      tests-card-themes.css    # Couleurs et icônes par thème animal
+      tests-question-card.css  # Positionnement icônes et carte blanche
+      tests-answers.css        # Liste des réponses
+      ...
+```
+
+### Règles à respecter pour la CSS
+
+- `globals.css` ne contient que : variables CSS (`:root`), reset, typographie de base, animations globales ;
+- chaque fichier CSS a **une responsabilité** : une page ou un composant majeur ;
+- les icônes d'animal dans la pile de cartes suivent une **convention stable** :
+  - taille de l'icône : `44px × 44px`, SVG interne : `26px × 26px` ;
+  - rendu visuel : silhouette blanche (`fill: currentColor`) avec découpe couleur de carte (`fill: var(--pet-sitter-test-surface)`) ;
+  - cette convention s'applique à **tout nouvel animal** ajouté ;
+  - aucun hardcode de couleur (`#c2d7f3`, `white`, etc.) dans les classes thème ;
+- les variables CSS custom (`--active-top`, `--card-height`, `--tab-step`, `--stage-scale`, `--pet-sitter-test-surface`, `--stack-offset`) sont la source de vérité pour le layout dynamique de la pile ;
+- aucun style inline React sauf pour les custom properties CSS dynamiques (ex : `style={{ "--stack-offset": n }}`).
+
+### Convention icônes animaux (nouveaux animaux)
+
+Pour ajouter un animal dans la pile de cartes, créer le composant icône avec deux classes SVG :
+
+```tsx
+// Classe "corps" = silhouette blanche
+<path className="nouveau-animal-body" d="..." />
+// Classe "découpe" = traits intérieurs (couleur de fond de carte)
+<path className="nouveau-animal-cutout" d="..." />
+```
+
+Et dans `tests-card-themes.css` :
+
+```css
+.pet-sitter-test-icon .nouveau-animal-body   { fill: currentColor; stroke: none; }
+.pet-sitter-test-icon .nouveau-animal-cutout { fill: var(--pet-sitter-test-surface); stroke: none; }
+```
+
+## 12. Noyau dur permanent
 
 Chaque implémentation doit respecter :
 

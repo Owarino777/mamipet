@@ -53,6 +53,9 @@ Le parcours doit réduire l'incertitude à chaque étape :
 
 2. Tests de compétence
    Les tests valident des badges publics cohérents avec les capacités affichées.
+   Les cartes de questionnaire affichent uniquement les animaux sélectionnés.
+   Quand plusieurs cartes sont empilées, leurs pastilles animal doivent rester alignées
+   verticalement sur le bord gauche de la pile pour conserver le repère visuel.
 
 3. Publication du profil
    Le profil public ne valorise que les garanties réellement validées.
@@ -70,6 +73,9 @@ Le parcours doit réduire l'incertitude à chaque étape :
 - Ne pas afficher l'adresse exacte publiquement.
 - Ne pas exposer les données médicales hors contexte de réservation.
 - Garder les badges lisibles et directement liés à une preuve.
+- Garder une cohérence visuelle stricte entre les icônes de test et les badges
+  de réussite : chat, chien et lapin utilisent leurs calques dédiés, avec une
+  épaisseur perçue équivalente dans les pastilles.
 - Ne jamais demander le paiement avant l'acceptation du pet-sitter.
 - Prévoir des états vides, erreurs, chargement et actions désactivées explicables.
 - Prioriser le flux direct propriétaire vers pet-sitter pour le MVP.

@@ -1,0 +1,23 @@
+.pet-sitter-expert-badge .dog-assessment-head {
+  width: 120px;
+  height: 78px;
+}
+
+.pet-sitter-expert-badge .dog-assessment-head__white {
+  paint-order: stroke fill;
+  stroke: white;
+  stroke-width: 1.65px;
+}
+
+.pet-sitter-expert-badge .dog-assessment-head__fur {
+  fill: #c2d7f3;
+  stroke: none;
+}
+
+.pet-sitter-test-icon .rabbit-assessment-head path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3.1px;
+}

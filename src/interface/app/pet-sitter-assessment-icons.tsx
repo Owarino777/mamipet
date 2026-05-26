@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { CatExpertHeadIcon } from "@/interface/app/cat-expert-head-icon";
+import { DogAssessmentHeadIcon } from "@/interface/app/dog-assessment-head-icon";
+import { RabbitAssessmentIcon } from "@/interface/app/rabbit-assessment-icon";
 import type {
   PetSitterAnimalAssessmentCard,
   PetSitterAnimalOptionId,
@@ -36,15 +38,11 @@ function renderAnimalAssessmentIcon(animalId: PetSitterAnimalOptionId) {
   }
 
   if (animalId === "dog") {
-    return (
-      <svg viewBox="0 0 48 48" focusable="false">
-        <path d="M13 17c2.8-4.2 7-6 11-6s8.2 1.8 11 6" />
-        <path d="M13 17c-4 1.8-6.2 5.9-5.4 10.6.4 2.3 3.2 2.8 4.4.8l3.1-5.3" />
-        <path d="M35 17c4 1.8 6.2 5.9 5.4 10.6-.4 2.3-3.2 2.8-4.4.8l-3.1-5.3" />
-        <path d="M12.5 26.5C12.5 34 17.5 39 24 39s11.5-5 11.5-12.5" />
-        <path d="M19 25h.1M29 25h.1M21 32c1.7 1.5 4.3 1.5 6 0" />
-      </svg>
-    );
+    return <DogAssessmentHeadIcon />;
+  }
+
+  if (animalId === "rodent" || animalId === "small_mammal") {
+    return <RabbitAssessmentIcon />;
   }
 
   if (["reptile", "amphibian", "fish", "insect", "invertebrate"].includes(animalId)) {

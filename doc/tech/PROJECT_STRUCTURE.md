@@ -168,6 +168,23 @@ Contient uniquement ce qui est vraiment transversal :
 - validation ;
 - types de pagination.
 
+### `src/interface/app`
+
+Contient les composants d'interface propres aux pages applicatives.
+
+Pour le parcours de qualification pet-sitter :
+
+- `pet-sitter-onboarding-page.tsx` orchestre le parcours ;
+- `pet-sitter-assessment-icons.tsx` choisit l'icône animal ou le badge de résultat ;
+- les calques animal complexes restent isolés dans des composants dédiés
+  (`cat-expert-head-icon.tsx`, `dog-assessment-head-icon.tsx`,
+  `rabbit-assessment-icon.tsx`) ;
+- les assets source stables sont rangés dans `public/figma`.
+
+Convention UI à conserver : les pastilles des questionnaires animaux font `44px`,
+sont alignées verticalement sur le bord gauche de la pile, et les nouveaux animaux
+doivent avoir une épaisseur visuelle comparable aux icônes chat, chien et lapin.
+
 ## 4. Convention de nommage
 
 - Dossiers : kebab-case.
@@ -242,4 +259,3 @@ Chaque DTO public doit exclure :
 - paiement detaille ;
 - commentaire admin ;
 - signalement.
-

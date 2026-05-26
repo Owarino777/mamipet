@@ -9,6 +9,9 @@
 }
 
 .pet-sitter-expert-badge .pet-sitter-test-icon {
+  --animal-icon-max-height: 108px;
+  --animal-icon-max-width: 108px;
+
   position: static;
   width: 116px;
   height: 116px;
@@ -17,9 +20,11 @@
   transform: none;
 }
 
-.pet-sitter-expert-badge .pet-sitter-test-icon svg {
+.pet-sitter-expert-badge .pet-sitter-test-icon svg,
+.pet-sitter-expert-badge .pet-sitter-test-icon__asset {
   width: 108px;
-  height: 108px;
+  height: auto;
+  max-height: 108px;
 }
 
 .pet-sitter-expert-badge span {

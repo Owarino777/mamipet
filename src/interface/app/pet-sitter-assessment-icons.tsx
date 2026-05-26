@@ -1,11 +1,15 @@
 import Image from "next/image";
-import { CatExpertHeadIcon } from "@/interface/app/cat-expert-head-icon";
-import { DogAssessmentHeadIcon } from "@/interface/app/dog-assessment-head-icon";
-import { RabbitAssessmentIcon } from "@/interface/app/rabbit-assessment-icon";
 import type {
   PetSitterAnimalAssessmentCard,
   PetSitterAnimalOptionId,
 } from "@/modules/pet-sitters/domain/pet-sitter-onboarding-preferences";
+
+type AnimalIconAsset = {
+  className: string;
+  height: number;
+  src: string;
+  width: number;
+};
 
 export function ExpertBadge({ card }: { card: PetSitterAnimalAssessmentCard }) {
   if (card.animalOptionId === "cat" || card.animalOptionId === "sick_animals") {
@@ -25,36 +29,70 @@ export function ExpertBadge({ card }: { card: PetSitterAnimalAssessmentCard }) {
 }
 
 export function AnimalAssessmentIcon({ animalId }: { animalId: PetSitterAnimalOptionId }) {
+  const asset = getAnimalIconAsset(animalId);
+
   return (
-    <span className="pet-sitter-test-icon" aria-hidden="true">
-      {renderAnimalAssessmentIcon(animalId)}
+    <span
+      className={`pet-sitter-test-icon${asset ? ` pet-sitter-test-icon--${asset.className}` : ""}`}
+      aria-hidden="true"
+    >
+      {asset ? (
+        <Image
+          alt=""
+          className="pet-sitter-test-icon__asset"
+          height={asset.height}
+          src={asset.src}
+          unoptimized
+          width={asset.width}
+        />
+      ) : (
+        renderFallbackAnimalAssessmentIcon()
+      )}
     </span>
   );
 }
 
-function renderAnimalAssessmentIcon(animalId: PetSitterAnimalOptionId) {
+function getAnimalIconAsset(animalId: PetSitterAnimalOptionId): AnimalIconAsset | null {
   if (animalId === "cat" || animalId === "sick_animals") {
-    return <CatExpertHeadIcon />;
+    return {
+      className: "cat",
+      height: 40,
+      src: "/figma/assessment-cat.svg",
+      width: 39,
+    };
   }
 
   if (animalId === "dog") {
-    return <DogAssessmentHeadIcon />;
+    return {
+      className: "dog",
+      height: 34,
+      src: "/figma/assessment-dog.svg",
+      width: 52,
+    };
   }
 
   if (animalId === "rodent" || animalId === "small_mammal") {
-    return <RabbitAssessmentIcon />;
+    return {
+      className: "rabbit",
+      height: 42,
+      src: "/figma/assessment-rabbit.svg",
+      width: 34,
+    };
   }
 
   if (["reptile", "amphibian", "fish", "insect", "invertebrate"].includes(animalId)) {
-    return (
-      <svg viewBox="0 0 48 48" focusable="false">
-        <path d="M31 9c-8 0-9 7-4 10l4 2c7 3 6 12-3 12H14" />
-        <path d="M17 39c8 0 9-7 4-10l-4-2c-7-3-6-12 3-12h10" />
-        <path d="M33 11h.1" />
-      </svg>
-    );
+    return {
+      className: "snake",
+      height: 42,
+      src: "/figma/assessment-snake.svg",
+      width: 29,
+    };
   }
 
+  return null;
+}
+
+function renderFallbackAnimalAssessmentIcon() {
   return (
     <svg viewBox="0 0 48 48" focusable="false">
       <path d="M24 11c8 0 14 5.8 14 13s-6 13-14 13-14-5.8-14-13 6-13 14-13Z" />

@@ -21,6 +21,7 @@
 
 @media (min-width: 768px) {
   .pet-sitter-tests-stage {
+    --stage-offset-y: -44px;
     --stage-scale: 1.18;
   }
 
@@ -35,6 +36,7 @@
 
 @media (max-height: 880px) and (min-width: 768px) {
   .pet-sitter-tests-stage {
+    --stage-offset-y: -24px;
     --stage-scale: 1;
   }
 
@@ -53,5 +55,17 @@
 @media (max-width: 380px) {
   .pet-sitter-tests-stage {
     --stage-scale: 0.86;
+  }
+}
+
+@media (max-width: 360px) {
+  .pet-sitter-tests-stage {
+    --stage-scale: 0.8;
+  }
+}
+
+@media (max-width: 340px) {
+  .pet-sitter-tests-stage {
+    --stage-scale: 0.76;
   }
 }

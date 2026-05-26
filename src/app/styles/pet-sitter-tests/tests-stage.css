@@ -13,6 +13,7 @@
 .pet-sitter-tests-stage {
   --active-top: 103px;
   --card-height: 530px;
+  --stage-offset-y: 0px;
   --stage-height: 735px;
   --stage-scale: 1;
   --tab-step: 52px;
@@ -20,7 +21,7 @@
   position: relative;
   width: 402px;
   height: var(--stage-height);
-  transform: scale(var(--stage-scale));
+  transform: translateY(var(--stage-offset-y)) scale(var(--stage-scale));
   transform-origin: top center;
 }
 
@@ -46,11 +47,12 @@
 
 .pet-sitter-test-tab {
   top: calc(var(--active-top) - var(--stack-offset, 1) * var(--tab-step));
-  left: 46px;
+  left: 50%;
   z-index: calc(10 - var(--stack-offset, 1));
   width: 310px;
   height: var(--card-height);
   padding: 0;
   cursor: pointer;
   box-shadow: none;
+  transform: translateX(-50%);
 }

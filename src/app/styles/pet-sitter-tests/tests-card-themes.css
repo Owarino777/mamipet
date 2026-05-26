@@ -1,27 +1,27 @@
 .pet-sitter-test-tab--coral,
 .pet-sitter-test-card--coral {
-  --pet-sitter-test-surface: #fb6f4b;
+  --pet-sitter-test-surface: #f3704c;
 
   background: var(--pet-sitter-test-surface);
 }
 
 .pet-sitter-test-tab--blue,
 .pet-sitter-test-card--blue {
-  --pet-sitter-test-surface: #bed6f4;
+  --pet-sitter-test-surface: #c2d7f3;
 
   background: var(--pet-sitter-test-surface);
 }
 
 .pet-sitter-test-tab--green,
 .pet-sitter-test-card--green {
-  --pet-sitter-test-surface: #9ba63a;
+  --pet-sitter-test-surface: #93993c;
 
   background: var(--pet-sitter-test-surface);
 }
 
 .pet-sitter-test-tab--pink,
 .pet-sitter-test-card--pink {
-  --pet-sitter-test-surface: #ffc2ec;
+  --pet-sitter-test-surface: #ffcfed;
 
   background: var(--pet-sitter-test-surface);
 }
@@ -36,19 +36,3 @@
   stroke: none;
 }
 
-.pet-sitter-test-icon .dog-assessment-head__fur {
-  fill: var(--pet-sitter-test-surface);
-  stroke: none;
-}
-
-.pet-sitter-test-icon .dog-assessment-head__white {
-  fill: white;
-  paint-order: stroke fill;
-  stroke: white;
-  stroke-width: 0.75px;
-}
-
-.pet-sitter-test-icon .dog-assessment-head {
-  width: 34px;
-  height: 24px;
-}

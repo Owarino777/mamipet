@@ -1,0 +1,58 @@
+
+.pet-image-preview {
+  position: relative;
+  width: 100%;
+  min-height: 150px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--green-soft);
+}
+
+.pet-image-preview img {
+  object-fit: cover;
+}
+
+.mini-sitter-card {
+  position: relative;
+  min-height: 210px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--green-soft);
+  color: white;
+}
+
+.mini-sitter-card::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(180deg, transparent 35%, rgb(0 0 0 / 62%));
+}
+
+.mini-sitter-card span,
+.mini-sitter-card small {
+  position: absolute;
+  z-index: 2;
+  left: 14px;
+}
+
+.mini-sitter-card span {
+  bottom: 34px;
+  font-weight: 900;
+}
+
+.mini-sitter-card small {
+  bottom: 14px;
+}
+
+.animal-detail-card {
+  display: grid;
+  gap: 14px;
+}
+
+.booking-steps {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  margin-bottom: 18px;
+}

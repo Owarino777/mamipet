@@ -1,0 +1,56 @@
+.pet-sitter-tests-screen {
+  display: grid;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  place-items: center;
+  overflow: hidden auto;
+  background: #fefefa;
+  padding: 0;
+}
+
+.pet-sitter-tests-stage {
+  --active-top: 103px;
+  --card-height: 530px;
+  --stage-height: 735px;
+  --stage-scale: 1;
+  --tab-step: 52px;
+
+  position: relative;
+  width: 402px;
+  height: var(--stage-height);
+  transform: scale(var(--stage-scale));
+  transform-origin: top center;
+}
+
+.pet-sitter-tests-stage[data-card-count="3"] {
+  --active-top: 163px;
+  --stage-height: 795px;
+  --tab-step: 56px;
+}
+
+.pet-sitter-tests-stage[data-card-count="4"] {
+  --active-top: 223px;
+  --stage-height: 855px;
+  --tab-step: 60px;
+}
+
+.pet-sitter-test-tab,
+.pet-sitter-test-card {
+  position: absolute;
+  border: 0;
+  border-radius: 20px;
+  color: white;
+}
+
+.pet-sitter-test-tab {
+  top: calc(var(--active-top) - var(--stack-offset, 1) * var(--tab-step));
+  left: 46px;
+  z-index: calc(10 - var(--stack-offset, 1));
+  width: 310px;
+  height: var(--card-height);
+  padding: 0;
+  cursor: pointer;
+  box-shadow: none;
+}

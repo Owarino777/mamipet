@@ -1,0 +1,63 @@
+
+.trust-badge span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.care-tag {
+  background: #fff0e7;
+  color: #7a3f1f;
+}
+
+.hero-search-dock,
+.hero-search-card,
+.sitter-card,
+.value-grid article,
+.filters-panel,
+.map-note,
+.profile-card,
+.booking-panel,
+.search-bar-panel,
+.workspace-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.hero-search-card {
+  overflow: hidden;
+}
+
+.hero-search-dock {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.hero-visual {
+  position: relative;
+  min-height: clamp(320px, 48vw, 620px);
+  overflow: hidden;
+  background: var(--green-soft);
+}
+
+.hero-visual img,
+.pet-visual img,
+.gallery-section img,
+.mini-sitter-card img {
+  object-fit: cover;
+}
+
+.quick-search {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.quick-search--hero {
+  align-items: end;
+}

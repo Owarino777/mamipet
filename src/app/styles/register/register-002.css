@@ -1,0 +1,59 @@
+
+.register-role-tab {
+  min-height: clamp(2.35rem, 9.1vw, 2.8rem);
+  border: 0.1rem solid rgb(3 64 207 / 18%);
+  border-radius: 999px;
+  background: rgb(255 253 246 / 94%);
+  color: #0340cf;
+  cursor: pointer;
+  font-size: clamp(1rem, 4.1vw, 1.18rem);
+  font-weight: 950;
+  box-shadow: 0 0.45rem 0.9rem rgb(39 49 79 / 8%);
+  transition:
+    border-color 220ms ease,
+    background-color 220ms ease,
+    box-shadow 220ms ease,
+    color 220ms ease,
+    transform 220ms ease;
+}
+
+.register-role-tab.is-active {
+  border-color: #0340cf;
+  background: #0340cf;
+  color: white;
+  box-shadow: 0 0.7rem 1.2rem rgb(3 64 207 / 16%);
+}
+
+.register-role-tab:hover {
+  transform: translateY(-0.08rem);
+}
+
+.register-card {
+  display: grid;
+  align-content: center;
+  width: min(100%, clamp(20rem, 87vw, 25.5rem));
+  margin-top: clamp(1.35rem, 5.3vw, 1.75rem);
+  padding: clamp(2rem, 7.5vw, 2.55rem) clamp(1.8rem, 7.6vw, 2.45rem) clamp(2.25rem, 8.5vw, 2.85rem);
+  border-radius: clamp(1.2rem, 5.4vw, 1.65rem);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 98%), rgb(255 255 255 / 95%)),
+    #fffdf6;
+  box-shadow:
+    0 1rem 1.8rem rgb(39 49 79 / 14%),
+    inset 0 0.06rem 0 rgb(255 255 255 / 90%);
+  animation: panel-swap 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.register-form {
+  display: grid;
+  gap: clamp(1.35rem, 4.8vw, 1.75rem);
+}
+
+.register-kind-fieldset {
+  display: grid;
+  gap: clamp(0.75rem, 3vw, 1rem);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}

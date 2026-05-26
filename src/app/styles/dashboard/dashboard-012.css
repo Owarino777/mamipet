@@ -1,0 +1,62 @@
+
+.booking-next-step-note strong {
+  color: var(--text);
+}
+
+.booking-next-step-note p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.booking-action-panel,
+.review-form {
+  display: grid;
+  gap: 12px;
+}
+
+.booking-action-panel .primary-button,
+.booking-action-panel .secondary-button,
+.review-form .primary-button {
+  justify-content: center;
+}
+
+.report-details {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+}
+
+.report-details summary {
+  color: var(--green);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.booking-summary-card dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.booking-summary-card dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.booking-summary-card dt {
+  color: var(--muted);
+}
+
+.booking-summary-card dd {
+  margin: 0;
+  font-weight: 900;
+}
+
+.metric-card {
+  display: grid;
+  gap: 8px;
+}

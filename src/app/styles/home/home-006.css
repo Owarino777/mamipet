@@ -1,0 +1,62 @@
+
+.sitter-card__copy {
+  display: -webkit-box;
+  min-height: 52px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.sitter-card__signals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.sitter-card__signals div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid rgb(142 165 231 / 42%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 72%);
+}
+
+.sitter-card__signals dt {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.sitter-card__signals dd {
+  margin: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sitter-card__footer {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sitter-card__footer span {
+  color: var(--green);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.sitter-card__footer strong {
+  font-size: 1.06rem;
+}
+
+.sitter-card__cta {
+  justify-content: center;
+  pointer-events: none;
+}

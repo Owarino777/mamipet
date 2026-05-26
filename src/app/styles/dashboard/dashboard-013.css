@@ -1,0 +1,57 @@
+
+.metric-card span {
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.metric-card strong {
+  font-size: 2rem;
+}
+
+.request-row,
+.admin-row {
+  display: grid;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.request-summary,
+.admin-row span {
+  display: grid;
+  gap: 4px;
+}
+
+.request-summary span,
+.request-summary small,
+.admin-row small {
+  color: var(--muted);
+}
+
+.request-actions,
+.admin-row div {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.request-actions button,
+.admin-row button {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.request-actions button:last-child,
+.admin-row button:first-child {
+  background: var(--green);
+  color: white;
+}
+
+.request-actions button:first-child,
+.admin-row button:last-child {
+  background: #fff0e7;
+  color: var(--danger);
+}

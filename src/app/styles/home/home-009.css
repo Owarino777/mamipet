@@ -1,0 +1,38 @@
+
+.map-preview__open {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 2;
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: var(--green);
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 900;
+  box-shadow: 0 12px 24px rgb(65 48 34 / 18%);
+}
+
+.map-preview p {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: white;
+  color: var(--green);
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.seo-section,
+.become-sitter-section {
+  display: grid;
+  gap: 24px;
+}
+
+.become-sitter-section {
+  border-top: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--green-soft), #fff7ef);
+}

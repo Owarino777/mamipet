@@ -1,0 +1,59 @@
+
+.login-forgot-action {
+  position: relative;
+  z-index: 1;
+  min-height: clamp(1.7rem, 7vw, 2rem);
+  padding: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #17121a;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: clamp(0.9rem, 3.75vw, 1rem);
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.login-close-action {
+  position: absolute;
+  bottom: clamp(-1.45rem, -4.7vw, -1.2rem);
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  width: clamp(2.65rem, 10.9vw, 3.2rem);
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, white, #fffdf6);
+  box-shadow:
+    0 0.65rem 1.1rem rgb(102 27 50 / 11%),
+    inset 0 0 0 0.06rem rgb(255 255 255 / 90%);
+  transform: translateX(-50%);
+}
+
+.login-close-action::before,
+.login-close-action::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 52%;
+  height: clamp(0.17rem, 0.68vw, 0.22rem);
+  border-radius: 999px;
+  background: #0340cf;
+  content: "";
+  transform-origin: center;
+}
+
+.login-close-action::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.login-close-action::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.login-close-action span {
+  display: none;
+}

@@ -1,6 +1,16 @@
 import type { Metadata } from "next";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
+// Styles par domaine fonctionnel — séparés selon SRP / Clean Architecture
+import "./styles/shell.css";
+import "./styles/home.css";
+import "./styles/search.css";
+import "./styles/profile.css";
+import "./styles/dashboard.css";
+import "./styles/login.css";
+import "./styles/register.css";
+import "./styles/pet-sitter-setup.css";
+import "./styles/pet-sitter-tests.css";
 import { getSiteUrl, siteDescription, siteName } from "@/shared/config/site";
 
 export const metadata: Metadata = {

@@ -1,0 +1,43 @@
+
+.login-form {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  gap: clamp(0.7rem, 3vw, 0.9rem);
+}
+
+.login-form label {
+  color: #111;
+  font-size: clamp(0.78rem, 3vw, 0.9rem);
+  font-weight: 900;
+}
+
+.login-form input {
+  min-height: clamp(2.68rem, 10.7vw, 3rem);
+  border: 1px solid #9f9f9f;
+  border-radius: clamp(0.5rem, 2vw, 0.7rem);
+  background: white;
+  color: #111;
+}
+
+.login-form .workspace-status {
+  color: #8a122a;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+}
+
+@media (min-width: 760px) {
+  .auth-back-button {
+    top: calc(env(safe-area-inset-top) + clamp(1.1rem, 2.4vw, 1.8rem));
+    right: auto;
+    bottom: auto;
+    left: clamp(1.1rem, 2.4vw, 1.8rem);
+  }
+
+  .login-panel {
+    padding-top: clamp(3.9rem, 7.2vh, 5.4rem);
+  }
+}

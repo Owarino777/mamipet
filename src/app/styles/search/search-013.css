@@ -1,0 +1,58 @@
+
+.skeleton-image {
+  display: block;
+  min-height: 250px;
+  border-radius: 0;
+}
+
+.skeleton-content {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.skeleton-line {
+  display: block;
+  height: 14px;
+}
+
+.skeleton-line--strong {
+  width: 72%;
+  height: 20px;
+}
+
+.skeleton-line--short {
+  width: 46%;
+}
+
+.skeleton-line--price {
+  width: 38%;
+  height: 18px;
+}
+
+.skeleton-pill-row {
+  width: 78%;
+  height: 30px;
+  border-radius: 999px;
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.empty-results-card {
+  display: grid;
+  min-height: 240px;
+  align-content: center;
+  gap: 10px;
+  padding: 28px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: var(--page);
+}
+
+.empty-results-card h2 {
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+}

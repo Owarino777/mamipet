@@ -1,0 +1,59 @@
+
+.pet-sitter-setup-column {
+  display: grid;
+  align-content: start;
+  gap: 0.62rem;
+}
+
+.pet-sitter-setup-check {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.62rem;
+  color: #686868;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1.28;
+}
+
+.pet-sitter-setup-check input {
+  width: 1rem;
+  height: 1rem;
+  min-height: 0;
+  flex: 0 0 auto;
+  border: 0.08rem solid #9a9a9a;
+  border-radius: 0;
+  accent-color: #ff8efa;
+}
+
+.pet-sitter-setup-check span {
+  min-width: 0;
+  overflow-wrap: normal;
+}
+
+.pet-sitter-setup-submit {
+  justify-self: center;
+  min-width: 9rem;
+  min-height: 2.25rem;
+  padding: 0 1.35rem;
+  border-radius: 999px;
+  background: #ff8efa;
+  color: white;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 950;
+  box-shadow: 0 0.65rem 1rem rgb(255 142 250 / 20%);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.pet-sitter-setup-submit:hover {
+  transform: translateY(-0.06rem);
+}
+
+.pet-sitter-setup-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}

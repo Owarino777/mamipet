@@ -1,0 +1,66 @@
+
+@media (min-width: 1024px) {
+  h1 {
+    font-size: clamp(4rem, 6vw, 6.7rem);
+  }
+
+  .public-header {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .public-header--search {
+    grid-template-columns: minmax(130px, 1fr) minmax(420px, 620px) minmax(260px, 1fr);
+  }
+
+  .public-header--search .brand-mark {
+    justify-self: start;
+  }
+
+  .public-header--search .header-actions {
+    justify-self: end;
+  }
+
+  .search-header-pill,
+  .round-header-button {
+    display: inline-flex;
+  }
+
+  .public-nav {
+    display: flex;
+    justify-content: center;
+    gap: clamp(22px, 3vw, 52px);
+    font-size: 0.95rem;
+    font-weight: 900;
+  }
+
+  .public-nav a {
+    border-bottom: 2px solid transparent;
+    color: var(--text);
+    padding: 12px 0;
+    text-decoration: none;
+    transition: color 140ms ease, border-color 140ms ease;
+  }
+
+  .public-nav a:hover {
+    color: var(--green);
+  }
+
+  .public-nav a.active,
+  .public-nav a[aria-current="page"] {
+    border-bottom-color: var(--green);
+    color: var(--green);
+  }
+
+  .quick-search {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .quick-search .primary-button {
+    grid-column: 1 / -1;
+  }
+
+  .quick-search--hero {
+    grid-template-columns: 1fr 1fr 1fr auto;
+  }
+
+}

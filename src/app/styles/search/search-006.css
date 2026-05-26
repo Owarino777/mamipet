@@ -1,0 +1,57 @@
+
+.map-floating-card {
+  position: absolute;
+  right: 18px;
+  bottom: 56px;
+  z-index: 5;
+  width: min(360px, calc(100% - 36px));
+  overflow: hidden;
+  border: 1px solid rgb(142 165 231 / 44%);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 98%), rgb(249 241 255 / 96%));
+  box-shadow: 0 20px 48px rgb(55 84 170 / 24%);
+  backdrop-filter: blur(14px);
+}
+
+.map-floating-card__media {
+  position: relative;
+  min-height: 176px;
+  overflow: hidden;
+  background: var(--green-soft);
+}
+
+.map-floating-card__media img {
+  object-fit: cover;
+}
+
+.map-floating-card__body {
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+}
+
+.map-floating-card__profile-link {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #fff8ef;
+  color: var(--green);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.map-floating-card small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.map-floating-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}

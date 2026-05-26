@@ -1,0 +1,61 @@
+
+.pet-sitter-test-tab .pet-sitter-test-icon {
+  top: -33px;
+  left: 39px;
+  width: 44px;
+  height: 44px;
+  transform: none;
+}
+
+.pet-sitter-test-tab .pet-sitter-test-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.pet-sitter-test-card>.pet-sitter-test-icon {
+  top: -35px;
+  left: 41px;
+  width: 44px;
+  height: 44px;
+  transform: none;
+}
+
+.pet-sitter-test-card>.pet-sitter-test-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.pet-sitter-test-question-card {
+  display: grid;
+  width: 270px;
+  min-height: 420px;
+  align-content: start;
+  gap: 10px;
+  padding: 24px 28px 24px;
+  border-radius: 20px;
+  background: white;
+  color: #0a0a0a;
+  text-align: center;
+}
+
+.pet-sitter-test-question-card h1 {
+  color: #080808;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.pet-sitter-test-question-card p {
+  color: #111;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.pet-sitter-test-question-index {
+  justify-self: start;
+  color: #8b8b8b !important;
+  font-size: 11px !important;
+  text-align: left;
+}

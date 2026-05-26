@@ -1,0 +1,66 @@
+@media (min-width: 1024px) {
+  .profile-hero {
+    grid-template-columns: 360px minmax(0, 1fr) 340px;
+    padding: 0;
+  }
+
+  .profile-hero__media .pet-visual {
+    min-height: 430px;
+    border-radius: 8px 0 0 8px;
+  }
+
+  .profile-hero__content {
+    padding: 26px 0;
+  }
+
+  .booking-panel {
+    margin: 24px 24px 24px 0;
+  }
+
+  .profile-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .profile-confidence-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .profile-detail-layout {
+    grid-template-columns: minmax(0, 1fr) 460px;
+  }
+
+  .connected-shell {
+    display: grid;
+    grid-template-columns: 276px minmax(0, 1fr);
+  }
+
+  .connected-sidebar {
+    min-height: 100vh;
+    align-content: start;
+    border-right: 1px solid var(--border);
+    border-bottom: 0;
+    padding: 28px 20px;
+  }
+
+  .connected-sidebar nav {
+    display: grid;
+    overflow: visible;
+  }
+
+  .connected-sidebar nav a {
+    border-radius: 8px;
+  }
+
+  .workspace-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .workspace-grid--hero {
+    grid-template-columns: 1.25fr 1fr;
+  }
+
+  .workspace-grid--four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+}

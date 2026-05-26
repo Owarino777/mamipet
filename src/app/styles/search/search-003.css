@@ -1,0 +1,61 @@
+
+.results-panel h1,
+.workspace-heading h1 {
+  max-width: none;
+  font-size: clamp(2.1rem, 4vw, 3.2rem);
+}
+
+.results-panel {
+  min-width: 0;
+  padding: clamp(20px, 3vw, 36px) clamp(18px, 3vw, 48px);
+  background:
+    linear-gradient(180deg, rgb(220 233 255 / 72%), rgb(255 239 247 / 36%) 210px, transparent 320px),
+    var(--page);
+}
+
+.result-count {
+  padding: 9px 13px;
+  border-radius: 999px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-weight: 900;
+}
+
+.map-pending-results {
+  display: grid;
+  gap: 6px;
+  margin: 18px 0;
+  padding: 14px;
+  border: 1px solid rgb(65 48 34 / 12%);
+  border-radius: 8px;
+  background: #fff8ef;
+}
+
+.map-pending-results span {
+  color: var(--green);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.map-pending-results p {
+  color: var(--muted);
+}
+
+.map-pending-results .secondary-button {
+  width: fit-content;
+}
+
+.map-column {
+  display: grid;
+  min-width: 0;
+  background: var(--green-soft);
+}
+
+.maplibre-map-shell {
+  position: relative;
+  min-height: 420px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #e7efff, #fdf1fb);
+  contain: layout style;
+}

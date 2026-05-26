@@ -1,0 +1,38 @@
+
+.primary-button {
+  padding: 0 24px;
+  background: linear-gradient(135deg, var(--coral), #ff9fbf);
+  color: white;
+  box-shadow: 0 12px 28px rgb(255 127 168 / 28%);
+  transition:
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.primary-button:hover {
+  box-shadow: 0 14px 30px rgb(238 102 91 / 28%);
+  transform: translateY(-1px);
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.primary-button--small {
+  min-height: 38px;
+  padding: 0 16px;
+  font-size: 0.9rem;
+}
+
+.secondary-button {
+  padding: 0 20px;
+  border: 1px solid #b8c8f8;
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.ghost-button {
+  padding: 0 10px;
+  color: var(--green);
+}

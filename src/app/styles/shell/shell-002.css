@@ -1,0 +1,64 @@
+
+.search-header-pill {
+  display: none;
+  min-height: 48px;
+  align-items: center;
+  justify-self: center;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: white;
+  color: var(--text);
+  box-shadow: 0 10px 28px rgb(65 48 34 / 12%);
+  font-size: 0.92rem;
+  font-weight: 850;
+}
+
+.search-header-pill a {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 0 18px;
+  border-right: 1px solid var(--border);
+}
+
+.search-header-pill a:last-child {
+  display: inline-grid;
+  width: 38px;
+  height: 38px;
+  margin: 0 6px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--coral);
+  color: white;
+  border-right: 0;
+}
+
+.round-header-button {
+  display: none;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.header-actions .ghost-button {
+  display: none;
+}
+
+.primary-button,
+.secondary-button,
+.ghost-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+}

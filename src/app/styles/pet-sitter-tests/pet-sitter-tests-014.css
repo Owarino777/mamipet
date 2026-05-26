@@ -1,0 +1,47 @@
+@media (min-width: 1024px) {
+  .onboarding-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 360px;
+    align-items: start;
+  }
+
+  .recommendation-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .journey-list--horizontal {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .assessment-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+
+@media (min-width: 1440px) {
+  .profile-page {
+    max-width: 1480px;
+  }
+}
+
+@media (max-width: 760px) {
+
+  .sitter-card--list .sitter-card__link {
+    grid-template-columns: 1fr;
+  }
+
+  .sitter-card--list .pet-visual {
+    min-height: 220px;
+  }
+
+  .map-floating-card {
+    right: 12px;
+    bottom: 56px;
+    left: 12px;
+    width: auto;
+  }
+
+  .map-floating-card__media {
+    min-height: 160px;
+  }
+}

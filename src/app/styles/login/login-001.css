@@ -1,0 +1,46 @@
+.admin-list {
+  display: grid;
+  gap: 6px;
+}
+
+.auth-back-button {
+  position: fixed;
+  right: clamp(1rem, 5vw, 1.6rem);
+  bottom: calc(env(safe-area-inset-bottom) + clamp(1rem, 5vw, 1.6rem));
+  z-index: 40;
+  display: inline-flex;
+  min-height: clamp(2.7rem, 11vw, 3.15rem);
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0 clamp(0.95rem, 4vw, 1.2rem);
+  border-radius: 999px;
+  background: rgb(255 253 246 / 86%);
+  color: #0340cf;
+  cursor: pointer;
+  font-size: clamp(0.9rem, 3.8vw, 1rem);
+  font-weight: 950;
+  box-shadow:
+    0 0.8rem 1.5rem rgb(39 49 79 / 12%),
+    inset 0 0 0 0.08rem rgb(3 64 207 / 12%);
+  backdrop-filter: blur(14px);
+  transition:
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.auth-back-button::before {
+  display: block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-bottom: 0.16rem solid currentColor;
+  border-left: 0.16rem solid currentColor;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.auth-back-button:hover {
+  box-shadow:
+    0 1rem 1.7rem rgb(39 49 79 / 16%),
+    inset 0 0 0 0.08rem rgb(3 64 207 / 18%);
+  transform: translateY(-0.08rem);
+}

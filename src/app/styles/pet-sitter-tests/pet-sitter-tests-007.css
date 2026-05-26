@@ -1,0 +1,66 @@
+
+@media (min-width: 1024px) {
+  .register-screen {
+    --register-card-width: min(100%, clamp(34rem, 41vw, 43rem));
+    --register-animal-size: clamp(17rem, 25vw, 31rem);
+    --register-animal-side-offset: max(clamp(1rem, 2.2vw, 3rem),
+        calc((100vw - var(--register-card-width)) / 4 - var(--register-animal-size) / 2));
+  }
+
+  .register-panel {
+    width: min(100%, clamp(40rem, 45vw, 50rem));
+    min-height: 100vh;
+    align-content: start;
+    padding-top: clamp(2.8rem, 4.9vh, 4.05rem);
+    padding-bottom: clamp(1.5rem, 2.8vh, 2.2rem);
+  }
+
+  .register-role-tabs {
+    width: min(100%, clamp(25rem, 31vw, 33rem));
+    margin-top: clamp(1.65rem, 2.8vh, 2.25rem);
+  }
+
+  .register-card {
+    width: var(--register-card-width);
+    min-height: min(68vh, 38.5rem);
+    margin-top: clamp(2rem, 3.3vh, 2.75rem);
+    padding: clamp(2.7rem, 4.4vh, 3.6rem) clamp(3rem, 3.9vw, 4.25rem) clamp(3.1rem, 5.4vh, 4.6rem);
+  }
+
+  .register-panel h1 {
+    font-size: clamp(2.45rem, 2.9vw, 3.2rem);
+  }
+
+  .register-form {
+    width: min(100%, 35.5rem);
+    justify-self: center;
+    gap: clamp(1.2rem, 2.15vh, 1.65rem);
+  }
+
+  .register-kind-fieldset {
+    gap: clamp(0.5rem, 1vh, 0.8rem);
+  }
+
+  .register-form-grid {
+    gap: clamp(0.78rem, 1.2vh, 1rem) clamp(1.2rem, 1.4vw, 1.55rem);
+  }
+
+  .register-form-grid input {
+    min-height: clamp(2.35rem, 4.4vh, 2.7rem);
+    font-size: clamp(0.9rem, 0.95vw, 1rem);
+  }
+
+  .register-form-grid label {
+    gap: 0.25rem;
+    font-size: clamp(0.7rem, 0.8vw, 0.78rem);
+  }
+
+  .register-chip span {
+    min-height: clamp(1.9rem, 3.5vh, 2.3rem);
+  }
+
+  .register-kind-fieldset legend {
+    font-size: clamp(0.88rem, 0.95vw, 1rem);
+  }
+
+}

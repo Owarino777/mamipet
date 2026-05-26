@@ -1,0 +1,58 @@
+
+.map-popup h2 {
+  font-family: var(--font-ui);
+  font-size: 1.05rem;
+}
+
+.map-popup strong {
+  color: var(--text);
+}
+
+.map-popup__profile-link {
+  color: var(--green);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.map-popup__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 6;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 999px;
+  background: white;
+  box-shadow: 0 8px 18px rgb(65 48 34 / 18%);
+  cursor: pointer;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.map-popup__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 6;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 94%);
+  box-shadow: 0 8px 18px rgb(65 48 34 / 18%);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1.6rem;
+  font-weight: 900;
+  transform: translateY(-50%);
+}
+
+.map-popup__nav--prev {
+  left: 10px;
+}
+
+.map-popup__nav--next {
+  right: 10px;
+}

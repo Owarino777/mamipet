@@ -1,0 +1,65 @@
+@media (min-width: 1024px) {
+  .quick-search--hero .primary-button {
+    grid-column: auto;
+  }
+
+  .value-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .featured-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.34fr);
+    align-items: start;
+  }
+
+  .featured-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .map-preview {
+    min-height: 560px;
+    position: sticky;
+    top: 96px;
+  }
+
+  .search-layout {
+    grid-template-columns: minmax(520px, 50vw) minmax(460px, 50vw);
+    align-items: stretch;
+    height: calc(100vh - 196px);
+    overflow: hidden;
+  }
+
+  .search-bar-panel {
+    position: sticky;
+    top: 77px;
+    z-index: 8;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+    align-items: end;
+  }
+
+  .search-bar-panel .search-chip-row {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+  }
+
+  .results-panel {
+    height: calc(100vh - 196px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .results-grid {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .maplibre-map-shell {
+    position: sticky;
+    top: 196px;
+    height: calc(100vh - 196px);
+    min-height: 620px;
+    border-left: 1px solid var(--border);
+  }
+
+}

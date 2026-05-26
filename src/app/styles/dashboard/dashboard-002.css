@@ -1,0 +1,62 @@
+
+.connected-sidebar nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.connected-sidebar nav a {
+  min-height: 40px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.connected-sidebar nav a.active {
+  background: var(--green);
+  color: white;
+  box-shadow: 0 10px 22px rgb(49 91 72 / 18%);
+}
+
+.connected-sidebar-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.connected-sidebar-actions button {
+  width: 100%;
+}
+
+.workspace-main,
+.booking-workspace {
+  width: min(100%, 1520px);
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 42px);
+}
+
+.inline-workspace-form {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  align-items: end;
+  margin-bottom: 18px;
+}
+
+.inline-workspace-form--compact {
+  margin-bottom: 0;
+}
+
+.workspace-status {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-weight: 850;
+}
+
+.workspace-status--warning {
+  background: rgb(255 241 229 / 88%);
+  color: #8d3c16;
+}

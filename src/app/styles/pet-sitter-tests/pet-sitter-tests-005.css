@@ -1,0 +1,57 @@
+
+.pet-sitter-test-empty {
+  display: grid;
+  gap: 1rem;
+  place-items: center;
+  padding: 2rem;
+  border-radius: 1rem;
+  background: white;
+  box-shadow: 0 0.85rem 1.2rem rgb(20 20 20 / 10%);
+}
+
+.pet-sitter-test-secondary {
+  min-height: 2.4rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  background: #bed6f4;
+  color: #27314f;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+@media (min-width: 768px) {
+  .pet-sitter-tests-stage {
+    --stage-scale: 1.18;
+  }
+
+  .pet-sitter-tests-stage[data-card-count="3"] {
+    --stage-scale: 1.1;
+  }
+
+  .pet-sitter-tests-stage[data-card-count="4"] {
+    --stage-scale: 1.03;
+  }
+}
+
+@media (max-height: 880px) and (min-width: 768px) {
+  .pet-sitter-tests-stage {
+    --stage-scale: 1;
+  }
+
+  .pet-sitter-tests-stage[data-card-count="3"],
+  .pet-sitter-tests-stage[data-card-count="4"] {
+    --stage-scale: 0.86;
+  }
+}
+
+@media (max-width: 420px) {
+  .pet-sitter-tests-stage {
+    --stage-scale: 0.92;
+  }
+}
+
+@media (max-width: 380px) {
+  .pet-sitter-tests-stage {
+    --stage-scale: 0.86;
+  }
+}

@@ -1,0 +1,64 @@
+
+.register-kind-fieldset legend {
+  width: 100%;
+  color: #050505;
+  font-size: clamp(0.95rem, 3.8vw, 1.1rem);
+  font-weight: 950;
+  text-align: center;
+}
+
+.register-kind-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.55rem, 2.4vw, 0.8rem);
+}
+
+.register-chip {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+
+.register-chip:nth-child(3) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(52%, 9.5rem);
+}
+
+.register-chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.register-chip span {
+  display: grid;
+  min-height: clamp(2.05rem, 7.4vw, 2.35rem);
+  place-items: center;
+  border: 0.12rem solid #9c9c9c;
+  border-radius: 999px;
+  background: white;
+  color: #111;
+  font-size: clamp(0.95rem, 3.8vw, 1.08rem);
+  line-height: 1;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.register-chip input:checked+span {
+  border-color: #0340cf;
+  box-shadow: inset 0 0 0 0.08rem #0340cf;
+}
+
+.register-chip input:focus-visible+span {
+  outline: 3px solid rgb(3 64 207 / 28%);
+  outline-offset: 3px;
+}
+
+.register-form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(4.5rem, 0.6fr);
+  gap: clamp(0.75rem, 3vw, 0.95rem) clamp(0.8rem, 3.2vw, 1.05rem);
+}

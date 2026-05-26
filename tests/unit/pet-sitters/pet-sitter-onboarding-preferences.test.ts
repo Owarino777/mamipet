@@ -32,6 +32,26 @@ describe("PetSitterOnboardingPreferences", () => {
     ]);
   });
 
+  it("creates one assessment card per selected animal", () => {
+    const preferences = PetSitterOnboardingPreferences.create({
+      animalOptionIds: ["cat", "dog"],
+      careOptionIds: ["home_visits"],
+    });
+
+    expect(preferences.getAnimalAssessmentCards()).toEqual([
+      {
+        animalOptionId: "cat",
+        competencyTrackId: "cats",
+        label: "Chat",
+      },
+      {
+        animalOptionId: "dog",
+        competencyTrackId: "dogs",
+        label: "Chien",
+      },
+    ]);
+  });
+
   it("maps setup choices to existing offer reference codes", () => {
     const preferences = PetSitterOnboardingPreferences.create({
       animalOptionIds: ["dog", "small_mammal", "sick_animals"],

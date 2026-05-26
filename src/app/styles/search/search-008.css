@@ -1,0 +1,61 @@
+
+.map-floating-card__nav,
+.map-floating-card__favorite {
+  position: absolute;
+  top: 50%;
+  z-index: 7;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #c8d5fb;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 96%);
+  color: var(--text);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.map-floating-card__nav--prev {
+  left: 10px;
+}
+
+.map-floating-card__nav--next {
+  right: 10px;
+}
+
+.map-floating-card__favorite {
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  color: var(--green);
+  font-size: 1rem;
+  transform: none;
+}
+
+.map-floating-card__favorite--active {
+  border-color: rgb(255 127 168 / 48%);
+  background: #fff0e7;
+  color: var(--coral);
+}
+
+.maplibre-map-shell .maplibregl-popup-content {
+  overflow: visible;
+  padding: 0;
+  border-radius: 20px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.maplibre-map-shell .maplibregl-popup-tip {
+  filter: drop-shadow(0 10px 14px rgb(25 31 41 / 24%));
+}
+
+.maplibre-map-shell .maplibregl-popup {
+  z-index: 8;
+}
+
+.map-note {
+  background: #fff8ef;
+}

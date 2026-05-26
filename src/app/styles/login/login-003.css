@@ -1,0 +1,65 @@
+
+.login-device-notch::after {
+  position: absolute;
+  top: 8px;
+  right: 18px;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 60% 45%, #162861 0 18%, #05070d 58%);
+  content: "";
+}
+
+.login-panel {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(100%, clamp(20rem, 100vw, 31rem));
+  min-height: 100vh;
+  min-height: 100dvh;
+  align-content: start;
+  justify-items: center;
+  padding: clamp(5.8rem, 10.9vh, 7.3rem) clamp(1.6rem, 6.7vw, 3rem) clamp(3rem, 8vh, 4.5rem);
+}
+
+.login-logo {
+  display: block;
+  width: clamp(15.1rem, 74vw, 22.5rem);
+  filter: drop-shadow(0 0.28rem 0.15rem rgb(3 64 207 / 6%));
+}
+
+.login-logo img {
+  width: 100%;
+  height: auto;
+}
+
+.login-action-card {
+  position: relative;
+  display: grid;
+  width: min(100%, clamp(18.6rem, 81vw, 25.2rem));
+  min-height: clamp(18.8rem, 81.7vw, 25.2rem);
+  justify-items: center;
+  gap: clamp(1.25rem, 5vw, 1.55rem);
+  margin-top: clamp(-5.15rem, -18.7vw, -3.35rem);
+  padding: clamp(2.45rem, 9.85vw, 3.1rem) clamp(2.45rem, 9.7vw, 3.15rem) clamp(3rem, 11.25vw, 3.75rem);
+  border-radius: clamp(1.35rem, 5.6vw, 1.8rem);
+  background:
+    radial-gradient(circle at 18% 12%, rgb(255 255 255 / 20%), transparent 34%),
+    #ffcfed;
+  box-shadow:
+    0 1.25rem 2.5rem rgb(102 27 50 / 10%),
+    inset 0 0.08rem 0 rgb(255 255 255 / 45%);
+}
+
+.login-action-card::after {
+  position: absolute;
+  bottom: clamp(-3.9rem, -11.35vw, -2.95rem);
+  left: 50%;
+  width: clamp(5.95rem, 23.2vw, 7.1rem);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: #ffcfed;
+  content: "";
+  box-shadow: 0 1.25rem 1.8rem rgb(102 27 50 / 8%);
+  transform: translateX(-50%);
+}

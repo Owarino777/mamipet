@@ -1,0 +1,56 @@
+.register-screen {
+  position: relative;
+  display: grid;
+  min-height: 100vh;
+  min-height: 100dvh;
+  place-items: center;
+  overflow: hidden auto;
+  background: #c2d7f3;
+}
+
+.register-panel {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(100%, clamp(22rem, 100vw, 30.5rem));
+  min-height: 100vh;
+  min-height: 100dvh;
+  align-content: center;
+  justify-items: center;
+  padding: clamp(2.2rem, 7vh, 5.8rem) clamp(1.65rem, 8vw, 3rem) clamp(3rem, 8vh, 5rem);
+}
+
+.register-animal {
+  position: absolute;
+  z-index: 0;
+  display: none;
+  pointer-events: none;
+}
+
+.register-animal img {
+  object-fit: contain;
+  filter: drop-shadow(0 1.4rem 1.8rem rgb(3 64 207 / 10%));
+}
+
+.register-panel h1 {
+  display: grid;
+  color: #0340cf;
+  font-family: var(--font-ui);
+  font-size: clamp(2.05rem, 8.4vw, 2.85rem);
+  font-weight: 950;
+  letter-spacing: 0;
+  line-height: 0.86;
+  text-align: center;
+}
+
+.register-panel h1 span {
+  display: block;
+}
+
+.register-role-tabs {
+  display: grid;
+  width: min(100%, clamp(17.5rem, 76vw, 23rem));
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(0.8rem, 3.5vw, 1.2rem);
+  margin-top: clamp(1.55rem, 5.2vw, 2rem);
+}

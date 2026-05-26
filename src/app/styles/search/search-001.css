@@ -1,0 +1,65 @@
+.search-page {
+  max-width: none;
+  width: 100%;
+  padding: 0;
+  background: var(--page);
+}
+
+.search-journey-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 12px clamp(18px, 3vw, 48px);
+  border-bottom: 1px solid var(--border);
+  background: rgb(255 255 255 / 82%);
+}
+
+.search-journey-strip span {
+  min-height: 34px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: white;
+  color: var(--muted);
+  font-size: 0.83rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.search-bar-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px clamp(18px, 3vw, 48px);
+  border-right: 0;
+  border-left: 0;
+  border-radius: 0;
+  box-shadow: 0 8px 24px rgb(65 48 34 / 6%);
+}
+
+.public-shell--compact .search-bar-panel {
+  border-bottom: 1px solid var(--border);
+  box-shadow: none;
+}
+
+.search-layout {
+  display: grid;
+  gap: 0;
+}
+
+.search-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.filter-chip {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: white;
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 850;
+}

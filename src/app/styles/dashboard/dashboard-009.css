@@ -1,0 +1,62 @@
+
+.journey-list__item--done {
+  border-color: rgb(47 107 63 / 22%);
+}
+
+.pet-sitter-workflow {
+  display: grid;
+  gap: 16px;
+  margin: 18px 0;
+}
+
+.upcoming-card {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  border-color: rgb(49 91 72 / 18%);
+  background:
+    linear-gradient(135deg, rgb(231 239 231 / 80%), transparent 64%),
+    white;
+}
+
+.card-heading-row,
+.request-row,
+.admin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-heading-row a {
+  color: var(--green);
+  font-weight: 900;
+}
+
+.pet-mini-grid,
+.recommendation-row {
+  display: grid;
+  gap: 12px;
+}
+
+.pet-mini-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pet-mini-card img,
+.booking-summary-card img {
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.pet-mini-card div {
+  display: grid;
+  gap: 4px;
+}
+
+.pet-mini-card span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}

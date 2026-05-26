@@ -1,0 +1,63 @@
+
+.pet-sitter-test-card {
+  top: var(--active-top);
+  left: 39px;
+  z-index: 20;
+  display: grid;
+  width: 324px;
+  min-height: var(--card-height);
+  height: auto;
+  justify-items: center;
+  padding: 44px 0 28px;
+  box-shadow: 4px 5px 12.9px rgb(0 0 0 / 25%);
+}
+
+.pet-sitter-test-tab--coral,
+.pet-sitter-test-card--coral {
+  background: #fb6f4b;
+}
+
+.pet-sitter-test-tab--blue,
+.pet-sitter-test-card--blue {
+  background: #bed6f4;
+}
+
+.pet-sitter-test-tab--green,
+.pet-sitter-test-card--green {
+  background: #9ba63a;
+}
+
+.pet-sitter-test-tab--pink,
+.pet-sitter-test-card--pink {
+  background: #ffc2ec;
+}
+
+.pet-sitter-test-icon {
+  position: absolute;
+  top: -33px;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 2px solid white;
+  border-radius: 999px;
+  background: inherit;
+  color: white;
+  transform: translateX(-50%);
+}
+
+.pet-sitter-test-icon svg {
+  width: 26px;
+  height: 26px;
+  overflow: visible;
+}
+
+.pet-sitter-test-icon path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.55;
+}

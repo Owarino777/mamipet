@@ -1,0 +1,63 @@
+.connected-shell {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgb(216 233 243 / 36%), transparent 280px),
+    var(--page);
+}
+
+.connected-sidebar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  gap: 14px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: rgb(255 255 255 / 94%);
+  backdrop-filter: blur(18px);
+}
+
+.connected-sidebar p {
+  color: var(--green);
+  font-weight: 900;
+}
+
+.connected-identity {
+  display: grid;
+  gap: 2px;
+}
+
+.connected-identity span {
+  color: var(--text);
+}
+
+.connected-identity small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.connected-role-switcher {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 72%);
+}
+
+.connected-role-switcher__button {
+  min-height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.connected-role-switcher__button--active {
+  background: var(--green);
+  color: white;
+  box-shadow: 0 8px 18px rgb(49 91 72 / 18%);
+}

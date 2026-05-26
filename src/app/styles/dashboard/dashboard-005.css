@@ -1,0 +1,65 @@
+
+.assessment-list {
+  display: grid;
+  gap: 12px;
+}
+
+.assessment-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 76%);
+}
+
+.assessment-card strong {
+  color: var(--text);
+}
+
+.assessment-card p {
+  margin-top: 4px;
+}
+
+.assessment-card span {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--green);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.assessment-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: clamp(14px, 3vw, 36px);
+  background: rgb(22 28 48 / 58%);
+  backdrop-filter: blur(10px);
+}
+
+.assessment-modal {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  width: min(100%, 980px);
+  max-height: min(92vh, 860px);
+  overflow: hidden;
+  border: 1px solid rgb(212 220 244 / 88%);
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 28px 80px rgb(22 28 48 / 32%);
+}
+
+.assessment-modal__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: start;
+  padding: clamp(18px, 4vw, 30px);
+  border-bottom: 1px solid var(--border);
+  background:
+    linear-gradient(135deg, rgb(233 239 255 / 96%), rgb(253 241 251 / 78%)),
+    white;
+}

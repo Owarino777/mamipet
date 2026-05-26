@@ -1,0 +1,66 @@
+
+.auth-account-card dl div {
+  display: grid;
+  gap: 2px;
+}
+
+.auth-account-card dt {
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.auth-account-card dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-weight: 800;
+}
+
+@media (min-width: 720px) {
+  .header-actions .ghost-button {
+    display: inline-flex;
+  }
+
+  .quick-search {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .search-bar-panel {
+    grid-template-columns: 1.15fr 0.9fr 0.9fr 1.1fr auto;
+    align-items: end;
+  }
+
+  .value-grid,
+  .featured-grid,
+  .results-grid,
+  .profile-grid,
+  .workspace-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gallery-section {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+
+  .auth-account-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gallery-main {
+    grid-row: span 2;
+    grid-column: auto;
+  }
+
+  .sticky-cta,
+  .workspace-heading {
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .booking-layout {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    align-items: start;
+  }
+}

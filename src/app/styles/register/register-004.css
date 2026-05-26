@@ -1,0 +1,64 @@
+
+.register-form-grid label {
+  gap: clamp(0.28rem, 1.1vw, 0.4rem);
+  color: #111;
+  font-size: clamp(0.72rem, 2.6vw, 0.82rem);
+  font-weight: 950;
+}
+
+.register-form-grid input {
+  min-height: clamp(2.3rem, 8.8vw, 2.75rem);
+  border: 0.08rem solid #7f7f7f;
+  border-radius: clamp(0.55rem, 2.4vw, 0.78rem);
+  background: white;
+  color: #111;
+  padding-inline: clamp(0.72rem, 2.8vw, 0.95rem);
+  font-size: clamp(0.85rem, 3.3vw, 0.98rem);
+}
+
+.register-field-wide {
+  min-width: 0;
+}
+
+.register-password-field {
+  grid-column: 1 / -1;
+  width: min(100%, 70%);
+}
+
+.register-submit {
+  justify-self: center;
+  width: min(100%, clamp(12.5rem, 53vw, 17rem));
+  min-height: clamp(2.75rem, 10.2vw, 3.25rem);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 18%), transparent 48%),
+    #ff97fd;
+  color: white;
+  cursor: pointer;
+  font-size: clamp(1rem, 4vw, 1.15rem);
+  font-weight: 950;
+  box-shadow: 0 0.8rem 1.3rem rgb(255 151 253 / 18%);
+  transition:
+    box-shadow 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.register-submit:hover {
+  transform: translateY(-0.08rem);
+  box-shadow: 0 0.95rem 1.45rem rgb(255 151 253 / 24%);
+}
+
+.register-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.register-card .workspace-status {
+  margin-top: 0.9rem;
+  color: #661b32;
+  font-size: 0.88rem;
+  font-weight: 850;
+  line-height: 1.35;
+  text-align: center;
+}

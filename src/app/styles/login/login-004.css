@@ -1,0 +1,57 @@
+
+.login-action-card--form {
+  width: min(100%, clamp(19.5rem, 82vw, 24rem));
+  min-height: 0;
+  gap: clamp(0.8rem, 3.5vw, 1rem);
+  margin-top: clamp(-3.7rem, -14vw, -2.4rem);
+  padding: clamp(1.75rem, 7vw, 2.3rem) clamp(1.9rem, 7.45vw, 2.5rem) clamp(2.5rem, 9.95vw, 3.1rem);
+}
+
+.login-primary-action,
+.login-secondary-action {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  width: min(100%, clamp(14.9rem, 71.7vw, 18.6rem));
+  min-height: clamp(3.75rem, 14.95vw, 4.35rem);
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: clamp(1.04rem, 4.98vw, 1.28rem);
+  font-weight: 950;
+  letter-spacing: 0;
+  transition:
+    box-shadow 160ms ease,
+    transform 160ms ease,
+    background-color 160ms ease;
+}
+
+.login-primary-action {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 11%), transparent 42%),
+    #0340cf;
+  color: white;
+  box-shadow:
+    0 0.75rem 1.15rem rgb(3 64 207 / 19%),
+    inset 0 -0.08rem 0 rgb(0 0 0 / 14%);
+}
+
+.login-primary-action:hover,
+.login-secondary-action:hover {
+  transform: translateY(-0.08rem);
+}
+
+.login-primary-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.login-secondary-action {
+  background:
+    linear-gradient(180deg, white, #fffdf6);
+  color: #050505;
+  box-shadow:
+    0 0.7rem 1.2rem rgb(102 27 50 / 8%),
+    inset 0 0 0 0.08rem rgb(255 255 255 / 70%);
+}

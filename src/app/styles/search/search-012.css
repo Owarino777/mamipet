@@ -1,0 +1,61 @@
+
+.map-popup__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 6;
+  display: flex;
+  gap: 5px;
+  transform: translateX(-50%);
+}
+
+.map-popup__dots span {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 66%);
+}
+
+.map-popup__dots .active {
+  width: 18px;
+  background: white;
+}
+
+.result-card-shell {
+  min-width: 0;
+  border-radius: 8px;
+}
+
+.result-card-shell--active {
+  box-shadow: 0 0 0 3px rgb(79 107 69 / 22%);
+}
+
+.sitter-card--skeleton {
+  display: grid;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.skeleton-block,
+.skeleton-line,
+.skeleton-pill-row {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #ece8e2;
+}
+
+.skeleton-block::after,
+.skeleton-line::after,
+.skeleton-pill-row::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+      transparent,
+      rgb(255 255 255 / 58%),
+      transparent);
+  content: "";
+  animation: skeleton-shimmer 1.25s infinite;
+  transform: translateX(-100%);
+}

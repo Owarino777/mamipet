@@ -1,0 +1,63 @@
+
+.filter-chip:hover {
+  border-color: rgb(79 107 69 / 45%);
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.filter-chip--active {
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
+}
+
+.filter-chip--active:hover {
+  background: var(--green);
+  color: white;
+}
+
+.filters-panel,
+.map-note {
+  padding: 18px;
+}
+
+.filters-heading {
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.filters-heading button {
+  background: transparent;
+  color: var(--green);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.filter-group {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 16px 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+.filter-group legend {
+  padding: 0 0 10px;
+  color: var(--text);
+  font-weight: 900;
+}
+
+.filter-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.filter-group input {
+  width: 18px;
+  min-height: 18px;
+  accent-color: var(--green);
+}

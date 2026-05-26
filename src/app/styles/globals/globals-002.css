@@ -1,0 +1,57 @@
+
+button,
+a,
+input,
+select,
+textarea {
+  outline-offset: 4px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgb(79 107 69 / 45%);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--text);
+  font-family: var(--font-title);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: clamp(2.55rem, 12vw, 4rem);
+  line-height: 0.98;
+}
+
+h2 {
+  font-size: clamp(1.75rem, 7vw, 2.65rem);
+  line-height: 1.08;
+}
+
+h3 {
+  font-size: 1.25rem;
+  line-height: 1.15;
+}
+
+p {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.62;
+}
+
+img {
+  display: block;
+}

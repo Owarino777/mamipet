@@ -1,0 +1,65 @@
+
+.hero-section h1,
+.hero-section p {
+  color: white;
+}
+
+.hero-section .section-kicker {
+  color: #d7ead9;
+}
+
+.hero-section .trust-badge {
+  background: rgb(255 255 255 / 14%);
+  color: white;
+  backdrop-filter: blur(12px);
+}
+
+.section-kicker {
+  color: var(--green);
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.hero-copy {
+  max-width: 720px;
+  font-size: clamp(1.05rem, 2vw, 1.22rem);
+}
+
+.hero-actions,
+.proof-row,
+.badge-row,
+.tag-row,
+.header-actions,
+.section-heading--inline,
+.filters-heading,
+.sitter-card__footer {
+  display: flex;
+  align-items: center;
+}
+
+.hero-actions,
+.proof-row,
+.badge-row,
+.tag-row {
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.trust-badge,
+.care-tag {
+  display: inline-flex;
+  min-height: 31px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.trust-badge {
+  background: var(--green-soft);
+  color: var(--green);
+}

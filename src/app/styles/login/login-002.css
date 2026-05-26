@@ -1,0 +1,65 @@
+
+.login-screen {
+  position: relative;
+  display: grid;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  place-items: stretch center;
+  background-color: #fffdf6;
+  background-image:
+    radial-gradient(circle at 50% 45%, rgb(255 207 237 / 20%), transparent 32rem),
+    image-set(url("/figma/login-floral-bg.avif") type("image/avif"),
+      url("/figma/login-floral-bg.webp") type("image/webp"));
+  background-position:
+    center,
+    center center;
+  background-repeat:
+    no-repeat,
+    no-repeat;
+  background-size:
+    cover,
+    cover;
+}
+
+.login-screen::before,
+.login-screen::after {
+  position: absolute;
+  top: -12%;
+  bottom: -12%;
+  z-index: 0;
+  width: clamp(18rem, 38vw, 46rem);
+  content: "";
+  background-image: image-set(url("/figma/login-floral-bg.avif") type("image/avif"),
+      url("/figma/login-floral-bg.webp") type("image/webp"));
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.34;
+  pointer-events: none;
+}
+
+.login-screen::before {
+  left: clamp(-22rem, -18vw, -6rem);
+  transform: scaleX(-1) rotate(-3deg);
+}
+
+.login-screen::after {
+  right: clamp(-22rem, -18vw, -6rem);
+  transform: rotate(4deg);
+}
+
+.login-device-notch {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 31px);
+  left: 50%;
+  z-index: 2;
+  display: none;
+  width: 106px;
+  height: 31px;
+  border-radius: 999px;
+  background: #020202;
+  box-shadow: inset -15px 0 0 rgb(255 255 255 / 3%);
+  transform: translateX(-50%);
+  pointer-events: none;
+}

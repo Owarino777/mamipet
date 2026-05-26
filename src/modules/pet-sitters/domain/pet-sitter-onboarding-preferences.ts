@@ -34,6 +34,12 @@ export type PetSitterOfferReferenceCodes = {
   speciesCodes: string[];
 };
 
+export type PetSitterAnimalAssessmentCard = {
+  animalOptionId: PetSitterAnimalOptionId;
+  competencyTrackId: string;
+  label: string;
+};
+
 export const petSitterCareOptions: Array<{
   id: PetSitterCareOptionId;
   label: string;
@@ -172,6 +178,16 @@ export class PetSitterOnboardingPreferences {
     return unique(
       this.animalOptionIds.flatMap((animalId) => competencyTrackIdsByAnimal[animalId]),
     );
+  }
+
+  getAnimalAssessmentCards(): PetSitterAnimalAssessmentCard[] {
+    return this.animalOptionIds.map((animalId) => ({
+      animalOptionId: animalId,
+      competencyTrackId: competencyTrackIdsByAnimal[animalId][0] ?? "nacs",
+      label:
+        petSitterAnimalOptions.find((option) => option.id === animalId)?.label ??
+        animalId,
+    }));
   }
 
   toOfferReferenceCodes(): PetSitterOfferReferenceCodes {

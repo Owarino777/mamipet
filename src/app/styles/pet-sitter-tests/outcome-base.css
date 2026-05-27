@@ -15,8 +15,8 @@
   align-content: center;
   gap: 2.2rem;
   background:
-    radial-gradient(ellipse at 10% 20%, rgb(3 64 207 / 10%), transparent 28%),
-    radial-gradient(ellipse at 84% 88%, rgb(3 64 207 / 10%), transparent 27%),
+    linear-gradient(rgb(255 254 250 / 72%), rgb(255 254 250 / 72%)),
+    url("/figma/login-floral-bg.webp") center / cover no-repeat,
     #fffefa;
   color: #0340cf;
 }

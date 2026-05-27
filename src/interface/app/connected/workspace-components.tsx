@@ -207,49 +207,70 @@ export function BookingDocumentsPanel({
       </div>
 
       {paidBookings.length === 0 ? (
-        <p>
-          Les documents sont générés après paiement: contrat de mission, reçu
-          Stripe test et fiche récapitulative de garde.
-        </p>
+        <div className="booking-document-empty">
+          <strong>Aucun dossier payé</strong>
+          <span>Contrat, reçu et fiche de garde apparaîtront ici.</span>
+        </div>
       ) : (
         <div className="booking-document-list">
           {paidBookings.map((booking) => (
-            <details className="booking-document" key={booking.id}>
-              <summary>
+            <article className="booking-dossier" key={booking.id}>
+              <header className="booking-dossier__header">
+                <span className="booking-dossier__icon" aria-hidden="true" />
                 <span>
                   <strong>{formatBookingTitle(booking, petById)}</strong>
-                  <small>
-                    {formatShortDate(booking.startDate)} -{" "}
-                    {formatShortDate(booking.endDate)} · {booking.petSitterName}
-                  </small>
+                  <small>{getBookingReference(booking.id)}</small>
                 </span>
-                <TrustBadge label="Documents prêts" />
-              </summary>
+                <TrustBadge label="Complet" />
+              </header>
 
-              <dl>
+              <dl className="booking-dossier__meta">
                 <div>
-                  <dt>Contrat de mission</dt>
+                  <dt>Période</dt>
                   <dd>
-                    Parties, animaux, dates, consignes, assurance et
-                    responsabilités.
+                    {formatShortDate(booking.startDate)} -{" "}
+                    {formatShortDate(booking.endDate)}
                   </dd>
                 </div>
                 <div>
-                  <dt>Reçu Stripe test</dt>
-                  <dd>
-                    Paiement {formatEuro(booking.totalAmountCents)} dont{" "}
-                    {formatEuro(booking.platformCommissionCents)} de commission
-                    MamiPet.
-                  </dd>
+                  <dt>Montant</dt>
+                  <dd>{formatEuro(booking.totalAmountCents)}</dd>
                 </div>
                 <div>
-                  <dt>Fiche de garde</dt>
-                  <dd>{booking.instructions || "Aucune consigne ajoutée."}</dd>
+                  <dt>Assurance</dt>
+                  <dd>{booking.insuranceLevel}</dd>
                 </div>
               </dl>
 
-              {booking.contractSummary ? <p>{booking.contractSummary}</p> : null}
-            </details>
+              <ul className="booking-piece-list">
+                <li>
+                  <span>
+                    <strong>Contrat de mission</strong>
+                    <small>{booking.contractSummary ?? "Contrat généré."}</small>
+                  </span>
+                  <button type="button">Consulter</button>
+                </li>
+                <li>
+                  <span>
+                    <strong>Reçu Stripe test</strong>
+                    <small>
+                      Commission MamiPet{" "}
+                      {formatEuro(booking.platformCommissionCents)}
+                    </small>
+                  </span>
+                  <button type="button">Consulter</button>
+                </li>
+                <li>
+                  <span>
+                    <strong>Fiche de garde</strong>
+                    <small>
+                      {booking.instructions || "Aucune consigne ajoutée."}
+                    </small>
+                  </span>
+                  <button type="button">Consulter</button>
+                </li>
+              </ul>
+            </article>
           ))}
         </div>
       )}
@@ -317,12 +338,12 @@ export function PetSitterPayoutPanel({
     <article className="workspace-card payout-card">
       <div>
         <p className="section-kicker">Versements</p>
-        <h2>Compte de paiement à finaliser</h2>
+        <h2>{formatEuro(netAmountCents)} à verser</h2>
       </div>
 
       <div className="payout-summary-grid">
         <span>
-          <small>Net pet-sitter</small>
+          <small>Solde pet-sitter</small>
           <strong>{formatEuro(netAmountCents)}</strong>
         </span>
         <span>
@@ -331,23 +352,24 @@ export function PetSitterPayoutPanel({
         </span>
       </div>
 
-      <p>
-        En production, le pet-sitter doit compléter Stripe Connect avant tout
-        versement: identité, coordonnées bancaires, informations fiscales et
-        acceptation des conditions Stripe.
-      </p>
-
-      <ul className="payout-checklist" aria-label="Informations nécessaires au versement">
+      <ul
+        className="payout-checklist"
+        aria-label="Statut du compte de versement"
+      >
         <li className="payout-checklist__done">Identité MamiPet vérifiée</li>
-        <li>Compte Stripe Connect à créer</li>
-        <li>IBAN et KYC Stripe à valider</li>
+        <li>Compte bénéficiaire non connecté</li>
+        <li>Coordonnées bancaires manquantes</li>
       </ul>
 
       <button className="secondary-button" type="button" disabled>
-        Configurer Stripe Connect
+        Connecter le compte bancaire
       </button>
     </article>
   );
+}
+
+function getBookingReference(bookingId: string): string {
+  return `Dossier ${bookingId.replace(/^booking-demo-/, "MP-").slice(0, 11).toUpperCase()}`;
 }
 
 function getBookingStatusDisplay(status: DemoBooking["status"]): string {

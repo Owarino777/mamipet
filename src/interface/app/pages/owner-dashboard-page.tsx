@@ -173,71 +173,13 @@ export function OwnerDashboardPage() {
             )}
           </article>
 
-          <article className="workspace-card journey-card">
-            <div className="card-heading-row">
-              <h2>Parcours recommandé</h2>
-
-              <Link href="/pet-sitters">Rechercher</Link>
-            </div>
-
-            <ol className="journey-list" aria-label="Parcours propriétaire">
-              <li className="journey-list__item journey-list__item--done">
-                <span>1</span>
-
-                <div>
-                  <strong>Compléter les animaux</strong>
-
-                  <p>
-                    Besoins, tempérament et informations médicales restent
-                    prêts.
-                  </p>
-                </div>
-              </li>
-
-              <li
-                className={
-                  nextBooking
-                    ? "journey-list__item journey-list__item--done"
-                    : "journey-list__item journey-list__item--active"
-                }
-              >
-                <span>2</span>
-
-                <div>
-                  <strong>Comparer les profils</strong>
-
-                  <p>
-                    Ville, badges, disponibilités et types de garde en premier.
-                  </p>
-                </div>
-              </li>
-
-              <li
-                className={
-                  nextBooking
-                    ? "journey-list__item journey-list__item--active"
-                    : "journey-list__item"
-                }
-              >
-                <span>3</span>
-
-                <div>
-                  <strong>Envoyer une demande claire</strong>
-
-                  <p>
-                    Le paiement arrive seulement après acceptation du
-                    pet-sitter.
-                  </p>
-                </div>
-              </li>
-            </ol>
-          </article>
-
           <article className="workspace-card">
             <div className="card-heading-row">
               <h2>Mes animaux</h2>
 
-              <Link href="/owner/animals">Voir tout</Link>
+              <ButtonLink href="/owner/animals" variant="secondary">
+                Voir tout
+              </ButtonLink>
             </div>
 
             {workspace.pets.length > 0 ? (

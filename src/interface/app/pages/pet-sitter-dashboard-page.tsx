@@ -108,55 +108,6 @@ export function PetSitterDashboardPage() {
           />
         </section>
 
-        <section className="workspace-card pet-sitter-workflow">
-          <div>
-            <p className="section-kicker">Parcours pet-sitter</p>
-
-            <h2>
-              Priorisez les demandes qui correspondent vraiment à vos
-              compétences.
-            </h2>
-          </div>
-
-          <ol
-            className="journey-list journey-list--horizontal"
-            aria-label="Parcours pet-sitter"
-          >
-            <li className="journey-list__item journey-list__item--active">
-              <span>1</span>
-
-              <div>
-                <strong>Lire besoins et consignes</strong>
-
-                <p>Espèces, dates, soins et contexte avant toute réponse.</p>
-              </div>
-            </li>
-
-            <li className="journey-list__item">
-              <span>2</span>
-
-              <div>
-                <strong>Accepter uniquement si faisable</strong>
-
-                <p>Une acceptation bloque le créneau dans le parcours MVP.</p>
-              </div>
-            </li>
-
-            <li className="journey-list__item">
-              <span>3</span>
-
-              <div>
-                <strong>Suivre paiement et contrat</strong>
-
-                <p>
-                  Le récapitulatif encadre parties, tarif, assurance et
-                  consignes.
-                </p>
-              </div>
-            </li>
-          </ol>
-        </section>
-
         <section className="workspace-grid">
           <article className="workspace-card">
             <h2>Demandes reçues</h2>
@@ -227,14 +178,10 @@ export function PetSitterDashboardPage() {
               ))}
             </div>
 
-            <p>
-              Les demandes sensibles restent réservées aux profils avec
-              garanties visibles et documents validés.
-            </p>
             <p className="workspace-muted-note">
               {hasPremiumInsurance
-                ? "Votre formule professionnelle active l’assurance premium."
-                : "Vous avez choisi de continuer sans formule : aucun badge assurance n’est affiché."}
+                ? "Assurance premium active."
+                : "Aucune assurance premium active."}
             </p>
           </article>
         </section>

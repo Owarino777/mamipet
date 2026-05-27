@@ -80,12 +80,12 @@
   right: 50%;
   bottom: 0.95rem;
   display: grid;
-  width: 82px;
-  height: 82px;
+  width: 96px;
+  height: 96px;
   margin: 0;
   place-items: center;
   color: #0340cf;
-  font-size: 0.94rem;
+  font-size: 1.08rem;
   font-weight: 950;
   line-height: 0.78;
   text-align: center;
@@ -238,9 +238,9 @@
 
   .pet-sitter-subscription-price {
     bottom: 2.9rem;
-    width: 124px;
-    height: 124px;
-    font-size: 1.22rem;
+    width: 148px;
+    height: 148px;
+    font-size: 1.42rem;
     line-height: 0.82;
   }
 

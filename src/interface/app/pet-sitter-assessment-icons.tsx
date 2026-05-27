@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { DogAssessmentHeadIcon } from "@/interface/app/dog-assessment-head-icon";
+import { RabbitExpertHeadIcon } from "@/interface/app/rabbit-expert-head-icon";
 import type {
   PetSitterAnimalAssessmentCard,
   PetSitterAnimalOptionId,
@@ -11,8 +13,17 @@ type AnimalIconAsset = {
   width: number;
 };
 
+type ExpertBadgeOverlay = AnimalIconAsset & {
+  badgeHeight: number;
+  badgeWidth: number;
+  badgeX: number;
+  badgeY: number;
+};
+
 export function ExpertBadge({ card }: { card: PetSitterAnimalAssessmentCard }) {
-  if (card.animalOptionId === "cat" || card.animalOptionId === "sick_animals") {
+  const asset = getAnimalIconAsset(card.animalOptionId);
+
+  if (!asset || asset.className === "cat") {
     return (
       <div className="pet-sitter-expert-badge pet-sitter-expert-badge--asset" aria-hidden="true">
         <Image alt="" height={372} priority src="/figma/expert-chat-badge.svg" unoptimized width={318} />
@@ -20,11 +31,55 @@ export function ExpertBadge({ card }: { card: PetSitterAnimalAssessmentCard }) {
     );
   }
 
+  return <ExpertBadgeWithAnimal asset={getExpertBadgeOverlay(asset)} />;
+}
+
+function ExpertBadgeWithAnimal({ asset }: { asset: ExpertBadgeOverlay }) {
   return (
-    <div className="pet-sitter-expert-badge" aria-hidden="true">
-      <AnimalAssessmentIcon animalId={card.animalOptionId} />
-      <span>EXPERT</span>
+    <div className="pet-sitter-expert-badge pet-sitter-expert-badge--asset" aria-hidden="true">
+      <svg className="pet-sitter-expert-medal" viewBox="0 0 318 372" focusable="false">
+        <image height="372" href="/figma/expert-chat-badge.svg" width="318" x="0" y="0" />
+        <rect className="pet-sitter-expert-medal__animal-cover" height="150" rx="18" width="142" x="88" y="112" />
+        {renderExpertBadgeAnimal(asset)}
+      </svg>
     </div>
+  );
+}
+
+function renderExpertBadgeAnimal(asset: ExpertBadgeOverlay) {
+  if (asset.className === "dog") {
+    return (
+      <DogAssessmentHeadIcon
+        className="pet-sitter-expert-medal__animal"
+        height={asset.badgeHeight}
+        width={asset.badgeWidth}
+        x={asset.badgeX}
+        y={asset.badgeY}
+      />
+    );
+  }
+
+  if (asset.className === "rabbit") {
+    return (
+      <RabbitExpertHeadIcon
+        className="pet-sitter-expert-medal__animal"
+        height={asset.badgeHeight}
+        width={asset.badgeWidth}
+        x={asset.badgeX}
+        y={asset.badgeY}
+      />
+    );
+  }
+
+  return (
+    <image
+      height={asset.badgeHeight}
+      href={asset.src}
+      preserveAspectRatio="xMidYMid meet"
+      width={asset.badgeWidth}
+      x={asset.badgeX}
+      y={asset.badgeY}
+    />
   );
 }
 
@@ -90,6 +145,22 @@ function getAnimalIconAsset(animalId: PetSitterAnimalOptionId): AnimalIconAsset 
   }
 
   return null;
+}
+
+function getExpertBadgeOverlay(asset: AnimalIconAsset): ExpertBadgeOverlay {
+  if (asset.className === "dog") {
+    return { ...asset, badgeHeight: 116, badgeWidth: 176, badgeX: 71, badgeY: 142 };
+  }
+
+  if (asset.className === "rabbit") {
+    return { ...asset, badgeHeight: 146, badgeWidth: 118, badgeX: 100, badgeY: 120 };
+  }
+
+  if (asset.className === "snake") {
+    return { ...asset, badgeHeight: 150, badgeWidth: 104, badgeX: 107, badgeY: 116 };
+  }
+
+  return { ...asset, badgeHeight: 128, badgeWidth: 128, badgeX: 95, badgeY: 124 };
 }
 
 function renderFallbackAnimalAssessmentIcon() {

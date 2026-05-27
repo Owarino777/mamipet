@@ -12,3 +12,13 @@
   width: 100%;
   height: auto;
 }
+
+.pet-sitter-expert-medal {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pet-sitter-expert-medal__animal-cover {
+  fill: #003dd4;
+}

@@ -1,6 +1,15 @@
-export function DogAssessmentHeadIcon() {
+import type { SVGProps } from "react";
+
+export function DogAssessmentHeadIcon(props: SVGProps<SVGSVGElement>) {
+  const { className, ...svgProps } = props;
+
   return (
-    <svg className="dog-assessment-head" viewBox="0 0 52 34" focusable="false">
+    <svg
+      {...svgProps}
+      className={`dog-assessment-head${className ? ` ${className}` : ""}`}
+      viewBox="0 0 52 34"
+      focusable="false"
+    >
       <path
         className="dog-assessment-head__white"
         d="M25.33 34c-4.68 0-9.18-1.99-12.36-5.45l-.05-.06a16.83 16.83 0 0 1-.63-.74C9.83 24.73 8.48 20.91 8.48 17c0-5.24 2.34-10.1 6.43-13.35A16.65 16.65 0 0 1 25.33 0c3.96 0 7.82 1.42 10.85 4l.57.5.18.17A16.86 16.86 0 0 1 42.18 17c0 3.45-1.02 6.77-2.96 9.61l-.2.28c-.11.17-.24.34-.39.54l-.06.08A16.73 16.73 0 0 1 25.33 34Z"

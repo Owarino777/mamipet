@@ -34,6 +34,13 @@ import {
   TrustBadge,
 } from "@/interface/shared/product-ui";
 import { AuthBackButton } from "@/interface/shared/auth-back-button";
+import {
+  defaultOwnerPetImageUrl,
+  OwnerRegistrationFlow,
+  type OwnerAccountDraft,
+  type OwnerAnimalDraft,
+  type OwnerRegistrationStep,
+} from "@/interface/app/owner-registration-flow";
 import { calculatePaymentBreakdown } from "@/modules/payments/domain/platform-commission";
 import { createSupabaseBrowserClient } from "@/shared/supabase/browser-client";
 
@@ -903,11 +910,16 @@ export function LoginPage() {
 export function RegisterPage() {
   const router = useRouter();
   const [role, setRole] = useState<"owner" | "petSitter">("petSitter");
+  const [ownerStep, setOwnerStep] = useState<OwnerRegistrationStep>("account");
+  const [ownerAccountDraft, setOwnerAccountDraft] = useState<OwnerAccountDraft | null>(null);
+  const [ownerAnimalDraft, setOwnerAnimalDraft] = useState<OwnerAnimalDraft | null>(null);
+  const [ownerPetImagePreview, setOwnerPetImagePreview] = useState(defaultOwnerPetImageUrl);
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   function selectRole(nextRole: "owner" | "petSitter") {
     setRole(nextRole);
+    setOwnerStep("account");
     setRegisterError(null);
     setRegisterSuccess(null);
   }
@@ -936,13 +948,19 @@ export function RegisterPage() {
           src="/figma/register-pet-right.avif"
         />
       </div>
-      <section className="register-panel" aria-labelledby="register-title">
-        <h1 id="register-title">
-          Rejoindre
-          <span>en tant que...</span>
-        </h1>
+      <section
+        className={`register-panel${role === "owner" && ownerStep !== "account" ? " register-panel--focused" : ""}`}
+        aria-labelledby="register-title"
+      >
+        {role === "owner" && ownerStep !== "account" ? null : (
+          <h1 id="register-title">
+            Rejoindre
+            <span>en tant que...</span>
+          </h1>
+        )}
 
-        <div className="register-role-tabs" aria-label="Choisir un type de compte">
+        {role === "owner" && ownerStep !== "account" ? null : (
+          <div className="register-role-tabs" aria-label="Choisir un type de compte">
           <button
             className={role === "petSitter" ? "register-role-tab is-active" : "register-role-tab"}
             type="button"
@@ -967,9 +985,28 @@ export function RegisterPage() {
           >
             Propriétaire
           </button>
-        </div>
+          </div>
+        )}
 
-        <section className="register-card" key={role}>
+        <section className={`register-card${role === "owner" ? ` register-card--owner-${ownerStep}` : ""}`} key={`${role}-${ownerStep}`}>
+          {role === "owner" ? (
+            <OwnerRegistrationFlow
+              accountDraft={ownerAccountDraft}
+              animalDraft={ownerAnimalDraft}
+              imagePreview={ownerPetImagePreview}
+              isSubmitting={isSubmitting}
+              onAccountDraftChange={setOwnerAccountDraft}
+              onAnimalDraftChange={setOwnerAnimalDraft}
+              onCompleteLocalRegistration={completeLocalRegistration}
+              onError={setRegisterError}
+              onImagePreviewChange={setOwnerPetImagePreview}
+              onNavigate={(href) => router.push(href)}
+              onSubmittingChange={setIsSubmitting}
+              onSuccess={setRegisterSuccess}
+              onStepChange={setOwnerStep}
+              step={ownerStep}
+            />
+          ) : (
           <form
             className="register-form"
             onSubmit={async (event) => {
@@ -1019,7 +1056,7 @@ export function RegisterPage() {
                       firstName,
                       role,
                     });
-                    router.push(role === "owner" ? "/dashboard" : "/pet-sitter/onboarding");
+                    router.push("/pet-sitter/onboarding");
                     return;
                   }
 
@@ -1033,24 +1070,7 @@ export function RegisterPage() {
                     firstName,
                     role,
                   });
-                  if (role === "petSitter") {
-                    router.push("/pet-sitter/onboarding");
-                    return;
-                  }
-
-                  setRegisterSuccess("Compte créé. Votre espace propriétaire est prêt.");
-                  router.push("/dashboard");
-                  return;
-                }
-
-                if (role === "owner") {
-                  completeLocalRegistration({
-                    email,
-                    firstName,
-                    role,
-                  });
-                  await ensureOwnerProfile({ firstName, city, postalCode });
-                  router.push("/dashboard");
+                  router.push("/pet-sitter/onboarding");
                   return;
                 }
 
@@ -1135,6 +1155,7 @@ export function RegisterPage() {
                   : "Créer mon compte"}
             </button>
           </form>
+          )}
           {registerError ? <p className="workspace-status">{registerError}</p> : null}
           {registerSuccess ? <p className="workspace-status">{registerSuccess}</p> : null}
         </section>
@@ -1923,33 +1944,6 @@ async function resolveDashboardRoute(): Promise<string> {
   }
 
   return "/dashboard";
-}
-
-async function ensureOwnerProfile(input: {
-  firstName: string;
-  city: string;
-  postalCode: string;
-}) {
-  const response = await fetch("/api/profiles/owner", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({
-      firstName: input.firstName,
-      city: input.city,
-      postalCode: input.postalCode || null,
-      country: "France",
-    }),
-  });
-
-  if (response.ok || response.status === 409) {
-    return;
-  }
-
-  const payload = (await response.json()) as ApiFailure;
-  throw new Error(payload.error?.message ?? "Impossible de créer le profil propriétaire.");
 }
 
 async function ensurePetSitterProfile(input: {

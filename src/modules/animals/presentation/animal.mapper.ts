@@ -21,6 +21,7 @@ export type AnimalRow = {
   sexe: string | null;
   date_naissance: string | null;
   couleur: string | null;
+  photo_url: string | null;
   poids_kg: number | string | null;
   temperament: string | null;
   besoins_specifiques: string | null;
@@ -37,6 +38,7 @@ export type AnimalDto = {
   sex: string | null;
   birthDate: string | null;
   color: string | null;
+  photoUrl: string | null;
   weightKg: number | null;
   temperament: string | null;
   specificNeeds: string | null;
@@ -83,6 +85,7 @@ export function mapAnimalRow(row: AnimalRow): AnimalDto {
     sex: row.sexe,
     birthDate: row.date_naissance,
     color: row.couleur,
+    photoUrl: row.photo_url,
     weightKg: row.poids_kg === null ? null : Number(row.poids_kg),
     temperament: row.temperament,
     specificNeeds: row.besoins_specifiques,

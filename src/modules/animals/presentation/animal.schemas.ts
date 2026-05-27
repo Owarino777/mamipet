@@ -12,6 +12,7 @@ export const createAnimalSchema = z.object({
     .nullable()
     .optional(),
   color: z.string().trim().min(1).max(80).nullable().optional(),
+  photoUrl: z.string().trim().url().max(2000).nullable().optional(),
   weightKg: z.number().min(0).max(5000).nullable().optional(),
   temperament: nullableText,
   specificNeeds: nullableText,

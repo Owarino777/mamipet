@@ -21,6 +21,7 @@ const animalSelect = `
   sexe,
   date_naissance,
   couleur,
+  photo_url,
   poids_kg,
   temperament,
   besoins_specifiques,
@@ -65,6 +66,7 @@ export async function PATCH(request: Request, context: AnimalRouteContext) {
       ...(input.sex !== undefined ? { sexe: input.sex } : {}),
       ...(input.birthDate !== undefined ? { date_naissance: input.birthDate } : {}),
       ...(input.color !== undefined ? { couleur: input.color } : {}),
+      ...(input.photoUrl !== undefined ? { photo_url: input.photoUrl } : {}),
       ...(input.weightKg !== undefined ? { poids_kg: input.weightKg } : {}),
       ...(input.temperament !== undefined ? { temperament: input.temperament } : {}),
       ...(input.specificNeeds !== undefined

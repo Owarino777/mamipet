@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { demoWorkspaceActions } from "@/interface/shared/demo-workspace-client";
+import { isLocalEmailVerificationBypassEnabled } from "@/shared/config/auth-public-env";
 import { createSupabaseBrowserClient } from "@/shared/supabase/browser-client";
 
 const defaultOwnerPetImageUrl =
@@ -44,6 +45,14 @@ export type OwnerPreferenceDraft = {
   showProfessionalPetSitters: boolean;
 };
 
+export type PendingOwnerRegistration = {
+  account: OwnerAccountDraft;
+  animal: OwnerAnimalDraft;
+  email: string;
+  preferences: OwnerPreferenceDraft;
+  role: "owner";
+};
+
 type OwnerRegistrationFlowProps = {
   accountDraft: OwnerAccountDraft | null;
   animalDraft: OwnerAnimalDraft | null;
@@ -57,6 +66,7 @@ type OwnerRegistrationFlowProps = {
     role: "owner";
   }) => void;
   onError: (message: string | null) => void;
+  onEmailVerificationRequired: (registration: PendingOwnerRegistration) => void;
   onImagePreviewChange: (preview: string) => void;
   onStepChange: (step: OwnerRegistrationStep) => void;
   onSubmittingChange: (isSubmitting: boolean) => void;
@@ -74,7 +84,10 @@ export function OwnerRegistrationFlow(props: OwnerRegistrationFlowProps) {
         className="register-form owner-onboarding-form"
         onSubmit={(event) => {
           event.preventDefault();
-          const draft = createOwnerAnimalDraft(new FormData(event.currentTarget), props.imagePreview);
+          const draft = createOwnerAnimalDraft(
+            new FormData(event.currentTarget),
+            props.imagePreview,
+          );
 
           props.onError(null);
           props.onSuccess(null);
@@ -91,7 +104,10 @@ export function OwnerRegistrationFlow(props: OwnerRegistrationFlowProps) {
         <div className="owner-form-grid">
           <label className="owner-field-wide">
             Type d’animal
-            <select name="speciesCode" defaultValue={props.animalDraft?.speciesCode ?? "cat"}>
+            <select
+              name="speciesCode"
+              defaultValue={props.animalDraft?.speciesCode ?? "cat"}
+            >
               {ownerAnimalSpeciesOptions.map((option) => (
                 <option key={option.code} value={option.code}>
                   {option.label}
@@ -101,11 +117,24 @@ export function OwnerRegistrationFlow(props: OwnerRegistrationFlowProps) {
           </label>
           <label>
             Nom
-            <input name="name" type="text" defaultValue={props.animalDraft?.name ?? ""} placeholder="Opale" required />
+            <input
+              name="name"
+              type="text"
+              defaultValue={props.animalDraft?.name ?? ""}
+              placeholder="Opale"
+              required
+            />
           </label>
           <label>
             Âge
-            <input name="age" type="number" min="0" defaultValue={props.animalDraft?.age ?? ""} placeholder="6" required />
+            <input
+              name="age"
+              type="number"
+              min="0"
+              defaultValue={props.animalDraft?.age ?? ""}
+              placeholder="6"
+              required
+            />
           </label>
           <label>
             Sexe
@@ -117,7 +146,14 @@ export function OwnerRegistrationFlow(props: OwnerRegistrationFlowProps) {
           </label>
           <label>
             Poids
-            <input name="weightKg" type="number" min="0" step="0.1" defaultValue={props.animalDraft?.weightKg ?? ""} placeholder="4.2 kg" />
+            <input
+              name="weightKg"
+              type="number"
+              min="0"
+              step="0.1"
+              defaultValue={props.animalDraft?.weightKg ?? ""}
+              placeholder="4.2 kg"
+            />
           </label>
           <label className="owner-field-wide">
             Photo de l’animal
@@ -129,7 +165,12 @@ export function OwnerRegistrationFlow(props: OwnerRegistrationFlowProps) {
             />
           </label>
           <div className="owner-photo-preview" aria-label="Aperçu photo animal">
-            <Image src={props.imagePreview} alt="Aperçu de l'animal" fill sizes="96px" />
+            <Image
+              src={props.imagePreview}
+              alt="Aperçu de l'animal"
+              fill
+              sizes="96px"
+            />
           </div>
         </div>
 
@@ -142,7 +183,13 @@ export function OwnerRegistrationFlow(props: OwnerRegistrationFlowProps) {
                   name="temperament"
                   type="checkbox"
                   value={option}
-                  defaultChecked={(props.animalDraft?.temperament ?? ["Calme", "Solitaire", "Joueur"]).includes(option)}
+                  defaultChecked={(
+                    props.animalDraft?.temperament ?? [
+                      "Calme",
+                      "Solitaire",
+                      "Joueur",
+                    ]
+                  ).includes(option)}
                 />
                 <span>{option}</span>
               </label>
@@ -153,27 +200,68 @@ export function OwnerRegistrationFlow(props: OwnerRegistrationFlowProps) {
         <fieldset className="owner-fieldset">
           <legend>A-t-il déjà mordu, griffé, poussé, etc&nbsp;?</legend>
           <div className="owner-radio-row">
-            <label><input name="hasBitten" type="radio" value="yes" defaultChecked={props.animalDraft?.hasBitten ?? true} /> Oui</label>
-            <label><input name="hasBitten" type="radio" value="no" defaultChecked={props.animalDraft?.hasBitten === false} /> Non</label>
+            <label>
+              <input
+                name="hasBitten"
+                type="radio"
+                value="yes"
+                defaultChecked={props.animalDraft?.hasBitten ?? true}
+              />{" "}
+              Oui
+            </label>
+            <label>
+              <input
+                name="hasBitten"
+                type="radio"
+                value="no"
+                defaultChecked={props.animalDraft?.hasBitten === false}
+              />{" "}
+              Non
+            </label>
           </div>
         </fieldset>
 
         <label>
           Carnet de santé
-          <input name="healthDocument" type="file" accept="application/pdf,image/jpeg,image/png" />
+          <input
+            name="healthDocument"
+            type="file"
+            accept="application/pdf,image/jpeg,image/png"
+          />
         </label>
 
         <fieldset className="owner-fieldset">
           <legend>A-t-il des problèmes de santé&nbsp;?</legend>
           <div className="owner-radio-row">
-            <label><input name="hasHealthIssues" type="radio" value="yes" defaultChecked={props.animalDraft?.hasHealthIssues === true} /> Oui</label>
-            <label><input name="hasHealthIssues" type="radio" value="no" defaultChecked={props.animalDraft?.hasHealthIssues !== true} /> Non</label>
+            <label>
+              <input
+                name="hasHealthIssues"
+                type="radio"
+                value="yes"
+                defaultChecked={props.animalDraft?.hasHealthIssues === true}
+              />{" "}
+              Oui
+            </label>
+            <label>
+              <input
+                name="hasHealthIssues"
+                type="radio"
+                value="no"
+                defaultChecked={props.animalDraft?.hasHealthIssues !== true}
+              />{" "}
+              Non
+            </label>
           </div>
         </fieldset>
 
         <label>
           Si oui, explique
-          <input name="healthNotes" type="text" defaultValue={props.animalDraft?.healthNotes ?? ""} placeholder="Décris la maladie, les soins, etc..." />
+          <input
+            name="healthNotes"
+            type="text"
+            defaultValue={props.animalDraft?.healthNotes ?? ""}
+            placeholder="Décris la maladie, les soins, etc..."
+          />
         </label>
 
         <button className="register-submit" type="submit">
@@ -196,7 +284,9 @@ function OwnerAccountForm(props: OwnerRegistrationFlowProps) {
       className="register-form"
       onSubmit={(event) => {
         event.preventDefault();
-        const draft = createOwnerAccountDraft(new FormData(event.currentTarget));
+        const draft = createOwnerAccountDraft(
+          new FormData(event.currentTarget),
+        );
 
         props.onError(null);
         props.onSuccess(null);
@@ -215,7 +305,12 @@ function OwnerAccountForm(props: OwnerRegistrationFlowProps) {
         <div className="register-kind-options">
           {["Maman", "Papa", "Ami"].map((option, index) => (
             <label className="register-chip" key={option}>
-              <input defaultChecked={index === 0} name="identityKind" type="radio" value={option} />
+              <input
+                defaultChecked={index === 0}
+                name="identityKind"
+                type="radio"
+                value={option}
+              />
               <span>{option}</span>
             </label>
           ))}
@@ -225,35 +320,81 @@ function OwnerAccountForm(props: OwnerRegistrationFlowProps) {
       <div className="register-form-grid">
         <label>
           Prénom
-          <input name="firstName" type="text" placeholder="Margo" defaultValue={props.accountDraft?.firstName ?? ""} required />
+          <input
+            name="firstName"
+            type="text"
+            placeholder="Margo"
+            defaultValue={props.accountDraft?.firstName ?? ""}
+            required
+          />
         </label>
         <label>
           Nom
-          <input name="lastName" type="text" placeholder="Da Silva" defaultValue={props.accountDraft?.lastName ?? ""} required />
+          <input
+            name="lastName"
+            type="text"
+            placeholder="Da Silva"
+            defaultValue={props.accountDraft?.lastName ?? ""}
+            required
+          />
         </label>
         <label className="register-field-wide">
           Adresse mail
-          <input name="email" type="email" placeholder="margo.mamipet@gmail.com" defaultValue={props.accountDraft?.email ?? ""} required />
+          <input
+            name="email"
+            type="email"
+            placeholder="margo.mamipet@gmail.com"
+            defaultValue={props.accountDraft?.email ?? ""}
+            required
+          />
         </label>
         <label>
           Âge
-          <input name="age" type="number" min="16" placeholder="24" defaultValue={props.accountDraft?.age ?? ""} />
+          <input
+            name="age"
+            type="number"
+            min="16"
+            placeholder="24"
+            defaultValue={props.accountDraft?.age ?? ""}
+          />
         </label>
         <label>
           Ville
-          <input name="city" type="text" placeholder="Caen" defaultValue={props.accountDraft?.city ?? ""} />
+          <input
+            name="city"
+            type="text"
+            placeholder="Caen"
+            defaultValue={props.accountDraft?.city ?? ""}
+          />
         </label>
         <label>
           Code postale
-          <input name="postalCode" type="text" inputMode="numeric" placeholder="14000" defaultValue={props.accountDraft?.postalCode ?? ""} />
+          <input
+            name="postalCode"
+            type="text"
+            inputMode="numeric"
+            placeholder="14000"
+            defaultValue={props.accountDraft?.postalCode ?? ""}
+          />
         </label>
         <label className="register-field-wide">
           Adresse
-          <input name="addressLine1" type="text" placeholder="12 rue des Lilas" defaultValue={props.accountDraft?.addressLine1 ?? ""} />
+          <input
+            name="addressLine1"
+            type="text"
+            placeholder="12 rue des Lilas"
+            defaultValue={props.accountDraft?.addressLine1 ?? ""}
+          />
         </label>
         <label className="register-password-field">
           Mot de passe
-          <input name="password" type="password" placeholder="********" minLength={8} required />
+          <input
+            name="password"
+            type="password"
+            placeholder="********"
+            minLength={8}
+            required
+          />
         </label>
       </div>
 
@@ -270,7 +411,9 @@ function OwnerPreferencesForm(props: OwnerRegistrationFlowProps) {
       className="register-form owner-onboarding-form"
       onSubmit={async (event) => {
         event.preventDefault();
-        const preferenceDraft = createOwnerPreferenceDraft(new FormData(event.currentTarget));
+        const preferenceDraft = createOwnerPreferenceDraft(
+          new FormData(event.currentTarget),
+        );
 
         props.onError(null);
         props.onSuccess(null);
@@ -289,12 +432,24 @@ function OwnerPreferencesForm(props: OwnerRegistrationFlowProps) {
         props.onSubmittingChange(true);
 
         try {
-          await completeOwnerRegistration({
+          const completion = await completeOwnerRegistration({
             account: props.accountDraft,
             animal: props.animalDraft,
             onCompleteLocalRegistration: props.onCompleteLocalRegistration,
             preferences: preferenceDraft,
           });
+
+          if (completion.requiresEmailVerification) {
+            props.onEmailVerificationRequired({
+              account: props.accountDraft,
+              animal: props.animalDraft,
+              email: props.accountDraft.email,
+              preferences: preferenceDraft,
+              role: "owner",
+            });
+            return;
+          }
+
           props.onNavigate("/pet-sitters");
         } catch (error) {
           props.onError(getErrorMessage(error));
@@ -319,8 +474,18 @@ function OwnerPreferencesForm(props: OwnerRegistrationFlowProps) {
         <fieldset className="owner-fieldset" key={option.name}>
           <legend>{option.label}</legend>
           <div className="owner-radio-row">
-            <label><input name={option.name} type="radio" value="yes" defaultChecked /> Oui</label>
-            <label><input name={option.name} type="radio" value="no" /> Non</label>
+            <label>
+              <input
+                name={option.name}
+                type="radio"
+                value="yes"
+                defaultChecked
+              />{" "}
+              Oui
+            </label>
+            <label>
+              <input name={option.name} type="radio" value="no" /> Non
+            </label>
           </div>
         </fieldset>
       ))}
@@ -335,7 +500,11 @@ function OwnerPreferencesForm(props: OwnerRegistrationFlowProps) {
         </select>
       </label>
 
-      <button className="register-submit" type="submit" disabled={props.isSubmitting}>
+      <button
+        className="register-submit"
+        type="submit"
+        disabled={props.isSubmitting}
+      >
         {props.isSubmitting ? "Création en cours..." : "Valider"}
       </button>
     </form>
@@ -351,7 +520,13 @@ const ownerAnimalSpeciesOptions = [
   { code: "farm_animal", label: "Animal de la ferme" },
 ] as const;
 
-const ownerTemperamentOptions = ["Calme", "Solitaire", "Joueur", "Anxieux", "Sociable"] as const;
+const ownerTemperamentOptions = [
+  "Calme",
+  "Solitaire",
+  "Joueur",
+  "Anxieux",
+  "Sociable",
+] as const;
 
 const ownerCareTypeOptions = [
   "Visites à domicile",
@@ -362,9 +537,18 @@ const ownerCareTypeOptions = [
 ] as const;
 
 const ownerVisibilityPreferenceOptions = [
-  { label: "Afficher les petsitters débutants", name: "showBeginnerPetSitters" },
-  { label: "Afficher les petsitters confirmés", name: "showConfirmedPetSitters" },
-  { label: "Afficher les petsitters professionnels", name: "showProfessionalPetSitters" },
+  {
+    label: "Afficher les petsitters débutants",
+    name: "showBeginnerPetSitters",
+  },
+  {
+    label: "Afficher les petsitters confirmés",
+    name: "showConfirmedPetSitters",
+  },
+  {
+    label: "Afficher les petsitters professionnels",
+    name: "showProfessionalPetSitters",
+  },
 ] as const;
 
 function handleOwnerPetPhotoChange(
@@ -378,7 +562,9 @@ function handleOwnerPetPhotoChange(
   }
 
   if (file.size > 900_000) {
-    props.onError("Image trop lourde pour la démo locale. Utilisez une image de moins de 900 Ko.");
+    props.onError(
+      "Image trop lourde pour la démo locale. Utilisez une image de moins de 900 Ko.",
+    );
     event.target.value = "";
     return;
   }
@@ -398,7 +584,9 @@ function createOwnerAccountDraft(formData: FormData): OwnerAccountDraft {
     addressLine1: String(formData.get("addressLine1") ?? "").trim(),
     age: String(formData.get("age") ?? "").trim(),
     city: String(formData.get("city") ?? "").trim() || "Caen",
-    email: String(formData.get("email") ?? "").trim().toLowerCase(),
+    email: String(formData.get("email") ?? "")
+      .trim()
+      .toLowerCase(),
     firstName: String(formData.get("firstName") ?? "").trim(),
     identityKind: String(formData.get("identityKind") ?? "").trim() || "Maman",
     lastName: String(formData.get("lastName") ?? "").trim(),
@@ -407,17 +595,22 @@ function createOwnerAccountDraft(formData: FormData): OwnerAccountDraft {
   };
 }
 
-function createOwnerAnimalDraft(formData: FormData, photoPreview: string): OwnerAnimalDraft {
+function createOwnerAnimalDraft(
+  formData: FormData,
+  photoPreview: string,
+): OwnerAnimalDraft {
   const speciesCode = String(formData.get("speciesCode") ?? "cat");
   const speciesLabel =
-    ownerAnimalSpeciesOptions.find((option) => option.code === speciesCode)?.label ?? "Chat";
+    ownerAnimalSpeciesOptions.find((option) => option.code === speciesCode)
+      ?.label ?? "Chat";
   const healthDocument = formData.get("healthDocument");
 
   return {
     age: String(formData.get("age") ?? "").trim(),
     hasBitten: formData.get("hasBitten") !== "no",
     hasHealthIssues: formData.get("hasHealthIssues") === "yes",
-    healthDocumentName: healthDocument instanceof File ? healthDocument.name : "",
+    healthDocumentName:
+      healthDocument instanceof File ? healthDocument.name : "",
     healthNotes: String(formData.get("healthNotes") ?? "").trim(),
     name: String(formData.get("name") ?? "").trim(),
     photoPreview,
@@ -441,7 +634,8 @@ function createOwnerPreferenceDraft(formData: FormData): OwnerPreferenceDraft {
       .filter(Boolean),
     showBeginnerPetSitters: formData.get("showBeginnerPetSitters") !== "no",
     showConfirmedPetSitters: formData.get("showConfirmedPetSitters") !== "no",
-    showProfessionalPetSitters: formData.get("showProfessionalPetSitters") !== "no",
+    showProfessionalPetSitters:
+      formData.get("showProfessionalPetSitters") !== "no",
   };
 }
 
@@ -450,12 +644,13 @@ async function completeOwnerRegistration(input: {
   animal: OwnerAnimalDraft;
   onCompleteLocalRegistration: OwnerRegistrationFlowProps["onCompleteLocalRegistration"];
   preferences: OwnerPreferenceDraft;
-}) {
+}): Promise<{ requiresEmailVerification: boolean }> {
   const supabase = createSupabaseBrowserClient();
   const { data, error } = await supabase.auth.signUp({
     email: input.account.email,
     password: input.account.password,
     options: {
+      emailRedirectTo: `${window.location.origin}/register`,
       data: {
         age: input.account.age,
         firstName: input.account.firstName,
@@ -471,6 +666,14 @@ async function completeOwnerRegistration(input: {
 
   if (error && !isAuthRateLimitError(error)) {
     throw new Error(error.message);
+  }
+
+  if (!error && !isLocalEmailVerificationBypassEnabled()) {
+    if (data.session) {
+      await supabase.auth.signOut();
+    }
+
+    return { requiresEmailVerification: true };
   }
 
   input.onCompleteLocalRegistration({
@@ -489,7 +692,7 @@ async function completeOwnerRegistration(input: {
   saveOwnerRegistrationPreferences(input.preferences);
 
   if (!data.session || error) {
-    return;
+    return { requiresEmailVerification: false };
   }
 
   await ensureOwnerProfile({
@@ -500,7 +703,53 @@ async function completeOwnerRegistration(input: {
   });
   const animalId = await createOwnerAnimal(input.animal);
 
-  if (animalId && (input.animal.hasHealthIssues || input.animal.healthNotes || input.animal.healthDocumentName)) {
+  if (
+    animalId &&
+    (input.animal.hasHealthIssues ||
+      input.animal.healthNotes ||
+      input.animal.healthDocumentName)
+  ) {
+    await upsertOwnerAnimalMedicalRecord(animalId, input.animal);
+  }
+
+  return { requiresEmailVerification: false };
+}
+
+export async function completeVerifiedOwnerRegistration(input: {
+  account: OwnerAccountDraft;
+  animal: OwnerAnimalDraft;
+  onCompleteLocalRegistration: OwnerRegistrationFlowProps["onCompleteLocalRegistration"];
+  preferences: OwnerPreferenceDraft;
+}) {
+  input.onCompleteLocalRegistration({
+    email: input.account.email,
+    firstName: input.account.firstName,
+    role: "owner",
+  });
+  demoWorkspaceActions.startEmptyWorkspace();
+  demoWorkspaceActions.addPet({
+    age: `${input.animal.age} ans`,
+    image: input.animal.photoPreview,
+    name: input.animal.name,
+    needs: buildOwnerPetNeeds(input.animal),
+    species: input.animal.speciesLabel,
+  });
+  saveOwnerRegistrationPreferences(input.preferences);
+
+  await ensureOwnerProfile({
+    addressLine1: input.account.addressLine1,
+    city: input.account.city,
+    firstName: input.account.firstName,
+    postalCode: input.account.postalCode,
+  });
+  const animalId = await createOwnerAnimal(input.animal);
+
+  if (
+    animalId &&
+    (input.animal.hasHealthIssues ||
+      input.animal.healthNotes ||
+      input.animal.healthDocumentName)
+  ) {
     await upsertOwnerAnimalMedicalRecord(animalId, input.animal);
   }
 }
@@ -516,12 +765,19 @@ function buildOwnerPetNeeds(animal: OwnerAnimalDraft): string[] {
 }
 
 function saveOwnerRegistrationPreferences(preferences: OwnerPreferenceDraft) {
-  window.localStorage.setItem("mamipet.ownerRegistrationPreferences", JSON.stringify(preferences));
+  window.localStorage.setItem(
+    "mamipet.ownerRegistrationPreferences",
+    JSON.stringify(preferences),
+  );
 }
 
-async function createOwnerAnimal(animal: OwnerAnimalDraft): Promise<string | null> {
+async function createOwnerAnimal(
+  animal: OwnerAnimalDraft,
+): Promise<string | null> {
   const species = await fetchReferenceItems("/api/reference-data/species");
-  const speciesId = species.find((item) => item.code === animal.speciesCode)?.id;
+  const speciesId = species.find(
+    (item) => item.code === animal.speciesCode,
+  )?.id;
 
   if (!speciesId) {
     return null;
@@ -536,7 +792,9 @@ async function createOwnerAnimal(animal: OwnerAnimalDraft): Promise<string | nul
     credentials: "include",
     body: JSON.stringify({
       name: animal.name,
-      photoUrl: animal.photoPreview.startsWith("https://") ? animal.photoPreview : null,
+      photoUrl: animal.photoPreview.startsWith("https://")
+        ? animal.photoPreview
+        : null,
       sex: animal.sex || null,
       speciesId,
       specificNeeds: buildOwnerPetNeeds(animal).join(", "),
@@ -576,7 +834,10 @@ async function fetchReferenceItems(endpoint: string): Promise<ReferenceItem[]> {
   return payload.data ?? [];
 }
 
-async function upsertOwnerAnimalMedicalRecord(animalId: string, animal: OwnerAnimalDraft) {
+async function upsertOwnerAnimalMedicalRecord(
+  animalId: string,
+  animal: OwnerAnimalDraft,
+) {
   await fetch(`/api/animals/${animalId}/medical-record`, {
     method: "PUT",
     headers: {
@@ -619,7 +880,9 @@ async function ensureOwnerProfile(input: {
   }
 
   const payload = (await response.json()) as ApiFailure;
-  throw new Error(payload.error?.message ?? "Impossible de créer le profil propriétaire.");
+  throw new Error(
+    payload.error?.message ?? "Impossible de créer le profil propriétaire.",
+  );
 }
 
 type ApiFailure = {
@@ -628,7 +891,10 @@ type ApiFailure = {
   } | null;
 };
 
-function isAuthRateLimitError(error: { message?: string | undefined; status?: number | undefined }) {
+function isAuthRateLimitError(error: {
+  message?: string | undefined;
+  status?: number | undefined;
+}) {
   const message = error.message?.toLowerCase() ?? "";
 
   return error.status === 429 || message.includes("rate limit");

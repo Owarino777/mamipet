@@ -20,6 +20,7 @@ export type DemoSession = {
     animalOptionIds: PetSitterAnimalOptionId[];
     careOptionIds: PetSitterCareOptionId[];
   };
+  petSitterSubscriptionPlan?: "none" | "premium";
   petSitterValidatedTests?: string[];
   roleLabel: string;
   route: string;
@@ -44,6 +45,7 @@ export const demoSessions: Record<string, DemoSession> = {
     id: "petSitter",
     name: "Sarah Johnson",
     petSitterProfileStatus: "published",
+    petSitterSubscriptionPlan: "premium",
     petSitterValidatedTests: ["dogs", "cats", "senior"],
     roleLabel: "Pet-sitter",
     route: "/pet-sitter/dashboard",
@@ -74,6 +76,7 @@ export function setLocalDemoSession(session: {
   id: string;
   name: string;
   petSitterProfileStatus?: DemoSession["petSitterProfileStatus"];
+  petSitterSubscriptionPlan?: DemoSession["petSitterSubscriptionPlan"];
   petSitterValidatedTests?: string[];
   roleLabel: string;
   route: string;
@@ -90,6 +93,9 @@ export function setLocalDemoSession(session: {
       petSitterProfileStatus:
         session.petSitterProfileStatus ??
         (activeRole === "petSitter" ? "draft" : undefined),
+      petSitterSubscriptionPlan:
+        session.petSitterSubscriptionPlan ??
+        (activeRole === "petSitter" ? "none" : undefined),
       petSitterValidatedTests: session.petSitterValidatedTests ?? [],
       source: "local" satisfies DemoSession["source"],
     }),
@@ -138,7 +144,10 @@ export function activateDemoSessionRole(role: DemoSessionRole) {
   window.dispatchEvent(new Event("mamipet-demo-session"));
 }
 
-export function publishDemoPetSitterProfile(validatedTests: string[]) {
+export function publishDemoPetSitterProfile(
+  validatedTests: string[],
+  subscriptionPlan: DemoSession["petSitterSubscriptionPlan"] = "none",
+) {
   const session = parseDemoSession(window.localStorage.getItem(demoSessionStorageKey) ?? "");
 
   if (!session) {
@@ -154,6 +163,7 @@ export function publishDemoPetSitterProfile(validatedTests: string[]) {
       activeRole: "petSitter",
       enabledRoles,
       petSitterProfileStatus: "published",
+      petSitterSubscriptionPlan: subscriptionPlan,
       petSitterValidatedTests: Array.from(new Set(validatedTests)),
       roleLabel: getRoleLabel("petSitter"),
       route: getRouteForRole("petSitter"),
@@ -176,6 +186,7 @@ export function saveDemoPetSitterValidatedTests(validatedTests: string[]) {
       activeRole: "petSitter",
       enabledRoles: Array.from(new Set([...(session.enabledRoles ?? []), "petSitter"])),
       petSitterProfileStatus: session.petSitterProfileStatus ?? "draft",
+      petSitterSubscriptionPlan: session.petSitterSubscriptionPlan ?? "none",
       petSitterValidatedTests: Array.from(new Set(validatedTests)),
       roleLabel: getRoleLabel("petSitter"),
       route: getRouteForRole("petSitter"),
@@ -201,6 +212,7 @@ export function saveDemoPetSitterSetupPreferences(input: {
       activeRole: "petSitter",
       enabledRoles: Array.from(new Set([...(session.enabledRoles ?? []), "petSitter"])),
       petSitterProfileStatus: session.petSitterProfileStatus ?? "draft",
+      petSitterSubscriptionPlan: session.petSitterSubscriptionPlan ?? "none",
       petSitterSetupPreferences: {
         animalOptionIds: Array.from(new Set(input.animalOptionIds)),
         careOptionIds: Array.from(new Set(input.careOptionIds)),
@@ -405,6 +417,8 @@ function parseDemoSession(rawSession: string): DemoSession | null {
       petSitterSetupPreferences: normalizeSetupPreferences(
         parsedSession.petSitterSetupPreferences,
       ),
+      petSitterSubscriptionPlan:
+        parsedSession.petSitterSubscriptionPlan === "premium" ? "premium" : "none",
       petSitterValidatedTests: Array.isArray(parsedSession.petSitterValidatedTests)
         ? parsedSession.petSitterValidatedTests
         : [],

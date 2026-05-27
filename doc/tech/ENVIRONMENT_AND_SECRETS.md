@@ -24,6 +24,8 @@ Chaque environnement doit avoir :
 # Application
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 APP_ENV=local
+# Production: required. Local dev only: local_bypass.
+NEXT_PUBLIC_AUTH_EMAIL_VERIFICATION_MODE=required
 
 # Supabase public client
 NEXT_PUBLIC_SUPABASE_URL=
@@ -73,6 +75,21 @@ MVP :
 - pas d'OAuth au depart ;
 - compte applicatif lie a `auth.users.id`.
 
+En local, le parcours d'inscription peut bypasser l'attente de confirmation
+email avec `NEXT_PUBLIC_AUTH_EMAIL_VERIFICATION_MODE=local_bypass`.
+Ce bypass est ignore en build production (`NODE_ENV=production`) et ne doit
+jamais etre active sur preview ou production.
+
+Nettoyage des utilisateurs de test :
+
+```bash
+npm run db:clean:test-users -- --email-like="%@example.test"
+npm run db:clean:test-users -- --email-like="%@example.test" --execute --confirm=mamipet-test-clean
+```
+
+Le premier appel est un dry-run. Le second supprime les comptes Auth Supabase
+correspondants avec leurs donnees applicatives cascadees.
+
 ### PostgreSQL
 
 Obligatoire :
@@ -96,10 +113,30 @@ Accès public interdit par défaut.
 
 MVP :
 
-- paiement test ;
+- paiement test via Stripe Checkout ;
 - Stripe Connect préparé ;
 - onboarding Connect complet non prioritaire ;
-- les références Stripe sont stockees mais le flux peut être simulé.
+- les références Stripe sont stockees dans les paiements.
+
+En local, renseigner au minimum :
+
+```env
+STRIPE_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+Carte de test Stripe utile :
+
+```txt
+4242 4242 4242 4242
+date future
+CVC quelconque
+```
+
+Le parcours démo crée une session Stripe Checkout et revient sur
+`/dashboard?demoCheckout=success&bookingId=...` pour marquer la réservation
+locale comme payée. En production, la confirmation serveur finale doit passer
+par un webhook Stripe signé avec `STRIPE_WEBHOOK_SECRET`.
 
 Statuts paiement :
 
@@ -137,4 +174,3 @@ Build minimal :
 - lint ;
 - tests ;
 - build.
-

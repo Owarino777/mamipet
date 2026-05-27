@@ -262,8 +262,8 @@ export function PetSitterOnboardingPage() {
     setLocalOnboardingPhase("subscription");
   }
 
-  function publishPetSitterAfterAssessments() {
-    publishDemoPetSitterProfile(selectedTests);
+  function publishPetSitterAfterAssessments(plan: "none" | "premium") {
+    publishDemoPetSitterProfile(selectedTests, plan);
     router.push("/pet-sitter/dashboard");
   }
 
@@ -345,8 +345,8 @@ export function PetSitterOnboardingPage() {
   if (onboardingPhase === "subscription") {
     return (
       <PetSitterSubscriptionScreen
-        onContinueWithoutPlan={publishPetSitterAfterAssessments}
-        onProfessionalPlan={publishPetSitterAfterAssessments}
+        onContinueWithoutPlan={() => publishPetSitterAfterAssessments("none")}
+        onProfessionalPlan={() => publishPetSitterAfterAssessments("premium")}
       />
     );
   }

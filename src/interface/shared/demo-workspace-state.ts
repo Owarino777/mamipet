@@ -197,7 +197,7 @@ export function createBooking(
     ...state,
     bookings: [
       createInitialBooking({
-        id: `booking-demo-${state.bookings.length + 1}`,
+        id: createDemoBookingId(state),
         petIds: command.petIds,
         status: "awaiting_response",
         totalAmountCents: payment.totalAmountCents,
@@ -214,6 +214,16 @@ export function createBooking(
       ...state.bookings,
     ],
   };
+}
+
+function createDemoBookingId(state: DemoWorkspaceState): string {
+  const randomId = globalThis.crypto?.randomUUID?.();
+
+  if (randomId) {
+    return `booking-demo-${randomId}`;
+  }
+
+  return `booking-demo-${state.bookings.length + 1}-${Date.now()}`;
 }
 
 export function acceptBooking(
@@ -248,10 +258,25 @@ export function payBooking(
     return {
       ...booking,
       status: "paid",
-      contractSummary:
-        "Récapitulatif contractuel MamiPet généré après paiement test: parties, animaux, dates, lieu, tarif, commission 15 %, assurance et consignes.",
+      contractSummary: createContractSummary(booking),
     };
   });
+}
+
+function createContractSummary(booking: DemoBooking): string {
+  return [
+    "Contrat de mission MamiPet généré après paiement Stripe test.",
+    `Garde du ${booking.startDate} au ${booking.endDate}.`,
+    `Montant total ${formatCents(booking.totalAmountCents)}, net pet-sitter ${formatCents(booking.providerAmountCents)}, commission 15 % MamiPet ${formatCents(booking.platformCommissionCents)}.`,
+    `Assurance ${booking.insuranceLevel}.`,
+  ].join(" ");
+}
+
+function formatCents(amountCents: number): string {
+  return new Intl.NumberFormat("fr-FR", {
+    currency: "EUR",
+    style: "currency",
+  }).format(amountCents / 100);
 }
 
 export function completeBooking(

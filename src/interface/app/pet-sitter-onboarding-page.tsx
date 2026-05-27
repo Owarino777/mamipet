@@ -27,12 +27,13 @@ import {
   AssessmentOutcomeScreen,
   type AssessmentOutcome,
 } from "@/interface/app/pet-sitter-assessment-outcome";
+import { PetSitterSubscriptionScreen } from "@/interface/app/pet-sitter-subscription-screen";
 
 export function PetSitterOnboardingPage() {
   const router = useRouter();
   const session = useDemoSession();
   const [localOnboardingPhase, setLocalOnboardingPhase] = useState<
-    "setup" | "tests" | null
+    "setup" | "tests" | "subscription" | null
   >(null);
   const [localCareOptionIds, setLocalCareOptionIds] = useState<
     PetSitterCareOptionId[] | null
@@ -257,7 +258,8 @@ export function PetSitterOnboardingPage() {
     }
 
     saveDemoPetSitterValidatedTests(selectedTests);
-    publishPetSitterAfterAssessments();
+    setAssessmentOutcome(null);
+    setLocalOnboardingPhase("subscription");
   }
 
   function publishPetSitterAfterAssessments() {
@@ -337,6 +339,15 @@ export function PetSitterOnboardingPage() {
           </form>
         </section>
       </main>
+    );
+  }
+
+  if (onboardingPhase === "subscription") {
+    return (
+      <PetSitterSubscriptionScreen
+        onContinueWithoutPlan={publishPetSitterAfterAssessments}
+        onProfessionalPlan={publishPetSitterAfterAssessments}
+      />
     );
   }
 

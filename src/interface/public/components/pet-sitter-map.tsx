@@ -77,6 +77,9 @@ export function PetSitterMap({
   const galleryIndex =
     galleryState.petSitterId === selectedPetSitterId ? galleryState.index : 0;
   const activeImage = selectedImages[galleryIndex] ?? null;
+  const activeImageSrc = activeImage
+    ? getMapCardImageUrl(activeImage.url)
+    : null;
 
   useEffect(() => {
     const map = mapRef.current;
@@ -92,6 +95,25 @@ export function PetSitterMap({
       zoom: zoomLevel,
     });
   }, [isMapReady, viewport.latitude, viewport.longitude, zoomLevel]);
+
+  useEffect(() => {
+    const imageUrls = new Set<string>();
+
+    for (const petSitter of mappablePetSitters.slice(0, 8)) {
+      const firstGalleryImage = petSitter.gallery[0]?.url;
+      imageUrls.add(getMapCardImageUrl(firstGalleryImage ?? petSitter.imageUrl));
+    }
+
+    for (const image of selectedImages) {
+      imageUrls.add(getMapCardImageUrl(image.url));
+    }
+
+    for (const imageUrl of imageUrls) {
+      const image = new globalThis.Image();
+      image.decoding = "async";
+      image.src = imageUrl;
+    }
+  }, [mappablePetSitters, selectedImages]);
 
   const handleMoveEnd = useCallback(
     (event: ViewStateChangeEvent) => {
@@ -186,8 +208,15 @@ export function PetSitterMap({
           onClick={(event) => event.stopPropagation()}
         >
           <div className="map-floating-card__media">
-            {activeImage ? (
-              <Image src={activeImage.url} alt={activeImage.alt} fill sizes="380px" />
+            {activeImage && activeImageSrc ? (
+              <Image
+                src={activeImageSrc}
+                alt={activeImage.alt}
+                fill
+                priority
+                sizes="(max-width: 640px) calc(100vw - 36px), 360px"
+                unoptimized
+              />
             ) : null}
             {selectedImages.length > 1 ? (
               <>
@@ -293,4 +322,23 @@ export function PetSitterMap({
       <p className="map-privacy-label">OpenFreeMap · adresse exacte masquée</p>
     </div>
   );
+}
+
+function getMapCardImageUrl(imageUrl: string): string {
+  try {
+    const url = new URL(imageUrl);
+
+    if (url.hostname !== "images.unsplash.com") {
+      return imageUrl;
+    }
+
+    url.searchParams.set("auto", "format");
+    url.searchParams.set("fit", "crop");
+    url.searchParams.set("w", "640");
+    url.searchParams.set("q", "72");
+
+    return url.toString();
+  } catch {
+    return imageUrl;
+  }
 }

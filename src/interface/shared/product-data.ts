@@ -179,6 +179,177 @@ const parisGallery = [
   ...sharedGallery.slice(0, 2),
 ];
 
+const lyonGallery = [
+  {
+    url: "https://images.unsplash.com/photo-1601758125946-6ec2ef64daf8?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat dans un intérieur chaleureux",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat calme sur un canapé",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien en extérieur",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat observant son environnement",
+  },
+];
+
+const marseilleGallery = [
+  {
+    url: "https://images.unsplash.com/photo-1525253013412-55c1a69a5738?auto=format&fit=crop&w=1600&q=82",
+    alt: "Petit chien porté avec douceur",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien accompagné pendant une garde",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1559190394-df5a28aab5c5?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien photographié dehors",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien calme en lumière naturelle",
+  },
+];
+
+const bordeauxGallery = [
+  {
+    url: "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat attentif près d'une fenêtre",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat allongé en sécurité",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat installé dans un intérieur calme",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=1600&q=82",
+    alt: "Petit chien en lumière naturelle",
+  },
+];
+
+const toulouseGallery = [
+  {
+    url: "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien lors d'une promenade",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien dehors pendant une sortie",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1600&q=82",
+    alt: "Deux chiens en promenade",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1601758064224-c3c75d147a0d?auto=format&fit=crop&w=1600&q=82",
+    alt: "Animal accompagné pendant une garde",
+  },
+];
+
+const nantesGallery = [
+  {
+    url: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat calme sur un canapé",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat posé près d'une fenêtre",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat allongé en sécurité",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien accompagné pendant une garde",
+  },
+];
+
+const lilleGallery = [
+  {
+    url: "https://images.unsplash.com/photo-1601758064224-c3c75d147a0d?auto=format&fit=crop&w=1600&q=82",
+    alt: "Animal accompagné pendant une garde",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=1600&q=82",
+    alt: "Petit chien photographié en lumière naturelle",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien calme en lumière naturelle",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat attentif",
+  },
+];
+
+const strasbourgGallery = [
+  {
+    url: "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat allongé en sécurité",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat installé près d'une fenêtre",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1525253013412-55c1a69a5738?auto=format&fit=crop&w=1600&q=82",
+    alt: "Petit chien accompagné",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1559190394-df5a28aab5c5?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien photographié dehors",
+  },
+];
+
+const niceGallery = [
+  {
+    url: "https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=1600&q=82",
+    alt: "Petit chien photographié en lumière naturelle",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien golden retriever calme",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1600&q=82",
+    alt: "Deux chiens en promenade",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1601758125946-6ec2ef64daf8?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat en intérieur",
+  },
+];
+
+const rennesGallery = [
+  {
+    url: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien en extérieur",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien accompagné pendant une garde",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chat calme sur un canapé",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=1600&q=82",
+    alt: "Chien lors d'une promenade",
+  },
+];
+
 export const demoPetSitters: PublicPetSitter[] = [
   {
     id: "sarah-johnson",
@@ -434,7 +605,7 @@ export const demoPetSitters: PublicPetSitter[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1601758125946-6ec2ef64daf8?auto=format&fit=crop&w=1800&q=82",
     imageAlt: "Pet-sitter avec un chat dans un cadre chaleureux",
-    gallery: sharedGallery,
+    gallery: lyonGallery,
   },
   {
     id: "ines-robert",
@@ -463,7 +634,7 @@ export const demoPetSitters: PublicPetSitter[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1525253013412-55c1a69a5738?auto=format&fit=crop&w=1800&q=82",
     imageAlt: "Pet-sitter tenant un petit chien avec douceur",
-    gallery: sharedGallery,
+    gallery: marseilleGallery,
   },
   {
     id: "camille-durand",
@@ -492,7 +663,7 @@ export const demoPetSitters: PublicPetSitter[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=1800&q=82",
     imageAlt: "Chat observant son environnement",
-    gallery: sharedGallery,
+    gallery: bordeauxGallery,
   },
   {
     id: "nora-garcia",
@@ -521,7 +692,7 @@ export const demoPetSitters: PublicPetSitter[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=1800&q=82",
     imageAlt: "Chien lors d'une promenade",
-    gallery: sharedGallery,
+    gallery: toulouseGallery,
   },
   {
     id: "jules-moreau",
@@ -550,7 +721,7 @@ export const demoPetSitters: PublicPetSitter[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1800&q=82",
     imageAlt: "Chat calme sur un canapé",
-    gallery: sharedGallery,
+    gallery: nantesGallery,
   },
   {
     id: "elise-legrand",
@@ -579,7 +750,7 @@ export const demoPetSitters: PublicPetSitter[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1601758064224-c3c75d147a0d?auto=format&fit=crop&w=1800&q=82",
     imageAlt: "Animal accompagné pendant une garde",
-    gallery: sharedGallery,
+    gallery: lilleGallery,
   },
   {
     id: "manon-schmitt",
@@ -608,7 +779,7 @@ export const demoPetSitters: PublicPetSitter[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?auto=format&fit=crop&w=1800&q=82",
     imageAlt: "Chat allongé en sécurité",
-    gallery: sharedGallery,
+    gallery: strasbourgGallery,
   },
   {
     id: "clara-rossi",
@@ -637,7 +808,7 @@ export const demoPetSitters: PublicPetSitter[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=1800&q=82",
     imageAlt: "Petit chien photographié en lumière naturelle",
-    gallery: sharedGallery,
+    gallery: niceGallery,
   },
   {
     id: "mael-le-gall",
@@ -666,6 +837,6 @@ export const demoPetSitters: PublicPetSitter[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1800&q=82",
     imageAlt: "Chien en extérieur",
-    gallery: sharedGallery,
+    gallery: rennesGallery,
   },
 ];

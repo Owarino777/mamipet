@@ -5,6 +5,8 @@ import {
   acceptBooking,
   addPet,
   completeBooking,
+  completeBookingPetMedicalRecords,
+  completePetMedicalRecord,
   createBooking,
   emptyDemoWorkspaceState,
   initialDemoWorkspaceState,
@@ -59,24 +61,57 @@ export const demoWorkspaceActions = {
     applyWorkspaceUpdate((state) => addPet(state, pet));
   },
 
+  completePetMedicalRecord(petId: string) {
+    applyWorkspaceUpdate((state) => completePetMedicalRecord(state, petId));
+  },
+
+  completeBookingPetMedicalRecords(bookingId: string) {
+    const nextState = completeBookingPetMedicalRecords(
+      readWorkspaceState(),
+      bookingId,
+    );
+    const booking = nextState.bookings.find(
+      (candidate) => candidate.id === bookingId,
+    );
+
+    saveWorkspaceState(nextState);
+
+    if (booking) {
+      mirrorBookingToRelatedWorkspaces(
+        booking,
+        nextState.pets.filter((pet) => booking.petIds.includes(pet.id)),
+      );
+    }
+  },
+
   createBooking(command: CreateBookingCommand) {
     const currentState = readWorkspaceState();
-    const nextState = createBooking(currentState, command);
+    const session = readDemoSession();
+    const nextState = createBooking(currentState, {
+      ...command,
+      ownerId: command.ownerId ?? session?.id ?? "anonymous-owner",
+      ownerName: command.ownerName ?? session?.name ?? "Propriétaire",
+    });
     const createdBooking = nextState.bookings[0];
 
     saveWorkspaceState(nextState);
 
     if (createdBooking) {
-      mirrorBookingToPetSitterWorkspaces(
-        createdBooking,
-        currentState.pets.filter((pet) => command.petIds.includes(pet.id)),
+      const pets = currentState.pets.filter((pet) =>
+        command.petIds.includes(pet.id),
       );
+
+      if (createdBooking.requestKind === "open") {
+        mirrorBookingToOpenMarketplaceWorkspaces(createdBooking, pets);
+      } else {
+        mirrorBookingToPetSitterWorkspaces(createdBooking, pets);
+      }
     }
   },
 
   acceptBooking(bookingId: string) {
     applySharedBookingUpdate(bookingId, (state) =>
-      acceptBooking(state, bookingId),
+      acceptBooking(state, bookingId, getCurrentPetSitterAssignee()),
     );
   },
 
@@ -151,10 +186,25 @@ function mirrorBookingToPetSitterWorkspaces(
   booking: DemoBooking,
   pets: DemoPet[],
 ) {
+  if (!booking.petSitterId) {
+    return;
+  }
+
   mirrorBookingToWorkspaceKeys(
     booking,
     pets,
     getPetSitterWorkspaceStorageKeys(booking.petSitterId),
+  );
+}
+
+function mirrorBookingToOpenMarketplaceWorkspaces(
+  booking: DemoBooking,
+  pets: DemoPet[],
+) {
+  mirrorBookingToWorkspaceKeys(
+    booking,
+    pets,
+    getOpenMarketplaceWorkspaceStorageKeys(),
   );
 }
 
@@ -165,7 +215,12 @@ function mirrorBookingToRelatedWorkspaces(
   const currentKey = getCurrentWorkspaceStorageKey();
   const targetKeys = Array.from(
     new Set([
-      ...getPetSitterWorkspaceStorageKeys(booking.petSitterId),
+      ...(booking.petSitterId
+        ? getPetSitterWorkspaceStorageKeys(booking.petSitterId)
+        : []),
+      ...(booking.requestKind === "open"
+        ? getOpenMarketplaceWorkspaceStorageKeys()
+        : []),
       ...getAllWorkspaceStorageKeys().filter((storageKey) => {
         if (storageKey === currentKey) {
           return false;
@@ -219,7 +274,11 @@ function syncIncomingPetSitterBookingsForCurrentSession() {
       const sourceState = readWorkspaceStateFromKey(storageKey);
 
       return sourceState.bookings
-        .filter((booking) => booking.petSitterId === petSitterId)
+        .filter(
+          (booking) =>
+            booking.petSitterId === petSitterId ||
+            isOpenMarketplaceBooking(booking),
+        )
         .reduce((mergedState, booking) => {
           const pets = sourceState.pets.filter((pet) =>
             booking.petIds.includes(pet.id),
@@ -299,6 +358,46 @@ function getPetSitterWorkspaceStorageKeys(petSitterId: string): string[] {
   return fixtureTargets[petSitterId] ?? [];
 }
 
+function getOpenMarketplaceWorkspaceStorageKeys(): string[] {
+  const fixtureTargets = [
+    `${workspaceStorageKeyPrefix}:fixture:petSitter`,
+    `${workspaceStorageKeyPrefix}:local:local-petSitter-sarah.sitter@mamipet.test`,
+    `${workspaceStorageKeyPrefix}:local:local-petSitter-amelie.sitter@mamipet.test`,
+    `${workspaceStorageKeyPrefix}:local:local-petSitter-hugo.sitter@mamipet.test`,
+  ];
+  const existingPetSitterTargets = getAllWorkspaceStorageKeys().filter(
+    (storageKey) =>
+      storageKey.includes("petSitter") ||
+      storageKey.includes("sitter@mamipet.test"),
+  );
+
+  return Array.from(new Set([...fixtureTargets, ...existingPetSitterTargets]));
+}
+
+function isOpenMarketplaceBooking(booking: DemoBooking): boolean {
+  return (
+    booking.requestKind === "open" &&
+    booking.status === "awaiting_response" &&
+    !booking.petSitterId
+  );
+}
+
+function getCurrentPetSitterAssignee():
+  | { petSitterId: string; petSitterName: string }
+  | undefined {
+  const session = readDemoSession();
+  const petSitterId = getPetSitterProfileIdFromSession(session);
+
+  if (!petSitterId || !session) {
+    return undefined;
+  }
+
+  return {
+    petSitterId,
+    petSitterName: formatSessionPetSitterName(session),
+  };
+}
+
 function getPetSitterProfileIdFromSession(
   session: DemoSession | null,
 ): string | null {
@@ -330,6 +429,17 @@ function getPetSitterProfileIdFromSession(
   }
 
   return `local-pet-sitter-${session.id}`;
+}
+
+function formatSessionPetSitterName(session: DemoSession): string {
+  if (session.source === "fixture" && session.id === "petSitter") {
+    return "Sarah J.";
+  }
+
+  const [firstName = "Pet-sitter", lastName = ""] = session.name.trim().split(/\s+/);
+  const lastInitial = lastName ? `${lastName[0]?.toUpperCase()}.` : "";
+
+  return [firstName, lastInitial].filter(Boolean).join(" ");
 }
 
 function readWorkspaceStateFromKey(storageKey: string): DemoWorkspaceState {
@@ -484,11 +594,23 @@ function parseWorkspaceState(rawState: string): DemoWorkspaceState {
 
     return {
       pets: parsedState.pets as DemoWorkspaceState["pets"],
-      bookings: parsedState.bookings as DemoWorkspaceState["bookings"],
+      bookings: (parsedState.bookings as DemoWorkspaceState["bookings"]).map(
+        normalizeStoredBooking,
+      ),
       documents: parsedState.documents as DemoWorkspaceState["documents"],
       reports: parsedState.reports as DemoWorkspaceState["reports"],
     };
   } catch {
     return initialDemoWorkspaceState;
   }
+}
+
+function normalizeStoredBooking(booking: DemoBooking): DemoBooking {
+  return {
+    ...booking,
+    ownerId: booking.ownerId ?? "owner",
+    requestKind: booking.requestKind ?? "direct",
+    petSitterId: booking.petSitterId ?? null,
+    petSitterName: booking.petSitterName ?? "À attribuer",
+  };
 }

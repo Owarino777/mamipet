@@ -395,7 +395,7 @@ export function RegisterPage() {
                   <input
                     name="firstName"
                     type="text"
-                    placeholder="Margo"
+                    placeholder="Ex. Camille"
                     required
                   />
                 </label>
@@ -405,7 +405,7 @@ export function RegisterPage() {
                   <input
                     name="lastName"
                     type="text"
-                    placeholder="Da Silva"
+                    placeholder="Ex. Martin"
                     required
                   />
                 </label>
@@ -415,28 +415,28 @@ export function RegisterPage() {
                   <input
                     name="email"
                     type="email"
-                    placeholder="margo.mamipet@gmail.com"
+                    placeholder="Ex. camille@example.com"
                     required
                   />
                 </label>
 
                 <label>
                   Âge
-                  <input name="age" type="number" min="16" placeholder="24" />
+                  <input name="age" type="number" min="16" placeholder="Ex. 28" />
                 </label>
 
                 <label>
                   Ville
-                  <input name="city" type="text" placeholder="Caen" />
+                  <input name="city" type="text" placeholder="Ex. Caen" />
                 </label>
 
                 <label>
-                  Code postale
+                  Code postal
                   <input
                     name="postalCode"
                     type="text"
                     inputMode="numeric"
-                    placeholder="14000"
+                    placeholder="Ex. 14000"
                   />
                 </label>
 
@@ -445,7 +445,7 @@ export function RegisterPage() {
                   <input
                     name="password"
                     type="password"
-                    placeholder="********"
+                    placeholder="Ex. 8 caractères minimum"
                     minLength={8}
                     required
                   />

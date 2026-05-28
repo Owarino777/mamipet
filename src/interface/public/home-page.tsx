@@ -57,7 +57,7 @@ export function HomePage() {
             </label>
             <label>
               Ville
-              <input name="city" defaultValue="Caen" placeholder="Caen" />
+              <input name="city" defaultValue="Caen" placeholder="Ex. Caen" />
             </label>
             <label>
               Besoin

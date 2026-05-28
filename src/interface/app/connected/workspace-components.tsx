@@ -102,7 +102,7 @@ export function BookingActionPanel({ booking }: { booking: DemoBooking }) {
           <textarea
             value={reportReason}
             onChange={(event) => setReportReason(event.target.value)}
-            placeholder="Expliquez brièvement le problème."
+            placeholder="Ex. retard, absence de nouvelle, document manquant..."
           />
         </label>
 
@@ -170,7 +170,7 @@ export function ReviewForm({ booking }: { booking: DemoBooking }) {
         Votre avis
         <textarea
           name="comment"
-          placeholder="Décrivez la garde en quelques mots."
+          placeholder="Ex. garde rassurante, nouvelles régulières, animal détendu..."
         />
       </label>
 
@@ -192,6 +192,9 @@ export function BookingDocumentsPanel({
   petById: Map<string, DemoPet>;
   title?: string;
 }) {
+  const [openDocument, setOpenDocument] = useState<BookingDocumentModal | null>(
+    null,
+  );
   const paidBookings = bookings.filter(
     (booking) =>
       booking.status === "paid" ||
@@ -248,7 +251,20 @@ export function BookingDocumentsPanel({
                     <strong>Contrat de mission</strong>
                     <small>{booking.contractSummary ?? "Contrat généré."}</small>
                   </span>
-                  <button type="button">Consulter</button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenDocument({
+                        booking,
+                        content:
+                          booking.contractSummary ??
+                          "Contrat généré après paiement.",
+                        title: "Contrat de mission",
+                      })
+                    }
+                  >
+                    Consulter
+                  </button>
                 </li>
                 <li>
                   <span>
@@ -258,7 +274,18 @@ export function BookingDocumentsPanel({
                       {formatEuro(booking.platformCommissionCents)}
                     </small>
                   </span>
-                  <button type="button">Consulter</button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenDocument({
+                        booking,
+                        content: `Paiement ${formatEuro(booking.totalAmountCents)}. Commission MamiPet ${formatEuro(booking.platformCommissionCents)}. Net pet-sitter ${formatEuro(booking.providerAmountCents)}.`,
+                        title: "Reçu Stripe test",
+                      })
+                    }
+                  >
+                    Consulter
+                  </button>
                 </li>
                 <li>
                   <span>
@@ -267,14 +294,96 @@ export function BookingDocumentsPanel({
                       {booking.instructions || "Aucune consigne ajoutée."}
                     </small>
                   </span>
-                  <button type="button">Consulter</button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenDocument({
+                        booking,
+                        content:
+                          booking.instructions ||
+                          "Aucune consigne ajoutée pour cette garde.",
+                        title: "Fiche de garde",
+                      })
+                    }
+                  >
+                    Consulter
+                  </button>
                 </li>
               </ul>
             </article>
           ))}
         </div>
       )}
+
+      {openDocument ? (
+        <BookingDocumentDialog
+          document={openDocument}
+          petById={petById}
+          onClose={() => setOpenDocument(null)}
+        />
+      ) : null}
     </article>
+  );
+}
+
+type BookingDocumentModal = {
+  booking: DemoBooking;
+  content: string;
+  title: string;
+};
+
+function BookingDocumentDialog({
+  document,
+  onClose,
+  petById,
+}: {
+  document: BookingDocumentModal;
+  onClose: () => void;
+  petById: Map<string, DemoPet>;
+}) {
+  const booking = document.booking;
+
+  return (
+    <div className="document-dialog-backdrop" role="presentation">
+      <section
+        className="document-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="document-dialog-title"
+      >
+        <header className="document-dialog__header">
+          <div>
+            <p className="section-kicker">{getBookingReference(booking.id)}</p>
+            <h2 id="document-dialog-title">{document.title}</h2>
+            <span>{formatBookingTitle(booking, petById)}</span>
+          </div>
+          <button className="ghost-button" type="button" onClick={onClose}>
+            Fermer
+          </button>
+        </header>
+
+        <div className="document-dialog__paper">
+          <dl>
+            <div>
+              <dt>Période</dt>
+              <dd>
+                {formatShortDate(booking.startDate)} -{" "}
+                {formatShortDate(booking.endDate)}
+              </dd>
+            </div>
+            <div>
+              <dt>Pet-sitter</dt>
+              <dd>{booking.petSitterName}</dd>
+            </div>
+            <div>
+              <dt>Montant</dt>
+              <dd>{formatEuro(booking.totalAmountCents)}</dd>
+            </div>
+          </dl>
+          <p>{document.content}</p>
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -386,9 +495,15 @@ function getBookingStatusDisplay(status: DemoBooking["status"]): string {
   return labels[status];
 }
 
-export function PetMiniCard({ pet }: { pet: DemoPet }) {
-  return (
-    <div className="pet-mini-card">
+export function PetMiniCard({
+  href,
+  pet,
+}: {
+  href?: string;
+  pet: DemoPet;
+}) {
+  const content = (
+    <>
       <Image
         src={pet.image}
         alt={`${pet.name}, ${pet.species}`}
@@ -403,6 +518,20 @@ export function PetMiniCard({ pet }: { pet: DemoPet }) {
           {pet.species} · {pet.age}
         </span>
       </div>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a className="pet-mini-card pet-mini-card--interactive" href={href}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <div className="pet-mini-card">
+      {content}
     </div>
   );
 }

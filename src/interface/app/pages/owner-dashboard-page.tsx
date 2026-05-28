@@ -47,6 +47,9 @@ export function OwnerDashboardPage() {
   const completedBookingToReview = workspace.bookings.find(
     (booking) => booking.status === "completed" && !booking.review,
   );
+  const incompleteMedicalPets = workspace.pets.filter(
+    (pet) => pet.medicalRecordStatus === "incomplete",
+  );
 
   const petById = useMemo(
     () => createPetById(workspace.pets),
@@ -167,9 +170,9 @@ export function OwnerDashboardPage() {
                 <BookingActionPanel booking={nextBooking} />
               </>
             ) : (
-              <ButtonLink href="/pet-sitters" variant="secondary">
-                Trouver un pet-sitter
-              </ButtonLink>
+                <ButtonLink href="/owner/search" variant="secondary">
+                  Trouver un pet-sitter
+                </ButtonLink>
             )}
           </article>
 
@@ -185,7 +188,7 @@ export function OwnerDashboardPage() {
             {workspace.pets.length > 0 ? (
               <div className="pet-mini-grid">
                 {workspace.pets.map((pet) => (
-                  <PetMiniCard key={pet.id} pet={pet} />
+                  <PetMiniCard key={pet.id} pet={pet} href="/owner/animals" />
                 ))}
               </div>
             ) : (
@@ -246,17 +249,31 @@ export function OwnerDashboardPage() {
             <SensitiveDataNotice />
 
             <p>
-              {
-                workspace.pets.filter(
-                  (pet) => pet.medicalRecordStatus === "incomplete",
-                ).length
-              }{" "}
-              dossier(s) à compléter avant une garde sensible.
+              {incompleteMedicalPets.length} dossier(s) à compléter avant une
+              garde sensible.
             </p>
 
-            <ButtonLink href="/owner/animals" variant="secondary">
-              Compléter
-            </ButtonLink>
+            <div className="medical-action-list">
+              {incompleteMedicalPets.slice(0, 3).map((pet) => (
+                <button
+                  key={pet.id}
+                  type="button"
+                  onClick={() =>
+                    demoWorkspaceActions.completePetMedicalRecord(pet.id)
+                  }
+                >
+                  Compléter {pet.name}
+                </button>
+              ))}
+
+              {incompleteMedicalPets.length === 0 ? (
+                <TrustBadge label="Tous les dossiers sont complets" />
+              ) : null}
+
+              <ButtonLink href="/owner/animals" variant="secondary">
+                Gérer les dossiers
+              </ButtonLink>
+            </div>
           </article>
 
           <article className="workspace-card">

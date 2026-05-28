@@ -115,22 +115,22 @@ export function OwnerAnimalsPage() {
           >
             <label>
               Nom
-              <input name="name" placeholder="Nala" />
+              <input name="name" placeholder="Ex. Nala" />
             </label>
 
             <label>
               Espèce
-              <input name="species" placeholder="Chien, chat, lapin..." />
+              <input name="species" placeholder="Ex. chien, chat, lapin..." />
             </label>
 
             <label>
               Âge
-              <input name="age" placeholder="4 ans" />
+              <input name="age" placeholder="Ex. 4 ans" />
             </label>
 
             <label>
               Besoins, séparés par des virgules
-              <input name="needs" placeholder="Sous traitement, anxieux" />
+              <input name="needs" placeholder="Ex. sous traitement, anxieux" />
             </label>
 
             <label>
@@ -174,7 +174,7 @@ export function OwnerAnimalsPage() {
               URL Unsplash optionnelle
               <input
                 name="imageUrl"
-                placeholder="https://images.unsplash.com/..."
+                placeholder="Ex. https://images.unsplash.com/..."
               />
             </label>
 
@@ -223,6 +223,22 @@ export function OwnerAnimalsPage() {
                 />
 
                 <SensitiveDataNotice />
+
+                <button
+                  className="secondary-button"
+                  type="button"
+                  disabled={pet.medicalRecordStatus === "complete"}
+                  onClick={() => {
+                    demoWorkspaceActions.completePetMedicalRecord(pet.id);
+                    setStatusMessage(
+                      `Le dossier médical de ${pet.name} est complet.`,
+                    );
+                  }}
+                >
+                  {pet.medicalRecordStatus === "complete"
+                    ? "Dossier complété"
+                    : "Compléter le dossier médical"}
+                </button>
               </article>
             ))}
           </section>

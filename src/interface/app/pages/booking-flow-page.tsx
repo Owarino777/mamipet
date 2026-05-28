@@ -29,9 +29,10 @@ export function BookingFlowPage() {
   const searchParams = useSearchParams();
 
   const sitterId = searchParams.get("sitter");
+  const isGeneralRequest = !sitterId;
 
   const sitter =
-    demoPetSitters.find((s) => s.id === sitterId) ?? getPrimaryPetSitter();
+    sitterId ? demoPetSitters.find((s) => s.id === sitterId) ?? getPrimaryPetSitter() : null;
 
   const [selectedPetIds, setSelectedPetIds] = useState(
     workspace.pets.map((pet) => pet.id),
@@ -45,9 +46,7 @@ export function BookingFlowPage() {
 
   const [careType, setCareType] = useState("Garde chez le pet-sitter");
 
-  const [instructions, setInstructions] = useState(
-    "Luna devient anxieuse pendant les orages. Milo doit rester à l'intérieur.",
-  );
+  const [instructions, setInstructions] = useState("");
 
   const [insuranceLevel, setInsuranceLevel] = useState<"standard" | "premium">(
     "standard",
@@ -105,14 +104,20 @@ export function BookingFlowPage() {
         <div className="booking-layout">
           <section className="workspace-card booking-form-card">
             <div className="booking-form-card__header">
-              <p className="section-kicker">Demande directe</p>
+              <p className="section-kicker">
+                {isGeneralRequest ? "Annonce générale" : "Demande directe"}
+              </p>
 
-              <h1>Préparez une demande claire pour {sitter.firstName}.</h1>
+              <h1>
+                {isGeneralRequest
+                  ? "Publiez une annonce claire pour les pet-sitters."
+                  : `Préparez une demande claire pour ${sitter?.firstName}.`}
+              </h1>
 
               <p>
                 Les informations sensibles servent uniquement à vérifier la
                 faisabilité de la garde. Le paiement test sera proposé après
-                acceptation.
+                acceptation par un pet-sitter.
               </p>
             </div>
 
@@ -232,7 +237,7 @@ export function BookingFlowPage() {
 
                   setRequestStatus(null);
                 }}
-                placeholder="Traitement, alimentation, comportement, urgence..."
+                placeholder="Ex. traitement le matin, alimentation spécifique, comportement à surveiller..."
               />
             </label>
 
@@ -249,15 +254,23 @@ export function BookingFlowPage() {
           <aside className="workspace-card booking-summary-card">
             <h2>Récapitulatif</h2>
 
-            <Image
-              src={sitter.imageUrl}
-              alt={sitter.imageAlt}
-              width={96}
-              height={96}
-            />
+            {sitter ? (
+              <Image
+                src={sitter.imageUrl}
+                alt={sitter.imageAlt}
+                width={96}
+                height={96}
+              />
+            ) : (
+              <span className="booking-summary-card__marketplace-icon" aria-hidden="true">
+                +
+              </span>
+            )}
 
             <p>
-              {sitter.firstName} {sitter.lastInitial} · {sitter.city}
+              {sitter
+                ? `${sitter.firstName} ${sitter.lastInitial} · ${sitter.city}`
+                : "Annonce visible par les pet-sitters disponibles"}
             </p>
 
             <dl>
@@ -303,8 +316,9 @@ export function BookingFlowPage() {
               <strong>Après envoi</strong>
 
               <p>
-                {sitter.firstName} accepte ou refuse. En cas d&apos;acceptation,
-                le créneau est bloqué et vous confirmez par paiement test.
+                {isGeneralRequest
+                  ? "Un pet-sitter disponible peut accepter l'annonce. Ensuite le créneau est bloqué et vous confirmez par paiement test."
+                  : `${sitter?.firstName} accepte ou refuse. En cas d'acceptation, le créneau est bloqué et vous confirmez par paiement test.`}
               </p>
             </div>
 
@@ -317,9 +331,13 @@ export function BookingFlowPage() {
                   demoWorkspaceActions.createBooking({
                     petIds: selectedPetIds,
 
-                    petSitterId: sitter.id,
+                    requestKind: isGeneralRequest ? "open" : "direct",
 
-                    petSitterName: `${sitter.firstName} ${sitter.lastInitial}`,
+                    petSitterId: sitter?.id ?? null,
+
+                    petSitterName: sitter
+                      ? `${sitter.firstName} ${sitter.lastInitial}`
+                      : "À attribuer",
 
                     startDate,
 
@@ -335,7 +353,9 @@ export function BookingFlowPage() {
                   });
 
                   setRequestStatus(
-                    "Demande envoyée. Elle apparaît maintenant côté pet-sitter.",
+                    isGeneralRequest
+                      ? "Annonce publiée. Les pet-sitters peuvent maintenant la voir et l'accepter."
+                      : "Demande envoyée. Elle apparaît maintenant côté pet-sitter.",
                   );
                 } catch (error) {
                   setRequestStatus(getErrorMessage(error));

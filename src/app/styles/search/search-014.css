@@ -1,0 +1,382 @@
+.role-search-page {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding: clamp(18px, 4vw, 42px);
+  background: #fffdfb;
+}
+
+.role-search-hero {
+  display: grid;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 14px;
+}
+
+.role-search-hero h1 {
+  color: #0340cf;
+  font-size: clamp(2.25rem, 9vw, 4.6rem);
+  line-height: 0.86;
+}
+
+.role-search-hero h1 span {
+  display: block;
+}
+
+.role-switch-pill {
+  display: inline-grid;
+  min-height: 28px;
+  width: fit-content;
+  place-items: center;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #ff8cf0;
+  color: white;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.role-search-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 36px;
+  gap: 8px;
+  align-items: end;
+  max-width: 420px;
+  margin-bottom: 10px;
+}
+
+.role-search-controls label {
+  display: grid;
+  gap: 4px;
+  color: #101936;
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.role-search-controls input {
+  width: 100%;
+  min-height: 32px;
+  padding: 5px 11px;
+  border: 1.5px solid #101010;
+  border-radius: 999px;
+  background: white;
+  color: #101936;
+  font: inherit;
+  font-weight: 850;
+}
+
+.role-search-controls button,
+.role-calendar-head button {
+  display: grid;
+  width: 32px;
+  min-height: 32px;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: #050505;
+  color: white;
+  cursor: pointer;
+  font-size: 1.25rem;
+  font-weight: 950;
+}
+
+.role-filter-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.role-search-map-panel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f4f8ff;
+  box-shadow: 0 16px 42px rgb(3 64 207 / 10%);
+}
+
+.role-search-map-panel .maplibre-map-shell {
+  min-height: clamp(360px, 56vw, 560px);
+  border-radius: 8px;
+}
+
+.role-search-map-panel .map-search-button {
+  display: none;
+}
+
+.maplibre-request-marker {
+  display: grid;
+  min-width: 52px;
+  min-height: 52px;
+  place-items: center;
+  border: 4px solid white;
+  border-radius: 999px;
+  background: #0340cf;
+  box-shadow: 0 12px 28px rgb(3 64 207 / 28%);
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 950;
+  transition:
+    background 120ms ease,
+    transform 120ms ease,
+    box-shadow 120ms ease;
+  white-space: nowrap;
+}
+
+.maplibre-request-marker--active,
+.maplibre-request-marker:hover,
+.maplibre-request-marker:focus-visible {
+  background: #ff7ce8;
+  transform: translateY(-2px) scale(1.07);
+  box-shadow: 0 16px 32px rgb(255 124 232 / 34%);
+}
+
+.maplibre-request-marker:focus-visible {
+  outline: 3px solid rgb(3 64 207 / 38%);
+  outline-offset: 3px;
+}
+
+.request-floating-card {
+  width: min(380px, calc(100% - 36px));
+}
+
+.request-floating-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.role-map-main-action {
+  position: absolute;
+  z-index: 12;
+  left: 50%;
+  top: 14px;
+  display: grid;
+  min-height: 34px;
+  width: min(calc(100% - 28px), 350px);
+  place-items: center;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #0340cf;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 10px 26px rgb(3 64 207 / 28%);
+  font-size: 0.82rem;
+  font-weight: 950;
+}
+
+.role-owner-announcement,
+.role-calendar-panel {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+  padding: clamp(18px, 5vw, 28px);
+  border-radius: 8px;
+  background: #ffc7ef;
+}
+
+.role-owner-announcement {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.role-owner-announcement h2,
+.role-guard-requests h2,
+.role-search-results h2 {
+  color: #0340cf;
+  font-size: clamp(1.7rem, 5vw, 2.5rem);
+  line-height: 0.95;
+}
+
+.role-owner-announcement a:last-child {
+  display: grid;
+  width: 36px;
+  min-height: 36px;
+  place-items: center;
+  border-radius: 999px;
+  background: #050505;
+  color: white;
+  text-decoration: none;
+  font-size: 1.35rem;
+  font-weight: 950;
+}
+
+.role-search-results,
+.role-guard-requests {
+  margin-top: clamp(18px, 3vw, 28px);
+}
+
+.role-calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.role-calendar-head span {
+  width: 46px;
+  height: 46px;
+  border: 4px solid white;
+  border-radius: 999px;
+  background: #0340cf;
+  box-shadow: 0 10px 24px rgb(3 64 207 / 24%);
+}
+
+.role-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 10px;
+  text-align: center;
+}
+
+.role-calendar-day {
+  display: grid;
+  min-height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  color: #050505;
+  font-weight: 950;
+}
+
+.role-calendar-day--active {
+  background: white;
+  color: #0340cf;
+}
+
+.role-request-list {
+  display: grid;
+  gap: 10px;
+}
+
+.role-request-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgb(190 205 246 / 86%);
+  border-radius: 8px;
+  background: white;
+}
+
+.role-request-card div {
+  display: grid;
+  gap: 4px;
+}
+
+.role-request-card__actions {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.role-request-card__actions .primary-button {
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 0.86rem;
+}
+
+.role-request-card small,
+.role-request-card p {
+  color: var(--muted);
+}
+
+.role-request-card p {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .role-search-page {
+    max-width: 430px;
+    padding: 28px 24px 72px;
+  }
+
+  .role-search-controls {
+    grid-template-columns: 1fr 1fr 32px;
+  }
+
+  .role-calendar-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .role-search-results .results-grid {
+    display: none;
+  }
+}
+
+@media (min-width: 760px) {
+  .role-search-hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .role-owner-announcement {
+    margin-top: 18px;
+  }
+
+  .role-request-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+
+@media (min-width: 1120px) {
+  .role-search-page {
+    display: grid;
+    width: min(calc(100% - 56px), 1480px);
+    grid-template-columns: minmax(430px, 0.46fr) minmax(620px, 1fr);
+    gap: 18px 24px;
+    align-items: start;
+    padding: clamp(28px, 3vw, 44px);
+  }
+
+  .role-search-hero h1 {
+    font-size: clamp(4.2rem, 5.4vw, 5.65rem);
+    line-height: 0.88;
+  }
+
+  .role-search-hero h1 span {
+    max-width: 11ch;
+  }
+
+  .role-search-controls {
+    max-width: 100%;
+  }
+
+  .role-filter-row {
+    margin-bottom: 0;
+  }
+
+  .role-search-hero,
+  .role-search-controls,
+  .role-filter-row,
+  .role-calendar-panel,
+  .role-owner-announcement {
+    grid-column: 1;
+  }
+
+  .role-search-map-panel {
+    grid-column: 2;
+    grid-row: 1 / span 5;
+  }
+
+  .role-search-map-panel .maplibre-map-shell {
+    min-height: min(62vh, 700px);
+  }
+
+  .role-search-results,
+  .role-guard-requests {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1500px) {
+  .role-search-page {
+    width: min(calc(100% - 96px), 1580px);
+    grid-template-columns: minmax(500px, 0.42fr) minmax(760px, 1fr);
+    gap: 20px 28px;
+  }
+
+  .role-owner-announcement,
+  .role-calendar-panel {
+    margin-top: 6px;
+  }
+}

@@ -23,9 +23,39 @@ describe("demo workspace state", () => {
     });
 
     expect(state.bookings[0]).toMatchObject({
+      requestKind: "direct",
       status: "awaiting_response",
       petIds: ["pet-luna"],
       platformCommissionCents: 1620,
+    });
+  });
+
+  it("creates a general request and assigns it only when a pet-sitter accepts", () => {
+    const state = createBooking(initialDemoWorkspaceState, {
+      petIds: ["pet-luna"],
+      requestKind: "open",
+      startDate: "2026-06-10",
+      endDate: "2026-06-12",
+      careType: "Garde à domicile",
+      instructions: "Annonce ouverte aux profils disponibles.",
+      baseAmountCents: 9800,
+      insuranceLevel: "standard",
+    });
+    const bookingId = state.bookings[0]?.id ?? "";
+    const acceptedState = acceptBooking(state, bookingId, {
+      petSitterId: "amelie-bernard",
+      petSitterName: "Amélie B.",
+    });
+
+    expect(state.bookings[0]).toMatchObject({
+      requestKind: "open",
+      petSitterId: null,
+      status: "awaiting_response",
+    });
+    expect(acceptedState.bookings[0]).toMatchObject({
+      petSitterId: "amelie-bernard",
+      petSitterName: "Amélie B.",
+      status: "accepted",
     });
   });
 

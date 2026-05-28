@@ -121,7 +121,7 @@ export function OwnerRegistrationFlow(props: OwnerRegistrationFlowProps) {
               name="name"
               type="text"
               defaultValue={props.animalDraft?.name ?? ""}
-              placeholder="Opale"
+              placeholder="Ex. Opale"
               required
             />
           </label>
@@ -132,7 +132,7 @@ export function OwnerRegistrationFlow(props: OwnerRegistrationFlowProps) {
               type="number"
               min="0"
               defaultValue={props.animalDraft?.age ?? ""}
-              placeholder="6"
+              placeholder="Ex. 6"
               required
             />
           </label>
@@ -152,7 +152,7 @@ export function OwnerRegistrationFlow(props: OwnerRegistrationFlowProps) {
               min="0"
               step="0.1"
               defaultValue={props.animalDraft?.weightKg ?? ""}
-              placeholder="4.2 kg"
+              placeholder="Ex. 4.2"
             />
           </label>
           <label className="owner-field-wide">
@@ -260,7 +260,7 @@ export function OwnerRegistrationFlow(props: OwnerRegistrationFlowProps) {
             name="healthNotes"
             type="text"
             defaultValue={props.animalDraft?.healthNotes ?? ""}
-            placeholder="Décris la maladie, les soins, etc..."
+            placeholder="Ex. traitement matin et soir, allergie connue..."
           />
         </label>
 
@@ -323,7 +323,7 @@ function OwnerAccountForm(props: OwnerRegistrationFlowProps) {
           <input
             name="firstName"
             type="text"
-            placeholder="Margo"
+            placeholder="Ex. Camille"
             defaultValue={props.accountDraft?.firstName ?? ""}
             required
           />
@@ -333,7 +333,7 @@ function OwnerAccountForm(props: OwnerRegistrationFlowProps) {
           <input
             name="lastName"
             type="text"
-            placeholder="Da Silva"
+            placeholder="Ex. Martin"
             defaultValue={props.accountDraft?.lastName ?? ""}
             required
           />
@@ -343,7 +343,7 @@ function OwnerAccountForm(props: OwnerRegistrationFlowProps) {
           <input
             name="email"
             type="email"
-            placeholder="margo.mamipet@gmail.com"
+            placeholder="Ex. camille@example.com"
             defaultValue={props.accountDraft?.email ?? ""}
             required
           />
@@ -354,7 +354,7 @@ function OwnerAccountForm(props: OwnerRegistrationFlowProps) {
             name="age"
             type="number"
             min="16"
-            placeholder="24"
+            placeholder="Ex. 28"
             defaultValue={props.accountDraft?.age ?? ""}
           />
         </label>
@@ -363,17 +363,17 @@ function OwnerAccountForm(props: OwnerRegistrationFlowProps) {
           <input
             name="city"
             type="text"
-            placeholder="Caen"
+            placeholder="Ex. Caen"
             defaultValue={props.accountDraft?.city ?? ""}
           />
         </label>
         <label>
-          Code postale
+          Code postal
           <input
             name="postalCode"
             type="text"
             inputMode="numeric"
-            placeholder="14000"
+            placeholder="Ex. 14000"
             defaultValue={props.accountDraft?.postalCode ?? ""}
           />
         </label>
@@ -382,7 +382,7 @@ function OwnerAccountForm(props: OwnerRegistrationFlowProps) {
           <input
             name="addressLine1"
             type="text"
-            placeholder="12 rue des Lilas"
+            placeholder="Ex. 10 rue Exemple"
             defaultValue={props.accountDraft?.addressLine1 ?? ""}
           />
         </label>
@@ -391,7 +391,7 @@ function OwnerAccountForm(props: OwnerRegistrationFlowProps) {
           <input
             name="password"
             type="password"
-            placeholder="********"
+            placeholder="Ex. 8 caractères minimum"
             minLength={8}
             required
           />

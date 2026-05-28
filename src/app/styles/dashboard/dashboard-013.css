@@ -69,6 +69,32 @@
   align-content: start;
 }
 
+.workspace-main {
+  display: grid;
+  gap: clamp(14px, 2vw, 22px);
+}
+
+.workspace-heading {
+  gap: 14px;
+}
+
+.workspace-heading h1 {
+  max-width: 980px;
+  line-height: 1.02;
+}
+
+.workspace-grid {
+  gap: clamp(14px, 2vw, 18px);
+}
+
+.workspace-grid--hero {
+  margin-bottom: 0;
+}
+
+.workspace-card {
+  min-width: 0;
+}
+
 .booking-document-list,
 .booking-history-list,
 .payout-card {
@@ -206,6 +232,97 @@
   cursor: pointer;
 }
 
+.document-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  padding: clamp(14px, 4vw, 40px);
+  background: rgb(22 28 48 / 58%);
+  backdrop-filter: blur(10px);
+}
+
+.document-dialog {
+  display: grid;
+  width: min(100%, 720px);
+  max-height: min(92vh, 760px);
+  overflow: auto;
+  border: 1px solid rgb(206 217 248 / 92%);
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 28px 80px rgb(22 28 48 / 34%);
+}
+
+.document-dialog__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+  padding: clamp(18px, 4vw, 26px);
+  border-bottom: 1px solid var(--border);
+  background:
+    linear-gradient(135deg, rgb(232 239 255 / 98%), rgb(255 243 251 / 82%)),
+    white;
+}
+
+.document-dialog__header h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+}
+
+.document-dialog__header span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-weight: 850;
+}
+
+.document-dialog__paper {
+  display: grid;
+  gap: 20px;
+  margin: clamp(16px, 4vw, 28px);
+  padding: clamp(18px, 4vw, 30px);
+  border: 1px solid rgb(210 220 249 / 88%);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgb(22 28 48 / 8%);
+}
+
+.document-dialog__paper dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.document-dialog__paper dl div {
+  display: grid;
+  gap: 3px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--green-soft);
+}
+
+.document-dialog__paper dt {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.document-dialog__paper dd {
+  margin: 0;
+  font-weight: 950;
+}
+
+.document-dialog__paper p {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
 .booking-history-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
@@ -275,6 +392,37 @@
 .payout-card button:disabled {
   opacity: 0.64;
   cursor: not-allowed;
+}
+
+.medical-action-list {
+  display: grid;
+  gap: 10px;
+}
+
+.medical-action-list button {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid rgb(3 64 207 / 24%);
+  border-radius: 999px;
+  background: #e8efff;
+  color: #0340cf;
+  cursor: pointer;
+  font-weight: 950;
+}
+
+.pet-mini-card--interactive {
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.pet-mini-card--interactive:hover,
+.pet-mini-card--interactive:focus-visible {
+  border-color: rgb(3 64 207 / 22%);
+  background: rgb(232 239 255 / 68%);
+  outline: none;
 }
 
 .achievement-dialog-backdrop {
@@ -451,12 +599,44 @@
 }
 
 @media (max-width: 640px) {
+  .connected-shell {
+    display: block;
+  }
+
+  .connected-sidebar {
+    position: static;
+  }
+
+  .workspace-main,
+  .booking-workspace {
+    padding: 16px;
+  }
+
+  .workspace-heading {
+    align-items: start;
+  }
+
+  .workspace-heading h1 {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+
+  .workspace-card {
+    padding: 14px;
+  }
+
   .booking-dossier__header,
   .booking-dossier__meta,
   .booking-piece-list li,
   .booking-history-row,
-  .payout-summary-grid {
+  .payout-summary-grid,
+  .document-dialog__header,
+  .document-dialog__paper dl {
     grid-template-columns: 1fr;
+  }
+
+  .booking-piece-list button,
+  .medical-action-list button {
+    width: 100%;
   }
 
   .achievement-dialog__header {
@@ -465,5 +645,36 @@
 
   .achievement-dialog__header .ghost-button {
     justify-self: start;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1180px) {
+  .workspace-main,
+  .booking-workspace {
+    padding: 24px;
+  }
+
+  .workspace-grid,
+  .workspace-grid--hero,
+  .workspace-grid--four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .booking-documents-card,
+  .booking-history-card,
+  .payout-card {
+    grid-column: span 1;
+  }
+}
+
+@media (min-width: 1181px) {
+  .workspace-grid {
+    align-items: stretch;
+  }
+
+  .booking-documents-card,
+  .booking-history-card,
+  .payout-card {
+    min-height: 100%;
   }
 }

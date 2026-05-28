@@ -19,10 +19,14 @@ export type DemoBookingStatus =
   | "cancelled"
   | "incident_reported";
 
+export type DemoBookingRequestKind = "direct" | "open";
+
 export type DemoBooking = {
   id: string;
+  ownerId: string;
   ownerName: string;
-  petSitterId: string;
+  requestKind: DemoBookingRequestKind;
+  petSitterId: string | null;
   petSitterName: string;
   petIds: string[];
   startDate: string;
@@ -63,9 +67,12 @@ export type DemoWorkspaceState = {
 };
 
 export type CreateBookingCommand = {
+  ownerId?: string;
+  ownerName?: string;
   petIds: string[];
-  petSitterId: string;
-  petSitterName: string;
+  requestKind?: DemoBookingRequestKind;
+  petSitterId?: string | null;
+  petSitterName?: string;
   startDate: string;
   endDate: string;
   careType: string;
@@ -176,6 +183,51 @@ export function addPet(
   };
 }
 
+export function completePetMedicalRecord(
+  state: DemoWorkspaceState,
+  petId: string,
+): DemoWorkspaceState {
+  let didFindPet = false;
+  const pets = state.pets.map((pet) => {
+    if (pet.id !== petId) {
+      return pet;
+    }
+
+    didFindPet = true;
+
+    return {
+      ...pet,
+      medicalRecordStatus: "complete" as const,
+      needs:
+        pet.needs.length > 0 && !pet.needs.includes("Carnet de santé validé")
+          ? [...pet.needs, "Carnet de santé validé"]
+          : pet.needs,
+    };
+  });
+
+  if (!didFindPet) {
+    throw new Error("Animal introuvable.");
+  }
+
+  return { ...state, pets };
+}
+
+export function completeBookingPetMedicalRecords(
+  state: DemoWorkspaceState,
+  bookingId: string,
+): DemoWorkspaceState {
+  const booking = state.bookings.find((candidate) => candidate.id === bookingId);
+
+  if (!booking) {
+    throw new Error("Réservation introuvable.");
+  }
+
+  return booking.petIds.reduce(
+    (currentState, petId) => completePetMedicalRecord(currentState, petId),
+    state,
+  );
+}
+
 export function createBooking(
   state: DemoWorkspaceState,
   command: CreateBookingCommand,
@@ -192,20 +244,32 @@ export function createBooking(
   }
 
   const payment = calculatePaymentBreakdown(command.baseAmountCents);
+  const requestKind = command.requestKind ?? "direct";
+
+  if (requestKind === "direct" && !command.petSitterId) {
+    throw new Error("Sélectionnez un pet-sitter pour une demande directe.");
+  }
 
   return {
     ...state,
     bookings: [
       createInitialBooking({
         id: createDemoBookingId(state),
+        ownerId: command.ownerId ?? "owner",
+        ownerName: command.ownerName ?? "Olivia Carter",
         petIds: command.petIds,
         status: "awaiting_response",
         totalAmountCents: payment.totalAmountCents,
         instructions: command.instructions.trim(),
         contractSummary: null,
         review: null,
-        petSitterId: command.petSitterId,
-        petSitterName: command.petSitterName,
+        requestKind,
+        petSitterId:
+          requestKind === "open" ? null : (command.petSitterId ?? null),
+        petSitterName:
+          requestKind === "open"
+            ? "À attribuer"
+            : (command.petSitterName ?? "Pet-sitter"),
         startDate: command.startDate,
         endDate: command.endDate,
         careType: command.careType,
@@ -229,9 +293,23 @@ function createDemoBookingId(state: DemoWorkspaceState): string {
 export function acceptBooking(
   state: DemoWorkspaceState,
   bookingId: string,
+  assignee?: { petSitterId: string; petSitterName: string },
 ): DemoWorkspaceState {
   return updateBooking(state, bookingId, (booking) => {
     assertStatus(booking, ["awaiting_response"], "Seule une demande en attente peut être acceptée.");
+
+    if (booking.requestKind === "open") {
+      if (!assignee) {
+        throw new Error("Un pet-sitter doit être identifié pour accepter une annonce générale.");
+      }
+
+      return {
+        ...booking,
+        petSitterId: assignee.petSitterId,
+        petSitterName: assignee.petSitterName,
+        status: "accepted",
+      };
+    }
 
     return { ...booking, status: "accepted" };
   });
@@ -372,6 +450,8 @@ export function getBookingStatusLabel(status: DemoBookingStatus): string {
 
 function createInitialBooking({
   id,
+  ownerId = "owner",
+  ownerName = "Olivia Carter",
   petIds,
   status,
   totalAmountCents,
@@ -380,20 +460,24 @@ function createInitialBooking({
   review,
   petSitterId = "sarah-johnson",
   petSitterName = "Sarah J.",
+  requestKind = "direct",
   startDate = "2026-05-24",
   endDate = "2026-05-26",
   careType = "Garde chez le pet-sitter",
   insuranceLevel = "standard",
 }: {
   id: string;
+  ownerId?: string;
+  ownerName?: string;
   petIds: string[];
   status: DemoBookingStatus;
   totalAmountCents: number;
   instructions: string;
   contractSummary: string | null;
   review: DemoReview | null;
-  petSitterId?: string;
+  petSitterId?: string | null;
   petSitterName?: string;
+  requestKind?: DemoBookingRequestKind;
   startDate?: string;
   endDate?: string;
   careType?: string;
@@ -403,7 +487,9 @@ function createInitialBooking({
 
   return {
     id,
-    ownerName: "Olivia Carter",
+    ownerId,
+    ownerName,
+    requestKind,
     petSitterId,
     petSitterName,
     petIds,

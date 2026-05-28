@@ -35,7 +35,7 @@ export function PetSitterSearchFilters({
         <input
           value={city}
           onChange={(event) => onCityChange(event.target.value)}
-          placeholder="Caen"
+          placeholder="Ex. Caen"
         />
       </label>
       <label>

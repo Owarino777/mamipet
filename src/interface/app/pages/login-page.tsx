@@ -160,7 +160,7 @@ export function LoginPage() {
                 <input
                   autoComplete="email"
                   name="email"
-                  placeholder="margo.mamipet@gmail.com"
+                  placeholder="Ex. camille@example.com"
                   type="email"
                 />
               </label>
@@ -170,7 +170,7 @@ export function LoginPage() {
                 <input
                   autoComplete="current-password"
                   name="password"
-                  placeholder="********"
+                  placeholder="Ex. votre mot de passe"
                   type="password"
                 />
               </label>

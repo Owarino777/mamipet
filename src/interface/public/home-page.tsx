@@ -1,5 +1,4 @@
 import {
-  ApproximateMap,
   ButtonLink,
   PublicPetSitterCard,
   PublicShell,
@@ -26,9 +25,8 @@ export function HomePage() {
           <div className="hero-content">
             <h1>Trouvez une garde fiable pour votre animal.</h1>
             <p className="hero-copy">
-              MamiPet vous aide à trouver des pet-sitters vérifiés, qualifiés et
-              capables de prendre soin d&apos;animaux classiques, sensibles, âgés ou
-              sous traitement.
+              Trouvez un pet-sitter vérifié, adapté aux besoins de votre animal,
+              même âgé, anxieux ou sous traitement.
             </p>
             <div className="hero-actions">
               <ButtonLink href="/pet-sitters">Trouver un pet-sitter</ButtonLink>
@@ -114,21 +112,7 @@ export function HomePage() {
                 <PublicPetSitterCard key={petSitter.id} petSitter={petSitter} />
               ))}
             </div>
-            <ApproximateMap petSitters={featuredPetSitters} />
           </div>
-        </section>
-
-        <section className="seo-section" id="garanties">
-          <div>
-            <p className="section-kicker">Confiance</p>
-            <h2>Une garde adaptée à chaque animal</h2>
-          </div>
-          <p>
-            Un chat anxieux, un chien âgé ou un animal sous traitement ne se
-            confie pas comme n&apos;importe quel animal. MamiPet structure les
-            profils, les compétences et les garanties pour aider les propriétaires
-            à choisir avec plus de confiance.
-          </p>
         </section>
 
         <section className="become-sitter-section" id="devenir-pet-sitter">
@@ -140,7 +124,7 @@ export function HomePage() {
               documents et vos disponibilités pour recevoir des demandes adaptées.
             </p>
           </div>
-          <ButtonLink href="/login">Créer mon profil</ButtonLink>
+          <ButtonLink href="/register">Créer mon profil</ButtonLink>
         </section>
       </main>
     </PublicShell>

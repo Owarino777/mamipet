@@ -36,6 +36,35 @@
   box-shadow: 0 8px 24px rgb(65 48 34 / 6%);
 }
 
+.search-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 18px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.search-status p {
+  margin: 0;
+}
+
+.search-status--error {
+  border-color: #e7b4bd;
+  background: #fff7f8;
+  color: #7d2432;
+}
+
+@media (max-width: 600px) {
+  .search-status {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
 .public-shell--compact .search-bar-panel {
   border-bottom: 1px solid var(--border);
   box-shadow: none;

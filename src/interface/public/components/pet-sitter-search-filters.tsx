@@ -39,10 +39,6 @@ export function PetSitterSearchFilters({
         />
       </label>
       <label>
-        Dates
-        <input type="date" />
-      </label>
-      <label>
         Espèce
         <select
           value={species}
@@ -72,16 +68,22 @@ export function PetSitterSearchFilters({
       <button className="primary-button" type="button" onClick={onSearchSubmit}>
         Rechercher
       </button>
-      <div className="search-chip-row" id="filters" aria-label="Filtres rapides">
-        {quickFilters.map((filter) => (
-          <FilterChip
-            active={activeQuickFilters.includes(filter.code)}
-            key={filter.code}
-            label={filter.label}
-            onClick={() => onQuickFilterToggle(filter.code)}
-          />
-        ))}
-      </div>
+      <details className="search-more-filters" id="filters">
+        <summary>
+          Plus de filtres
+          {activeQuickFilters.length > 0 ? ` (${activeQuickFilters.length} actifs)` : ""}
+        </summary>
+        <div className="search-chip-row" aria-label="Filtres rapides">
+          {quickFilters.map((filter) => (
+            <FilterChip
+              active={activeQuickFilters.includes(filter.code)}
+              key={filter.code}
+              label={filter.label}
+              onClick={() => onQuickFilterToggle(filter.code)}
+            />
+          ))}
+        </div>
+      </details>
     </section>
   );
 }

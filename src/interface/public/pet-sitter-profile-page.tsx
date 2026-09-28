@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  ApproximateMap,
   ButtonLink,
   CareCapabilityTag,
   InlineTagList,
@@ -16,6 +15,7 @@ import {
 import { demoPetSitters, type PublicPetSitter } from "@/interface/shared/product-data";
 import { formatEuro, formatRating } from "@/interface/shared/format";
 import { useDemoSession } from "@/interface/shared/demo-session-client";
+import { mapApiPetSitter, type ApiPetSitterProfileDto } from "./hooks/use-pet-sitter-search";
 
 type ProfilePageProps = {
   petSitterId: string;
@@ -23,52 +23,58 @@ type ProfilePageProps = {
 
 export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
   const session = useDemoSession();
-  const [petSitter, setPetSitter] = useState<PublicPetSitter>(() =>
-    findInitialProfile(petSitterId),
-  );
-  const bookingHref = session ? `/reservations/new?sitter=${petSitterId}` : "/login";
+  const [petSitter, setPetSitter] = useState<PublicPetSitter | null>(null);
+  const [loadError, setLoadError] = useState("");
+  const bookingRoute = `/reservations/new?sitter=${encodeURIComponent(petSitterId)}`;
+  const bookingHref = session ? bookingRoute : `/login?next=${encodeURIComponent(bookingRoute)}`;
 
   useEffect(() => {
     const controller = new AbortController();
 
     async function loadProfile() {
-      if (demoPetSitters.some((profile) => profile.id === petSitterId)) {
+      if (session?.source === "fixture") {
+        setPetSitter(demoPetSitters.find((profile) => profile.id === petSitterId) ?? null);
+        setLoadError("");
         return;
       }
 
       try {
+        setPetSitter(null);
+        setLoadError("");
         const response = await fetch(`/api/pet-sitters/${petSitterId}`, {
           signal: controller.signal,
         });
 
         if (!response.ok) {
+          setLoadError(response.status === 404 ? "Ce profil est introuvable." : "Impossible de charger ce profil.");
           return;
         }
 
-        const payload = (await response.json()) as { data: unknown };
+        const payload = (await response.json()) as { data: ApiPetSitterProfileDto | null };
 
-        if (payload.data && typeof payload.data === "object") {
-          setPetSitter((current) => ({
-            ...current,
-            id: petSitterId,
-          }));
-        }
+        if (!payload.data || payload.data.id !== petSitterId) throw new Error("Invalid profile response");
+        setPetSitter(mapApiPetSitter(payload.data));
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
           return;
         }
+        setLoadError("Impossible de charger ce profil.");
       }
     }
 
     void loadProfile();
 
     return () => controller.abort();
-  }, [petSitterId]);
+  }, [petSitterId, session?.source]);
 
   const acceptedCare = useMemo(
-    () => petSitter.careCapabilities.slice(0, 6),
+    () => petSitter?.careCapabilities.slice(0, 6) ?? [],
     [petSitter],
   );
+
+  if (!petSitter) {
+    return <PublicShell compact><main className="profile-page"><Link className="back-link" href="/pet-sitters">Retour aux résultats</Link><h1>Profil pet-sitter</h1><p role={loadError ? "alert" : "status"}>{loadError || "Chargement du profil…"}</p></main></PublicShell>;
+  }
 
   return (
     <PublicShell compact>
@@ -82,12 +88,12 @@ export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
             <PetSitterVisual petSitter={petSitter} />
           </div>
           <div className="profile-hero__content">
-            <p className="section-kicker">Pet-sitter vérifié</p>
+            <p className="section-kicker">{petSitter.verificationStatus === "published_unverified" ? "Pet-sitter" : "Pet-sitter vérifié"}</p>
             <h1>
               {petSitter.firstName} {petSitter.lastInitial}
             </h1>
             <p className="profile-meta">
-              {formatRating(petSitter.rating)} / 5 · {petSitter.reviewCount} avis ·{" "}
+              {petSitter.reviewCount > 0 ? `${formatRating(petSitter.rating)} / 5 · ${petSitter.reviewCount} avis · ` : "Aucun avis publié · "}
               {petSitter.city} · {petSitter.distanceLabel}
             </p>
             <p className="hero-copy">{petSitter.description}</p>
@@ -99,32 +105,13 @@ export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
           </div>
           <aside className="booking-panel">
             <h2>Demander une réservation</h2>
-            <p>
-              Dès {formatEuro(petSitter.basePriceCents)} / {petSitter.priceUnit}
-            </p>
+            <p className="booking-panel__price">{petSitter.basePriceCents > 0 ? `Dès ${formatEuro(petSitter.basePriceCents)} / ${petSitter.priceUnit}` : "Tarif à confirmer"}</p>
             <div className="booking-panel__proofs">
               <span>Réponse moyenne : {petSitter.responseTime}</span>
               <span>{petSitter.availabilitySummary}</span>
-              <span>Adresse exacte masquée avant réservation</span>
             </div>
-            <label>
-              Début
-              <input type="date" />
-            </label>
-            <label>
-              Fin
-              <input type="date" />
-            </label>
-            <label>
-              Type de garde
-              <select>
-                {petSitter.careLocations.map((location) => (
-                  <option key={location.id}>{location.label}</option>
-                ))}
-              </select>
-            </label>
-            <ButtonLink href={bookingHref}>Vérifier les disponibilités</ButtonLink>
-            <small>Vous ne serez pas facturé avant acceptation.</small>
+            <ButtonLink href={bookingHref}>Préparer une demande</ButtonLink>
+            <small>Dates et type de garde à préciser dans la demande. Aucun paiement avant acceptation.</small>
           </aside>
         </section>
 
@@ -149,8 +136,7 @@ export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
             <span>3</span>
             <h2>Payer après acceptation</h2>
             <p>
-              Le paiement test et le récapitulatif contractuel arrivent seulement
-              lorsque le pet-sitter confirme la faisabilité.
+              Le paiement en ligne et le contrat sont actuellement indisponibles.
             </p>
           </article>
         </section>
@@ -179,14 +165,6 @@ export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
         </section>
 
         <section className="gallery-section" aria-label="Galerie du pet-sitter">
-          <div className="gallery-main">
-            <Image
-              src={petSitter.imageUrl}
-              alt={petSitter.imageAlt}
-              fill
-              sizes="(max-width: 900px) 100vw, 52vw"
-            />
-          </div>
           {petSitter.gallery.slice(0, 4).map((image) => (
             <div className="gallery-tile" key={image.url}>
               <Image src={image.url} alt={image.alt} fill sizes="24vw" />
@@ -196,48 +174,17 @@ export function PetSitterProfilePage({ petSitterId }: ProfilePageProps) {
 
         <section className="profile-detail-layout">
           <div className="profile-card">
-            <h2>Avis vérifiés</h2>
-            <article className="review-card">
-              <strong>Réservation terminée</strong>
-              <p>
-                Communication claire, consignes respectées et nouvelles envoyées
-                pendant la garde.
-              </p>
-              <span>{formatRating(petSitter.rating)} / 5</span>
-            </article>
+            <h2>Avis</h2>
+            <p className="profile-rating">{petSitter.reviewCount > 0 ? <><strong>{formatRating(petSitter.rating)} / 5</strong> · {petSitter.reviewCount} avis</> : "Aucun avis publié"}</p>
           </div>
           <div className="profile-card">
-            <h2>Zone approximative</h2>
-            <ApproximateMap compact petSitters={[petSitter]} />
+            <h2>Zone de garde</h2>
+            <p>{petSitter.city} · {petSitter.distanceLabel}</p>
+            <p className="profile-detail-note">L’adresse exacte reste privée avant la réservation.</p>
+            <Link href="/pet-sitters">Voir la carte des pet-sitters</Link>
           </div>
         </section>
-
-        <div className="sticky-cta">
-          <div>
-            <strong>
-              Dès {formatEuro(petSitter.basePriceCents)} / {petSitter.priceUnit}
-            </strong>
-            <span>Réservation encadrée après acceptation</span>
-          </div>
-          <ButtonLink href={bookingHref}>Demander une réservation</ButtonLink>
-        </div>
       </main>
     </PublicShell>
   );
-}
-
-function findInitialProfile(petSitterId: string): PublicPetSitter {
-  const matchingProfile = demoPetSitters.find((profile) => profile.id === petSitterId);
-
-  if (matchingProfile) {
-    return matchingProfile;
-  }
-
-  const fallbackProfile = demoPetSitters[0];
-
-  if (!fallbackProfile) {
-    throw new Error("At least one public pet-sitter profile is required.");
-  }
-
-  return fallbackProfile;
 }

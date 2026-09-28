@@ -49,11 +49,7 @@ export const mapConfig = {
   minZoom: 4,
   maxZoom: 17,
   dragPan: true,
-  scrollZoom: {
-    around: "center",
-    speed: 0.7,
-    smooth: true,
-  },
+  scrollZoom: true,
   doubleClickZoom: false,
   attributionControl: true,
 } as const;

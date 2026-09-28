@@ -119,6 +119,13 @@ export function PetSitterMap({
     (event: ViewStateChangeEvent) => {
       const map = event.target;
       const center = map.getCenter();
+      if (
+        Math.abs(center.lat - viewport.latitude) < 0.00001 &&
+        Math.abs(center.lng - viewport.longitude) < 0.00001 &&
+        Math.abs(map.getZoom() - zoomLevel) < 0.01
+      ) {
+        return;
+      }
 
       onMoveEnd({
         latitude: center.lat,
@@ -126,17 +133,24 @@ export function PetSitterMap({
         zoom: map.getZoom(),
       });
     },
-    [onMoveEnd],
+    [onMoveEnd, viewport.latitude, viewport.longitude, zoomLevel],
   );
 
   if (hasMapError) {
     return (
       <div className="maplibre-map-shell maplibre-map-shell--fallback">
         <h2>Carte indisponible</h2>
-        <p>
-          La liste reste utilisable. La carte se recharge automatiquement dès que
-          le provider gratuit répond.
-        </p>
+        <p>La liste reste utilisable pendant que la carte est indisponible.</p>
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={() => {
+            setHasMapError(false);
+            setIsMapReady(false);
+          }}
+        >
+          Réessayer la carte
+        </button>
       </div>
     );
   }
@@ -196,7 +210,7 @@ export function PetSitterMap({
               onFocus={() => onPetSitterSelect(petSitter.id)}
               aria-label={`Sélectionner ${petSitter.firstName} ${petSitter.lastInitial}`}
             >
-              {formatEuro(petSitter.basePriceCents)}
+              {petSitter.basePriceCents > 0 ? formatEuro(petSitter.basePriceCents) : "Tarif ?"}
             </button>
           </Marker>
         ))}
@@ -229,7 +243,7 @@ export function PetSitterMap({
                       petSitterId: selectedPetSitter.id,
                       index:
                         current.petSitterId !== selectedPetSitter.id ||
-                        current.index === 0
+                          current.index === 0
                           ? selectedImages.length - 1
                           : current.index - 1,
                     }))
@@ -246,7 +260,7 @@ export function PetSitterMap({
                       petSitterId: selectedPetSitter.id,
                       index:
                         current.petSitterId !== selectedPetSitter.id ||
-                        current.index === selectedImages.length - 1
+                          current.index === selectedImages.length - 1
                           ? 0
                           : current.index + 1,
                     }))
@@ -297,8 +311,9 @@ export function PetSitterMap({
               ))}
             </span>
             <b>
-              Dès {formatEuro(selectedPetSitter.basePriceCents)} /{" "}
-              {selectedPetSitter.priceUnit}
+              {selectedPetSitter.basePriceCents > 0
+                ? `Dès ${formatEuro(selectedPetSitter.basePriceCents)} / ${selectedPetSitter.priceUnit}`
+                : "Tarif à confirmer"}
             </b>
             <Link
               className="map-floating-card__profile-link"

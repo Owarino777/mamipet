@@ -1,11 +1,13 @@
 import {
   mapPetSitterPublicProfileRow,
-  petSitterProfileSelect,
+  publicPetSitterProfileSelect,
 } from "@/modules/pet-sitters/presentation/pet-sitter-profile.mapper";
 import { NotFoundError } from "@/shared/errors/http-error";
 import { jsonError, jsonOk } from "@/shared/http/route-response";
 import { createSupabaseRouteClient } from "@/shared/supabase/route-client";
 import { throwIfSupabaseError } from "@/shared/supabase/errors";
+import { validateInput } from "@/shared/http/validate-input";
+import { z } from "zod";
 
 type PetSitterRouteContext = {
   params: Promise<{
@@ -15,14 +17,12 @@ type PetSitterRouteContext = {
 
 export async function GET(request: Request, context: PetSitterRouteContext) {
   try {
-    const { petSitterId } = await context.params;
+    const petSitterId = validateInput(z.string().uuid(), (await context.params).petSitterId);
     const supabase = createSupabaseRouteClient(request);
     const { data, error } = await supabase
-      .from("profil_pet_sitter")
-      .select(petSitterProfileSelect)
+      .from("pet_sitter_public_profile")
+      .select(publicPetSitterProfileSelect)
       .eq("id_profil_pet_sitter", petSitterId)
-      .eq("visibilite_publique", true)
-      .not("statut_verification", "in", "(suspended,rejected)")
       .maybeSingle();
 
     throwIfSupabaseError(error, "Unable to read pet-sitter profile.");

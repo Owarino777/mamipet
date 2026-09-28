@@ -21,7 +21,7 @@ type ReferenceItemDto = {
   label: string;
 };
 
-type ApiPetSitterProfileDto = {
+export type ApiPetSitterProfileDto = {
   id: string;
   pseudo: string | null;
   firstName: string;
@@ -92,8 +92,10 @@ export function usePetSitterSearch() {
   const [pendingZoomLevel, setPendingZoomLevel] = useState(mapAreas.caen.zoom);
   const [hasPendingMapMove, setHasPendingMapMove] = useState(false);
   const [selectedPetSitterId, setSelectedPetSitterId] = useState<string | null>(null);
-  const [petSitters, setPetSitters] = useState<PublicPetSitter[]>(demoPetSitters);
+  const [petSitters, setPetSitters] = useState<PublicPetSitter[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryToken, setRetryToken] = useState(0);
 
   useEffect(() => {
     window.queueMicrotask(() => {
@@ -129,16 +131,28 @@ export function usePetSitterSearch() {
   }, []);
 
   useEffect(() => {
+    if (session?.source === "fixture") {
+      return;
+    }
+
     let ignoreResult = false;
 
     async function loadPetSitters() {
       setIsLoading(true);
+      setLoadError(null);
 
       try {
         const profiles = await loadPublicPetSitters(city);
 
-        if (!ignoreResult && profiles.length > 0) {
+        if (!ignoreResult) {
           setPetSitters(profiles);
+        }
+      } catch {
+        if (!ignoreResult) {
+          setPetSitters([]);
+          setLoadError(
+            "La recherche en ligne est momentanément indisponible. Réessayez.",
+          );
         }
       } finally {
         if (!ignoreResult) {
@@ -152,10 +166,10 @@ export function usePetSitterSearch() {
     return () => {
       ignoreResult = true;
     };
-  }, [city]);
+  }, [city, retryToken, session?.source]);
 
   const visiblePetSitters = useMemo(
-    () => mergeLocalPetSitterProfile(petSitters, session),
+    () => mergeLocalPetSitterProfile(session?.source === "fixture" ? demoPetSitters : petSitters, session),
     [petSitters, session],
   );
 
@@ -177,6 +191,7 @@ export function usePetSitterSearch() {
     city,
     hasPendingMapMove,
     isLoading,
+    loadError,
     mapViewport: hasPendingMapMove ? pendingViewport : mapViewport,
     need,
     orderedAreaIds: orderedMapAreaIds,
@@ -189,6 +204,7 @@ export function usePetSitterSearch() {
     applyCitySearch,
     commitPendingViewport,
     registerMapMove,
+    retry: () => setRetryToken((current) => current + 1),
     setCity,
     setNeed,
     setSelectedPetSitterId,
@@ -280,7 +296,7 @@ async function fetchPublicPetSitters(city: string): Promise<PublicPetSitter[]> {
   const response = await fetch(`/api/pet-sitters?${searchParams}`);
 
   if (!response.ok) {
-    return [];
+    throw new Error(`Pet-sitter search failed with status ${response.status}.`);
   }
 
   const payload = (await response.json()) as {
@@ -360,7 +376,7 @@ function doesPetSitterMatchQuickFilter(
   ].some((tag) => tag.code === filterCode);
 }
 
-function mapApiPetSitter(profile: ApiPetSitterProfileDto): PublicPetSitter {
+export function mapApiPetSitter(profile: ApiPetSitterProfileDto): PublicPetSitter {
   return {
     id: profile.id,
     firstName: profile.pseudo ?? profile.firstName,
@@ -371,10 +387,10 @@ function mapApiPetSitter(profile: ApiPetSitterProfileDto): PublicPetSitter {
       : "Zone approximative, adresse exacte masquée",
     latitude: profile.latitude ?? mapAreas.caen.viewport.latitude,
     longitude: profile.longitude ?? mapAreas.caen.viewport.longitude,
-    distanceLabel: "Zone proche",
-    rating: 4.8,
+    distanceLabel: "Distance non calculée",
+    rating: 0,
     reviewCount: 0,
-    basePriceCents: profile.basePriceCents ?? 2500,
+    basePriceCents: profile.basePriceCents ?? 0,
     priceUnit: "jour",
     responseTime: "À confirmer",
     availabilitySummary: "Disponibilités à vérifier",
@@ -388,10 +404,8 @@ function mapApiPetSitter(profile: ApiPetSitterProfileDto): PublicPetSitter {
     careLocations: profile.offer.careLocations,
     careFormats: profile.offer.careFormats,
     services: profile.offer.additionalServices,
-    imageUrl:
-      profile.photoUrl ??
-      "https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=1800&q=82",
-    imageAlt: "Pet-sitter avec un animal dans un intérieur lumineux",
+    imageUrl: profile.photoUrl ?? "/figma/assessment-dog.svg",
+    imageAlt: profile.photoUrl ? `Photo de ${profile.firstName}` : "Photo du pet-sitter indisponible",
     gallery: [],
   };
 }
@@ -400,7 +414,7 @@ function mergeLocalPetSitterProfile(
   petSitters: PublicPetSitter[],
   session: ReturnType<typeof useDemoSession>,
 ): PublicPetSitter[] {
-  if (!session?.enabledRoles?.includes("petSitter")) {
+  if (session?.source !== "fixture" || !session.enabledRoles?.includes("petSitter")) {
     return petSitters;
   }
 

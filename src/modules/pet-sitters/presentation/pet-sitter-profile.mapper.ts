@@ -65,6 +65,11 @@ export type PetSitterPublicProfileDto = Omit<
   badges: ReferenceItemDto[];
 };
 
+export type PublicPetSitterRow = Omit<
+  PetSitterProfileRow,
+  "telephone" | "adresse_ligne1" | "visibilite_publique"
+>;
+
 type OfferSpeciesRelation = {
   espece?: MaybeOneOrMany<{
     id_espece: string;
@@ -141,6 +146,14 @@ export const petSitterProfileSelect = `
   profil_pet_sitter_badge_public(actif,badge_public(id_badge_public,code_badge_public,libelle_badge_public))
 `;
 
+export const publicPetSitterProfileSelect = `
+  id_profil_pet_sitter,pseudo,prenom,photo_url,description,ville,pays,
+  latitude,longitude,tarif_base,rayon_km,statut_verification,date_creation,
+  profil_pet_sitter_espece,profil_pet_sitter_capacite_soin,
+  profil_pet_sitter_lieu_garde,profil_pet_sitter_format_garde,
+  profil_pet_sitter_service_additionnel,profil_pet_sitter_badge_public
+`;
+
 export function mapPetSitterProfileRow(
   row: PetSitterProfileRow,
 ): PetSitterPrivateProfileDto {
@@ -168,26 +181,24 @@ export function mapPetSitterProfileRow(
 }
 
 export function mapPetSitterPublicProfileRow(
-  row: PetSitterProfileRow,
+  row: PublicPetSitterRow,
 ): PetSitterPublicProfileDto {
-  const privateProfile = mapPetSitterProfileRow(row);
-
   return {
-    id: privateProfile.id,
-    pseudo: privateProfile.pseudo,
-    firstName: privateProfile.firstName,
-    photoUrl: privateProfile.photoUrl,
-    description: privateProfile.description,
-    city: privateProfile.city,
-    country: privateProfile.country,
-    latitude: toApproximateCoordinate(privateProfile.latitude),
-    longitude: toApproximateCoordinate(privateProfile.longitude),
-    basePriceCents: privateProfile.basePriceCents,
-    interventionRadiusKm: privateProfile.interventionRadiusKm,
-    verificationStatus: privateProfile.verificationStatus,
-    offer: privateProfile.offer,
+    id: row.id_profil_pet_sitter,
+    pseudo: row.pseudo,
+    firstName: row.prenom,
+    photoUrl: row.photo_url,
+    description: row.description,
+    city: row.ville,
+    country: row.pays,
+    latitude: toApproximateCoordinate(row.latitude),
+    longitude: toApproximateCoordinate(row.longitude),
+    basePriceCents: row.tarif_base === null ? null : Math.round(Number(row.tarif_base) * 100),
+    interventionRadiusKm: row.rayon_km,
+    verificationStatus: row.statut_verification,
+    offer: mapPetSitterOffer(row),
     badges: mapPublicBadges(row.profil_pet_sitter_badge_public ?? []),
-    createdAt: privateProfile.createdAt,
+    createdAt: row.date_creation,
     updatedAt: null,
   };
 }
@@ -200,7 +211,7 @@ function toApproximateCoordinate(value: number | null): number | null {
   return Math.round(value * 100) / 100;
 }
 
-function mapPetSitterOffer(row: PetSitterProfileRow): PetSitterPrivateProfileDto["offer"] {
+function mapPetSitterOffer(row: PublicPetSitterRow): PetSitterPrivateProfileDto["offer"] {
   return {
     species: (row.profil_pet_sitter_espece ?? []).flatMap((relation) => {
       const species = firstRelation(relation.espece);

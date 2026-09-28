@@ -1,7 +1,7 @@
 
 @media (min-width: 1024px) {
-  h1 {
-    font-size: clamp(4rem, 6vw, 6.7rem);
+  .hero-section h1 {
+    font-size: clamp(3rem, 4.4vw, 4.4rem);
   }
 
   .public-header {

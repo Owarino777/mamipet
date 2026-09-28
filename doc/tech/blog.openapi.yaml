@@ -1,0 +1,222 @@
+openapi: 3.1.0
+info:
+  title: MamiPet editorial API
+  version: 1.0.0
+servers:
+  - url: /api
+security:
+  - supabaseSession: []
+paths:
+  /admin/blog:
+    get:
+      summary: List private drafts (active administrators only)
+      security: [{ supabaseSession: [] }]
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, maximum: 4000, default: 1 }
+      responses:
+        "200":
+          description: Paginated draft list (20 per page)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - properties:
+                      data:
+                        type: object
+                        required: [articles, total]
+                        properties:
+                          articles:
+                            {
+                              type: array,
+                              items: { $ref: "#/components/schemas/Draft" },
+                            }
+                          total: { type: integer }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      summary: Create a private draft
+      security: [{ supabaseSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Document" }
+      responses:
+        "201": { $ref: "#/components/responses/Draft" }
+        default: { $ref: "#/components/responses/Error" }
+  /admin/blog/{articleId}:
+    parameters:
+      - $ref: "#/components/parameters/ArticleId"
+    get:
+      summary: Read a private draft
+      security: [{ supabaseSession: [] }]
+      responses:
+        "200": { $ref: "#/components/responses/Draft" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      summary: Save a draft only if its revision is still current
+      security: [{ supabaseSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [version, document]
+              properties:
+                version: { type: integer, minimum: 1 }
+                document: { $ref: "#/components/schemas/Document" }
+      responses:
+        "200": { $ref: "#/components/responses/Draft" }
+        default: { $ref: "#/components/responses/Error" }
+  /admin/blog/{articleId}/publication:
+    parameters:
+      - $ref: "#/components/parameters/ArticleId"
+    post:
+      summary: Atomically publish or withdraw the current revision
+      security: [{ supabaseSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [version, publish]
+              properties:
+                version: { type: integer, minimum: 1 }
+                publish: { type: boolean }
+      responses:
+        "200": { $ref: "#/components/responses/Draft" }
+        default: { $ref: "#/components/responses/Error" }
+  /admin/blog/images:
+    post:
+      summary: Upload a public editorial image (raw body, at most 4194304 bytes)
+      security: [{ supabaseSession: [] }]
+      requestBody:
+        required: true
+        content:
+          image/jpeg: { schema: { type: string, format: binary } }
+          image/png: { schema: { type: string, format: binary } }
+          image/webp: { schema: { type: string, format: binary } }
+      responses:
+        "201":
+          description: Public image URL
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - properties:
+                      data:
+                        type: object
+                        required: [url]
+                        properties:
+                          url: { type: string, format: uri }
+        default: { $ref: "#/components/responses/Error" }
+components:
+  securitySchemes:
+    supabaseSession:
+      type: apiKey
+      in: cookie
+      name: sb-project-ref-auth-token
+      description: Supabase SSR session; replace project-ref with the project reference. Cookies may be chunked. An active administrator account is required.
+  parameters:
+    ArticleId:
+      name: articleId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  responses:
+    Draft:
+      description: Saved draft, current revision and publication state
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/Envelope"
+              - properties:
+                  data: { $ref: "#/components/schemas/Draft" }
+    Error:
+      description: "400 invalid input; 401 session missing; 403 authorization/origin; 404 missing; 409 conflict; 413 body too large; 422 incomplete; 5xx technical failure. Responses are private, no-store."
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data, meta, error]
+            properties:
+              data: { type: "null" }
+              meta: { type: object }
+              error:
+                type: object
+                required: [code, message]
+                properties:
+                  code: { type: string }
+                  message: { type: string }
+                  details: { type: object }
+  schemas:
+    Envelope:
+      type: object
+      required: [data, meta, error]
+      properties:
+        data: {}
+        meta: { type: object }
+        error: { type: "null" }
+    Draft:
+      type: object
+      required: [id, document, version, publicSlug, updatedAt, publishedAt]
+      properties:
+        id: { type: string, format: uuid }
+        document: { $ref: "#/components/schemas/Document" }
+        version: { type: integer, minimum: 1 }
+        publicSlug: { type: [string, "null"] }
+        updatedAt: { type: string, format: date-time }
+        publishedAt: { type: [string, "null"], format: date-time }
+    Document:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          title,
+          slug,
+          excerpt,
+          authorName,
+          coverImageUrl,
+          coverImageAlt,
+          seoTitle,
+          seoDescription,
+          blocks,
+        ]
+      properties:
+        title: { type: string, maxLength: 160 }
+        slug:
+          {
+            type: string,
+            maxLength: 160,
+            pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          }
+        excerpt: { type: string, maxLength: 320 }
+        authorName: { type: string, maxLength: 100 }
+        coverImageUrl:
+          type: string
+          maxLength: 2048
+          description: Empty string or HTTPS URL inside this project's public blog-images bucket.
+        coverImageAlt: { type: string, maxLength: 250 }
+        seoTitle: { type: string, maxLength: 70 }
+        seoDescription: { type: string, maxLength: 170 }
+        blocks:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            additionalProperties: false
+            required: [type, text]
+            properties:
+              type: { type: string, enum: [paragraph, heading, quote, list] }
+              text:
+                type: string
+                maxLength: 8000
+                description: "Max characters by type: paragraph 8000, heading 180, quote 2000, list 4000. Lists contain one item per line."

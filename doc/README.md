@@ -1,5 +1,7 @@
 # Documentation MamiPet
 
+État de livraison : [préparation à l’ouverture](tech/PRODUCTION_READINESS.md). Pour le journal et la rédaction non technique : [guide du blog](tech/BLOG.md). Les documents de conception décrivent aussi des fonctions cibles encore à intégrer ; ils ne constituent pas un constat de fonctionnement du code actuel.
+
 Ce dossier regroupe la documentation de conception du projet MamiPet.
 
 ## Organisation

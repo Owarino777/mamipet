@@ -1,5 +1,13 @@
 # MamiPet
 
+> Statut de livraison : le paiement en ligne est désactivé. Les migrations `202609230001` à `202609230009` sont requises avant le déploiement du code actuel. Le parcours complet compte → avis n'est pas validé sur une instance Supabase réelle. Voir [préparation à l'ouverture](doc/tech/PRODUCTION_READINESS.md).
+
+## Journal et rédaction
+
+Le code du blog expose `/blog` et `/admin/blog` ; l'éditeur exige un **vrai compte administrateur Supabase**. Les tests locaux couvrent les brouillons, la publication et les permissions SQL. L'installation Auth/Storage distante reste à vérifier. [Guide d’utilisation et installation](doc/tech/BLOG.md).
+
+La CI vérifie le typage, le lint, les tests, le build et l’audit des dépendances. La commande locale est `npm run quality`. Les tests PostgreSQL éditoriaux fonctionnent sans Docker ni service payant.
+
 MamiPet est une marketplace de confiance pour la garde d'animaux. Le projet met en relation des propriétaires avec des pet-sitters qualifiés, avec un positionnement fort sur la sécurité, la vérification, les compétences et la prise en charge d'animaux sensibles : animaux âgés, sous traitement, handicapés, anxieux ou avec besoins spécifiques.
 
 La trajectoire du projet distingue clairement :
@@ -18,8 +26,8 @@ La trajectoire du projet distingue clairement :
 - Supabase PostgreSQL
 - Supabase Storage
 - Supabase RLS
-- Stripe Connect préparé, paiement MVP simulé en mode test
-- Google Maps API
+- Stripe Connect prévu, paiement en ligne désactivé
+- MapLibre GL JS et OpenFreeMap
 - Vercel
 - GitHub
 
@@ -86,7 +94,7 @@ Implémenté :
 - recherche publique des pet-sitters visibles ;
 - réservation directe propriétaire vers pet-sitter ;
 - acceptation, refus, annulation, blocage de créneau ;
-- paiement MVP simulé et génération de récapitulatif contractuel ;
+- logique de commission et tables paiement/contrat ; encaissement serveur et génération de contrat non opérationnels ;
 - avis après réservation terminée ;
 - réponse du pet-sitter à un avis ;
 - signalements généraux ou ciblés ;
@@ -94,22 +102,13 @@ Implémenté :
 - migrations Supabase initiales, policies RLS MVP et seeds référentiels ;
 - règles domaine unitaires pour réservation, paiement, qualification, avis et signalement.
 
-Configuration locale :
-
-- copier `.env.example` vers `.env.local` ;
-- renseigner `NEXT_PUBLIC_SUPABASE_URL` ;
-- renseigner `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ;
-- appliquer `supabase/migrations/202605020001_initial_schema.sql` sur le projet Supabase ;
-- appliquer `supabase/migrations/202605020002_pet_sitter_offer_access.sql` ;
-- appliquer `supabase/migrations/202605020003_reservation_flow_access.sql` ;
-- appliquer `supabase/migrations/202605020004_trust_admin_access.sql` ;
-- exécuter `supabase/seeds/001_reference_data.sql`.
+Configuration locale : voir [Installation et vérification](#installation-et-vérification). Appliquer **toutes** les migrations dans l'ordre de leur nom sur une base neuve, puis `supabase/seeds/001_reference_data.sql` séparément. Sur une base préexistante, rapprocher d'abord l'historique SQL ; `db:apply` refuse de réappliquer aveuglément le schéma.
 
 À faire ensuite :
 
 - documents Storage réels ;
 - Stripe Connect réel après la simulation MVP ;
-- Google Maps côté recherche ;
+- géocodage et requêtes géographiques réels ; la carte utilise MapLibre/OpenFreeMap ;
 - tests d'intégration authentifiés sur Supabase.
 
 ## Routes API MVP
@@ -207,32 +206,29 @@ Documents essentiels avant implémentation :
 - Un compte peut avoir un profil propriétaire, un profil pet-sitter, ou les deux.
 - Les données médicales et documents sont privés par défaut.
 - Les statuts de réservation et de paiement sont séparés.
-- Le paiement MVP est simulé/test, Stripe Connect reste préparé.
+- Le paiement serveur est fermé ; la simulation UI est locale et ne confirme aucun paiement.
 - La commission plateforme MVP est de 15 %.
 - Le front consomme des DTO, jamais les tables brutes.
 - Toute sécurité doit être portée côté backend, SQL/RLS et services serveur.
 
-## Initialisation future
+## Installation et vérification
 
-Le socle applicatif est initialisé avec Next.js, TypeScript strict, Vitest,
-une première migration Supabase et les scripts qualité.
-
-Commandes utiles :
+Prérequis : Node.js `>=22.13`, npm et un projet Supabase de **test** pour exercer Auth, PostgreSQL et Storage. Copier `.env.example` vers `.env.local` et définir `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` et `NEXT_PUBLIC_APP_URL`. `SUPABASE_DB_URL` sert uniquement au script d'application des migrations ; aucune clé service rôle n'est requise au fonctionnement de l'application. Ne pas committer `.env.local`.
 
 ```bash
-npm install
-npm run dev
+npm ci
 npm run typecheck
 npm run lint
 npm test
+npm run coverage
 npm run build
+npm run quality
+npm run dev
 ```
 
-À finaliser ensuite :
+Sous PowerShell, utiliser `npm.cmd` si la politique locale bloque `npm.ps1`. Sur une base **vide**, `npm run db:apply` applique les migrations triées avec suivi par empreinte SHA-256 ; le seed `supabase/seeds/001_reference_data.sql` est séparé et doit être appliqué explicitement. Sur une base déjà créée, vérifier la liste des migrations exécutées avant d'utiliser ce script. Le seed éditorial local optionnel est `npm run db:seed:local-blog` et ne doit pas viser la production. La CI dans `.github/workflows/quality.yml` lance installation, typage, lint, tests, build et audit npm ; elle n'exécute pas les migrations distantes.
 
-- pipeline CI minimal ;
-- upload binaire Storage réel pour documents animaux et documents pros ;
-- tests d'intégration authentifiés avec comptes Supabase de démonstration.
+Le rapport de couverture inclut tout `src/**/*.{ts,tsx}` et mesure des lignes non couvertes dans les écrans et Route Handlers. Les tests PostgreSQL embarqués ne remplacent pas une recette Supabase Auth/Storage. Voir [audit de consolidation](doc/audits/CONSOLIDATION_JALON_3_2026-09-29.md) et [ADR 003](doc/tech/ADR_003_CONSOLIDATION_JALON_3.md).
 
 ## Maintenance documentaire
 

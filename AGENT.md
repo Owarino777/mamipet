@@ -1,5 +1,7 @@
 # AGENT.md - Règles de contribution IA/dev pour MamiPet
 
+> Ce fichier décrit les règles métier et l'architecture cible. Pour l'état réellement vérifié du code et les limites du paiement/Storage, consulter [l'audit Jalon 3](doc/audits/CONSOLIDATION_JALON_3_2026-09-29.md).
+
 Ce fichier cadre le travail de toute IA ou développeur intervenant sur MamiPet. Il doit être lu avant toute implémentation.
 
 ## 1. Mission du projet
@@ -52,7 +54,7 @@ Stack retenue :
 - Supabase Storage ;
 - RLS ;
 - Stripe Connect préparé mais paiement MVP simulé/test ;
-- Google Maps API ;
+- MapLibre GL JS + OpenFreeMap pour la carte actuelle ; Google Maps reste une option cible ;
 - Vercel.
 
 Architecture cible :

@@ -1,5 +1,7 @@
 # MamiPet - Document complet de comprehension et de passation
 
+> Référence de conception historique et cible. Pour distinguer les fonctionnalités réellement vérifiées du modèle, lire [l'audit de consolidation](audits/CONSOLIDATION_JALON_3_2026-09-29.md) et [ADR 003](tech/ADR_003_CONSOLIDATION_JALON_3.md).
+
 Ce document sert de référence projet pour la suite du travail sur MamiPet. Il explique le produit, le contexte, les choix techniques, les règles métier, le modèle de données cible et l'ordre de travail attendu pour poursuivre proprement la modélisation, les UML et le backend.
 
 Il doit être lu avec les schémas suivants :

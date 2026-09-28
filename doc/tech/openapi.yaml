@@ -3,9 +3,11 @@ info:
   title: MamiPet MVP API
   version: 0.1.0
   description: >
-    Contrat REST du MVP MamiPet. L'API est implementee via Next.js Route
-    Handlers. Supabase Auth gere l'authentification. Les donnees sensibles ne
-    doivent jamais etre exposees dans les DTO publics.
+    Contrat cible du MVP MamiPet. Plusieurs routes de paiement, contrat et
+    documents animaux decrites ici ne sont pas implementees. Les routes
+    Checkout actuelles repondent 409. Voir PRODUCTION_READINESS.md et les
+    Route Handlers pour le comportement effectivement disponible. Supabase
+    Auth gere l'authentification ; les DTO publics excluent les donnees privees.
 servers:
   - url: http://localhost:3000/api
     description: Local development
@@ -27,6 +29,14 @@ tags:
 security:
   - bearerAuth: []
 paths:
+  /admin/blog:
+    $ref: './blog.openapi.yaml#/paths/~1admin~1blog'
+  /admin/blog/{articleId}:
+    $ref: './blog.openapi.yaml#/paths/~1admin~1blog~1{articleId}'
+  /admin/blog/{articleId}/publication:
+    $ref: './blog.openapi.yaml#/paths/~1admin~1blog~1{articleId}~1publication'
+  /admin/blog/images:
+    $ref: './blog.openapi.yaml#/paths/~1admin~1blog~1images'
   /me:
     get:
       tags: [Me]
@@ -821,6 +831,8 @@ paths:
 
 components:
   securitySchemes:
+    supabaseSession:
+      $ref: './blog.openapi.yaml#/components/securitySchemes/supabaseSession'
     bearerAuth:
       type: http
       scheme: bearer

@@ -1,5 +1,7 @@
 # Audit de conformité MamiPet
 
+> Archive de l'audit du 23 avril 2026, antérieure aux migrations et au code consolidés en septembre. Pour les preuves du repository actuel, voir [CONSOLIDATION_JALON_3_2026-09-29.md](CONSOLIDATION_JALON_3_2026-09-29.md).
+
 Date : 2026-04-23
 Version : 2.0 - Audit complet base sur le dossier de synthese final (partie dev sections 6 a 8)
 

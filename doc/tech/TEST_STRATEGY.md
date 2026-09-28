@@ -1,5 +1,11 @@
 # Stratégie de tests
 
+## Vérifications ajoutées au code actuel
+
+`npm test` comprend les tests métier, les frontières HTTP et les tests PostgreSQL embarqués des migrations éditoriales 006/007. [QA_BLOG.md](QA_BLOG.md) décrit le parcours navigateur sur transport simulé. Le workflow `.github/workflows/quality.yml` lance typage, lint, tests, build et audit npm sur push/PR, sans secrets. Il ne déploie rien. Les scénarios distants Auth/Storage et le parcours complet de réservation restent à valider ; la liste cible ci-dessous ne signifie pas qu’ils sont déjà testés.
+
+`npm run coverage` mesure l'ensemble de `src/**/*.{ts,tsx}` avec Vitest V8 (lines, statements, branches, functions), sans seuil arbitraire. Les tests PostgreSQL couvrent aussi la projection publique des pet-sitters et des refus directs pour animal, dossier médical, acceptation de réservation, document et avis. Les chiffres et limites de la mesure figurent dans [l'audit de consolidation](../audits/CONSOLIDATION_JALON_3_2026-09-29.md).
+
 La stratégie de tests MamiPet est progressive, centree sur les règles métier critiques et le flux de réservation directe.
 
 ## 1. Objectifs

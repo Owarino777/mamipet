@@ -1,5 +1,9 @@
 # Contrats API REST
 
+> Ce catalogue contient aussi des routes **cibles non implémentées**. Pour le comportement du code actuel, consulter les Route Handlers dans `src/app/api`. En particulier, `POST /api/reservations/{reservationId}/pay` et `POST /api/demo-payments/checkout` répondent `409` ; les routes `payment-intent`, `payment-confirmation`, `payment` et `contract` ci-dessous n'existent pas encore.
+
+Les routes éditoriales effectivement implémentées sont décrites dans [BLOG.md](BLOG.md) et [blog.openapi.yaml](blog.openapi.yaml). Elles utilisent les cookies Supabase SSR, les contrôles administrateur côté serveur et des copies publiques séparées des brouillons.
+
 Les routes API sont en anglais. Les contrats REST sont la source stable pour intégrer le futur front.
 
 Base path : `/api`

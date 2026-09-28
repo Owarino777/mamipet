@@ -1,5 +1,7 @@
 # UML MamiPet
 
+Ces diagrammes représentent le **parcours cible**. Les séquences Stripe, contrat et Storage ne décrivent pas le code déployable actuel ; consulter [ADR 003](../tech/ADR_003_CONSOLIDATION_JALON_3.md) pour l'écart constaté.
+
 Ces diagrammes UML sont dérivés de `../PASSATION_PROJET_MAMIPET.md` et des schémas Merise présents dans `../merise/`.
 
 Ils suivent les principes UML 2.5.1 : séparation entre structure et comportement, acteurs explicites, états métier distincts des statuts techniques, et diagrammes de sequence centres sur les responsabilités.

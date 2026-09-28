@@ -1,5 +1,9 @@
 # Documentation technique MamiPet
 
+## État du code actuel
+
+La description cible ci-dessous ne vaut pas validation de production. Voir [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) pour les écarts des parcours existants. Le paiement reste désactivé ; la carte actuelle utilise MapLibre et OpenFreeMap. Le journal et son éditeur administrateur sont documentés dans [BLOG.md](BLOG.md), avec [la décision d’architecture](ADR_002_BLOG.md), [le contrat REST](blog.openapi.yaml) et [la recette navigateur](QA_BLOG.md).
+
 Ce dossier contient les documents a lire avant d'implémenter le backend MamiPet.
 
 Les décisions retenues sont les suivantes :
@@ -9,7 +13,7 @@ Les décisions retenues sont les suivantes :
 - Supabase pour Auth, PostgreSQL, Storage et RLS ;
 - API REST via `app/api/.../route.ts` pour fournir des contrats stables au front ;
 - Server Actions autorisées uniquement pour des besoins UI internes, jamais comme contrat principal ;
-- Stripe Connect préparé dans le modèle, paiement MVP simulé en mode test ;
+- Stripe Connect prévu dans le modèle, paiement en ligne désactivé ;
 - code, routes API, DTO et noms techniques en anglais ;
 - documentation métier en français.
 

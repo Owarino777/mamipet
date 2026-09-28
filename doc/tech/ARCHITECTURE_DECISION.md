@@ -1,5 +1,7 @@
 # Décision d'architecture
 
+> Ce document décrit la cible et les choix initiaux. L'état implémenté et les écarts de sécurité/paiement sont précisés dans [ADR 003](ADR_003_CONSOLIDATION_JALON_3.md) et [Préparation à l'ouverture](PRODUCTION_READINESS.md). Le paiement serveur et le stockage privé de documents ne sont pas opérationnels.
+
 ## 1. Décision retenue
 
 Le MVP applicatif MamiPet est implémenté dans un seul repository avec :

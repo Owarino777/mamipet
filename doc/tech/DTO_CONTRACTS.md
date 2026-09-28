@@ -1,5 +1,7 @@
 # Contrats DTO
 
+> Les types ci-dessous comprennent des contrats cibles. La vue SQL `pet_sitter_public_profile` définit maintenant la frontière de lecture publique ; le DTO HTTP ne constitue pas à lui seul un contrôle d'accès. Les DTO de paiement et de contrat ne sont pas disponibles dans un parcours serveur complet.
+
 Les DTO sont les objets renvoyes au front. Ils ne doivent pas exposer les tables brutes.
 
 Conventions :

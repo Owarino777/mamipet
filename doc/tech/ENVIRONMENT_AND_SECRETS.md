@@ -1,5 +1,7 @@
 # Environnement et secrets
 
+Pour l'application et le blog, les variables publiques Supabase et `NEXT_PUBLIC_APP_URL` suffisent au démarrage ; aucune clé service rôle n’est utilisée par les Route Handlers. `SUPABASE_DB_URL` sert aux migrations sur une base de test. Le bucket `blog-images` est public et réservé aux images éditoriales. Configurer `/auth/callback` dans les URL autorisées de Supabase Auth pour la récupération du mot de passe. Voir [BLOG.md](BLOG.md). Les paramètres Stripe/Google Maps ci-dessous appartiennent à la cible historique : le paiement est fermé et la carte actuelle utilise MapLibre/OpenFreeMap.
+
 Ce document liste les variables et règles de gestion des secrets pour le MVP MamiPet.
 
 ## 1. Environnements
@@ -111,32 +113,7 @@ Accès public interdit par défaut.
 
 ## 5. Stripe
 
-MVP :
-
-- paiement test via Stripe Checkout ;
-- Stripe Connect préparé ;
-- onboarding Connect complet non prioritaire ;
-- les références Stripe sont stockees dans les paiements.
-
-En local, renseigner au minimum :
-
-```env
-STRIPE_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-Carte de test Stripe utile :
-
-```txt
-4242 4242 4242 4242
-date future
-CVC quelconque
-```
-
-Le parcours démo crée une session Stripe Checkout et revient sur
-`/dashboard?demoCheckout=success&bookingId=...` pour marquer la réservation
-locale comme payée. En production, la confirmation serveur finale doit passer
-par un webhook Stripe signé avec `STRIPE_WEBHOOK_SECRET`.
+Les routes Checkout répondent actuellement `409`. Une redirection de retour ne valide aucun paiement. `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONNECT_CLIENT_ID`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` et `PAYMENT_MODE` dans `.env.example` sont des emplacements réservés à la future intégration, pas des prérequis de démarrage. La simulation visible dans certains écrans reste locale. Avant toute activation : définir les comptes Connect et les conditions de versement, vérifier les webhooks signés, gérer les événements idempotents et tester les remboursements. Voir [ADR 003](ADR_003_CONSOLIDATION_JALON_3.md).
 
 Statuts paiement :
 

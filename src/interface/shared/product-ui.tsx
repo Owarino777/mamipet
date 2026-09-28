@@ -5,9 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type React from "react";
-import { demoPetSitters, type PublicPetSitter, type ReferenceTag } from "./product-data";
+import {
+  demoPetSitters,
+  type PublicPetSitter,
+  type ReferenceTag,
+} from "./product-data";
 import { formatEuro, formatRating } from "./format";
 import { PublicHeaderAuthAction } from "./public-auth-client";
+import { useDemoSession } from "./demo-session-client";
 
 type ShellProps = {
   children: React.ReactNode;
@@ -16,7 +21,11 @@ type ShellProps = {
 
 export function PublicShell({ children, compact = false }: ShellProps) {
   return (
-    <div className={compact ? "public-shell public-shell--compact" : "public-shell"}>
+    <div
+      className={
+        compact ? "public-shell public-shell--compact" : "public-shell"
+      }
+    >
       <PublicHeader />
       {children}
     </div>
@@ -25,6 +34,11 @@ export function PublicShell({ children, compact = false }: ShellProps) {
 
 export function PublicHeader() {
   const pathname = usePathname();
+  const session = useDemoSession();
+  const isPetSitter = session?.activeRole === "petSitter";
+  const searchLabel = isPetSitter
+    ? "Demandes de garde"
+    : "Rechercher un pet-sitter";
   const isSearchPage = pathname.startsWith("/pet-sitters");
   const isBecomePage = pathname === "/register";
 
@@ -34,31 +48,57 @@ export function PublicHeader() {
         <span className="brand-symbol" aria-hidden="true">
           M
         </span>
-        <span>Mami<span>Pet</span></span>
+        <span>
+          Mami<span>Pet</span>
+        </span>
       </Link>
       <nav className="public-nav" aria-label="Navigation principale">
+        <Link
+          href="/blog"
+          aria-current={pathname.startsWith("/blog") ? "page" : undefined}
+        >
+          Conseils
+        </Link>
         <Link
           className={isSearchPage ? "active" : undefined}
           href="/pet-sitters"
           aria-current={isSearchPage ? "page" : undefined}
         >
-          Rechercher un pet-sitter
+          {searchLabel}
         </Link>
-        <Link
-          className={isBecomePage ? "active" : undefined}
-          href="/register"
-          aria-current={isBecomePage ? "page" : undefined}
-        >
-          Devenir pet-sitter
-        </Link>
+        {!isPetSitter ? (
+          <Link
+            className={isBecomePage ? "active" : undefined}
+            href="/register"
+            aria-current={isBecomePage ? "page" : undefined}
+          >
+            Devenir pet-sitter
+          </Link>
+        ) : null}
       </nav>
+      <details className="public-mobile-menu">
+        <summary>Menu</summary>
+        <nav aria-label="Navigation mobile">
+          <Link href="/blog">Conseils</Link>
+          <Link href="/pet-sitters">{searchLabel}</Link>
+          {!isPetSitter ? (
+            <Link href="/register">Devenir pet-sitter</Link>
+          ) : null}
+          <PublicHeaderAuthAction />
+        </nav>
+      </details>
       <div className="header-actions">
         <PublicHeaderAuthAction />
-        <Link className="ghost-button" href="/register">
-          Inscription
-        </Link>
-        <Link className="primary-button primary-button--small" href="/pet-sitters">
-          Rechercher
+        {!session ? (
+          <Link className="ghost-button" href="/register">
+            Inscription
+          </Link>
+        ) : null}
+        <Link
+          className="primary-button primary-button--small"
+          href="/pet-sitters"
+        >
+          {isPetSitter ? "Demandes" : "Rechercher"}
         </Link>
       </div>
     </header>
@@ -71,7 +111,11 @@ type ButtonLinkProps = {
   variant?: "primary" | "secondary" | "ghost";
 };
 
-export function ButtonLink({ href, children, variant = "primary" }: ButtonLinkProps) {
+export function ButtonLink({
+  href,
+  children,
+  variant = "primary",
+}: ButtonLinkProps) {
   const className =
     variant === "primary"
       ? "primary-button"
@@ -128,10 +172,11 @@ export function PublicPetSitterCard({
                 {petSitter.firstName} {petSitter.lastInitial}
               </h3>
               <p>
-                {formatRating(petSitter.rating)} / 5 · {petSitter.reviewCount} avis ·{" "}
-                {petSitter.city}
+                {petSitter.reviewCount > 0
+                  ? `${formatRating(petSitter.rating)} / 5 · ${petSitter.reviewCount} avis`
+                  : "Aucun avis publié"} · {petSitter.city}
               </p>
-              <p>{petSitter.approximateAddress}</p>
+              {layout === "grid" ? <p>{petSitter.approximateAddress}</p> : null}
             </div>
           </div>
           <div className="badge-row">
@@ -163,13 +208,19 @@ export function PublicPetSitterCard({
           <div className="sitter-card__footer">
             <span>{petSitter.availabilitySummary}</span>
             <strong>
-              Dès {formatEuro(petSitter.basePriceCents)} / {petSitter.priceUnit}
+              {petSitter.basePriceCents > 0
+                ? `Dès ${formatEuro(petSitter.basePriceCents)} / ${petSitter.priceUnit}`
+                : "Tarif à confirmer"}
             </strong>
           </div>
-          <span className="secondary-button sitter-card__cta">Voir le profil</span>
+          <span className="secondary-button sitter-card__cta">
+            Voir le profil
+          </span>
         </div>
       </Link>
-      <FavoriteButton petSitterName={`${petSitter.firstName} ${petSitter.lastInitial}`} />
+      <FavoriteButton
+        petSitterName={`${petSitter.firstName} ${petSitter.lastInitial}`}
+      />
     </article>
   );
 }
@@ -195,15 +246,25 @@ function FavoriteButton({ petSitterName }: { petSitterName: string }) {
 }
 
 export function PetSitterVisual({ petSitter }: { petSitter: PublicPetSitter }) {
+  const [imageFailed, setImageFailed] = useState(false);
+
   return (
-    <div className="pet-visual">
-      <Image
-        src={petSitter.imageUrl}
-        alt={petSitter.imageAlt}
-        fill
-        sizes="(max-width: 760px) 100vw, (max-width: 1180px) 50vw, 33vw"
-        priority={petSitter.id === "sarah-johnson"}
-      />
+    <div className={imageFailed ? "pet-visual pet-visual--fallback" : "pet-visual"}>
+      {imageFailed ? (
+        <div className="pet-visual__fallback" role="img" aria-label="Photo indisponible">
+          <span aria-hidden="true">M</span>
+          <small>Photo indisponible</small>
+        </div>
+      ) : (
+        <Image
+          src={petSitter.imageUrl}
+          alt={petSitter.imageAlt}
+          fill
+          sizes="(max-width: 760px) 100vw, (max-width: 1180px) 50vw, 33vw"
+          priority={petSitter.id === "sarah-johnson"}
+          onError={() => setImageFailed(true)}
+        />
+      )}
     </div>
   );
 }
@@ -237,7 +298,9 @@ export function ApproximateMap({
   const mapCenter = getApproximateMapCenter(visiblePetSitters);
 
   return (
-    <div className={compact ? "map-preview map-preview--compact" : "map-preview"}>
+    <div
+      className={compact ? "map-preview map-preview--compact" : "map-preview"}
+    >
       <iframe
         title="Carte approximative des pet-sitters"
         src={getApproximateMapSrc(mapCenter)}
@@ -251,7 +314,7 @@ export function ApproximateMap({
           key={petSitter.id}
           aria-label={`Voir le profil de ${petSitter.firstName} ${petSitter.lastInitial}`}
         >
-          {formatEuro(petSitter.basePriceCents)}
+          {petSitter.basePriceCents > 0 ? formatEuro(petSitter.basePriceCents) : "Tarif ?"}
         </Link>
       ))}
       <Link className="map-preview__open" href="/pet-sitters">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   DemoSessionGreeting,
   type DemoSession,
@@ -21,7 +21,6 @@ import { DogAssessmentHeadIcon } from "@/interface/app/dog-assessment-head-icon"
 import {
   BookingDocumentsPanel,
   BookingHistoryList,
-  MetricCard,
   PetSitterPayoutPanel,
 } from "@/interface/app/connected/workspace-components";
 import { RabbitExpertHeadIcon } from "@/interface/app/rabbit-expert-head-icon";
@@ -61,6 +60,10 @@ export function PetSitterDashboardPage() {
   const dashboardBadges = getPetSitterAchievementBadges(session);
   const unlockedBadges = dashboardBadges.filter((badge) => badge.isUnlocked);
   const hasPremiumInsurance = session?.petSitterSubscriptionPlan === "premium";
+  const completedBookings = petSitterBookings.filter((booking) => booking.status === "completed").length;
+  const payableBookings = petSitterBookings.filter((booking) =>
+    booking.status === "paid" || booking.status === "completed" || booking.status === "incident_reported",
+  );
 
   const blockedContent = useRoleAccess("petSitter");
 
@@ -70,7 +73,7 @@ export function PetSitterDashboardPage() {
 
   return (
     <ConnectedShell role="Pet-sitter" active="Tableau de bord">
-      <main className="workspace-main">
+      <main className="workspace-main pet-sitter-dashboard">
         <div className="workspace-heading">
           <div>
             <DemoSessionGreeting
@@ -78,34 +81,19 @@ export function PetSitterDashboardPage() {
               fallbackName="Sarah"
             />
 
-            <h1>Votre activité de garde est prête.</h1>
+            <h1>Votre activité</h1>
           </div>
 
-          <ButtonLink href="/pet-sitter/dashboard">
-            Modifier mon profil
+          <ButtonLink href="/pet-sitter/onboarding">
+            Gérer mes tests et services
           </ButtonLink>
         </div>
 
-        <section className="workspace-grid workspace-grid--four">
-          <MetricCard
-            title="Complétion profil"
-            value="85 %"
-            detail="Encore quelques documents"
-          />
-
-          <MetricCard
-            title="Statut"
-            value="Vérifiée"
-            detail="Identité validée"
-          />
-
-          <MetricCard title="Réponse" value="98 %" detail="Temps moyen : 1 h" />
-
-          <MetricCard
-            title="Demandes actives"
-            value={String(activeRequests.length)}
-            detail={`${acceptedCount} acceptée(s)`}
-          />
+        <section className="pet-sitter-overview" aria-label="Votre activité en chiffres">
+          <div><strong>{activeRequests.length}</strong><span>Demandes actives</span></div>
+          <div><strong>{acceptedCount}</strong><span>Acceptées</span></div>
+          <div><strong>{completedBookings}</strong><span>Gardes terminées</span></div>
+          <div><strong>{session?.petSitterValidatedTests?.length ?? 0}</strong><span>Tests validés</span></div>
         </section>
 
         <section className="workspace-grid">
@@ -186,21 +174,21 @@ export function PetSitterDashboardPage() {
           </article>
         </section>
 
-        <section className="workspace-grid">
-          <PetSitterPayoutPanel bookings={petSitterBookings} />
+        {petSitterBookings.length > 0 ? <section className="workspace-grid">
+          {payableBookings.length > 0 ? <PetSitterPayoutPanel bookings={petSitterBookings} /> : null}
 
-          <BookingDocumentsPanel
+          {payableBookings.length > 0 ? <BookingDocumentsPanel
             bookings={petSitterBookings}
             petById={petById}
             title="Documents de mission"
-          />
+          /> : null}
 
           <BookingHistoryList
             bookings={petSitterBookings}
             petById={petById}
             title="Historique pet-sitter"
           />
-        </section>
+        </section> : null}
 
         {isBadgePanelOpen ? (
           <AchievementBadgeDialog
@@ -237,6 +225,24 @@ function AchievementBadgeDialog({
   onClose: () => void;
 }) {
   const unlockedCount = badges.filter((badge) => badge.isUnlocked).length;
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeButtonRef.current?.focus();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+      if (event.key === "Tab") {
+        event.preventDefault();
+        closeButtonRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      previousFocus?.focus();
+    };
+  }, [onClose]);
 
   return (
     <div className="achievement-dialog-backdrop" role="presentation">
@@ -245,17 +251,18 @@ function AchievementBadgeDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="achievement-dialog-title"
+        aria-describedby="achievement-dialog-description"
       >
         <div className="achievement-dialog__header">
           <div>
             <p className="section-kicker">Succès pet-sitter</p>
             <h2 id="achievement-dialog-title">Badges débloqués</h2>
-            <p>
+            <p id="achievement-dialog-description">
               {unlockedCount} badge(s) obtenu(s) sur {badges.length}. Les badges
               non validés restent grisés.
             </p>
           </div>
-          <button className="ghost-button" type="button" onClick={onClose}>
+          <button ref={closeButtonRef} className="ghost-button" type="button" onClick={onClose}>
             Fermer
           </button>
         </div>
@@ -363,10 +370,10 @@ function getPetSitterAchievementBadges(
 
   return [
     {
-      description: "Compte pet-sitter activé et identité renseignée.",
+      description: "Profil pet-sitter publié.",
       id: "identity",
       isUnlocked: true,
-      label: "Identité vérifiée",
+      label: "Profil actif",
     },
     {
       description: "Formule professionnelle avec assurance premium incluse.",

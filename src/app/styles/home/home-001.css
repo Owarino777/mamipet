@@ -16,7 +16,7 @@
   display: grid;
   width: 100%;
   max-width: none;
-  min-height: clamp(400px, calc(100vh - 170px), 960px);
+  min-height: clamp(440px, 54vh, 620px);
   align-items: start;
   overflow: hidden;
   isolation: isolate;
@@ -28,9 +28,9 @@
   position: relative;
   z-index: 1;
   display: grid;
-  gap: 22px;
-  max-width: 820px;
-  padding-top: clamp(50px, 8vh, 110px);
+  gap: 20px;
+  max-width: 700px;
+  padding-top: clamp(54px, 8vh, 96px);
   padding-bottom: 20px;
 }
 
@@ -60,4 +60,10 @@
   border-radius: 48% 52% 0 0 / 62% 58% 0 0;
   background: rgb(246 244 238 / 96%);
   content: none;
+}
+
+.hero-section h1 {
+  max-width: 690px;
+  font-size: clamp(2.6rem, 4.6vw, 4rem);
+  line-height: 1.07;
 }

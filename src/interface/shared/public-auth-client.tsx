@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { createSupabaseBrowserClient } from "@/shared/supabase/browser-client";
-import { clearDemoSession } from "./demo-session-client";
 
 type MeResponse = {
     data: {
@@ -99,22 +98,5 @@ export function PublicHeaderAuthAction() {
         );
     }
 
-    return (
-        <div className="demo-session-pill">
-            <Link href={dashboardHref}>
-                <span>{session.user.email ?? "Compte connecté"}</span>
-                <small>Session sécurisée</small>
-            </Link>
-            <button
-                type="button"
-                onClick={() => {
-                    void supabase.auth.signOut();
-                    clearDemoSession();
-                    setDashboardHref("/dashboard");
-                }}
-            >
-                Déconnexion
-            </button>
-        </div>
-    );
+    return <Link className="ghost-button" href={dashboardHref}>Mon espace</Link>;
 }

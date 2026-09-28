@@ -92,12 +92,7 @@ export function PetSitterOnboardingPage() {
   const activeAssessmentIsLastQuestion =
     activeAssessmentTrack !== undefined &&
     activeAssessmentQuestionIndex === activeAssessmentTrack.questions.length - 1;
-  const resolvedOnboardingPhase =
-    session?.petSitterProfileStatus === "published" ||
-      sessionValidatedTests.length > 0 ||
-      setupSelectedTests.length > 0
-      ? "tests"
-      : "setup";
+  const resolvedOnboardingPhase = onboardingPreferences ? "tests" : "setup";
   const onboardingPhase = localOnboardingPhase ?? resolvedOnboardingPhase;
 
   async function handleStartTests() {
@@ -279,6 +274,11 @@ export function PetSitterOnboardingPage() {
               void handleStartTests();
             }}
           >
+            <div className="pet-sitter-setup-intro">
+              <p className="section-kicker">Profil pet-sitter</p>
+              <h1>Configurer vos gardes</h1>
+              <p>Choisissez vos services et les animaux que vous souhaitez garder.</p>
+            </div>
             <fieldset className="pet-sitter-setup-group">
               <legend id="pet-sitter-setup-title">
                 Quelles gardes

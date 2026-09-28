@@ -24,7 +24,7 @@
 
 .login-logo {
   display: block;
-  width: clamp(15.1rem, 74vw, 22.5rem);
+  width: clamp(13.5rem, 60vw, 18rem);
   filter: drop-shadow(0 0.28rem 0.15rem rgb(3 64 207 / 6%));
 }
 

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   activateDemoSessionRole,
@@ -43,6 +43,8 @@ export function ConnectedShell({
   children: React.ReactNode;
 }) {
   const session = useDemoSession();
+  const [sessionError, setSessionError] = useState("");
+  const [verified, setVerified] = useState(false);
 
   const router = useRouter();
 
@@ -52,36 +54,22 @@ export function ConnectedShell({
 
   const sessionEnabledRolesKey = session?.enabledRoles?.join("|") ?? "";
 
+  function handleSignOut() {
+    const supabase = createSupabaseBrowserClient();
+    void supabase.auth.signOut();
+    clearDemoSession();
+    router.push("/login");
+  }
+
   useEffect(() => {
     let isMounted = true;
 
     const supabase = createSupabaseBrowserClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") { setVerified(false); clearDemoSession(); router.replace("/login"); router.refresh(); }
+    });
 
     const renderedRole = getWorkspaceKindFromRoleLabel(role);
-
-    const isPetSitterActivationPage =
-      renderedRole === "petSitter" && active === "Tests & profil";
-
-    if (session?.source === "local" && isPetSitterActivationPage) {
-      if (!sessionEnabledRolesKey.split("|").includes("petSitter")) {
-        activateDemoSessionRole("petSitter");
-      } else if (sessionActiveRole !== "petSitter") {
-        switchDemoSessionRole("petSitter");
-      }
-
-      return;
-    }
-
-    if (
-      session?.source === "local" &&
-      sessionEnabledRolesKey.split("|").includes(renderedRole)
-    ) {
-      if (sessionActiveRole !== renderedRole) {
-        switchDemoSessionRole(renderedRole);
-      }
-
-      return;
-    }
 
     void supabase.auth
 
@@ -90,11 +78,13 @@ export function ConnectedShell({
       .then(async ({ data }) => {
         const user = data.user;
 
-        if (!isMounted || !user?.email) {
-          return;
-        }
+        if (!isMounted) return;
+        if (!user?.email) { clearDemoSession(); router.replace("/login"); return; }
 
         const sessionProfile = await resolveSessionProfile(renderedRole);
+        if (!isMounted) return;
+        setVerified(true);
+        setSessionError("");
 
         const roleKind = sessionProfile.activeRole;
 
@@ -116,7 +106,8 @@ export function ConnectedShell({
           session?.source === "local" &&
           session.id === nextSession.id &&
           session.name === nextSession.name &&
-          session.route === nextSession.route
+          session.route === nextSession.route &&
+          sessionEnabledRolesKey === nextSession.enabledRoles.join("|")
         ) {
           return;
         }
@@ -127,11 +118,12 @@ export function ConnectedShell({
       })
 
       .catch(() => {
-        // Connected demo state remains usable when Supabase is unavailable locally.
+        if (isMounted) { setVerified(false); setSessionError("Impossible de vérifier votre session. Rechargez la page pour réessayer."); }
       });
 
     return () => {
       isMounted = false;
+      subscription.unsubscribe();
     };
   }, [
     active,
@@ -149,6 +141,7 @@ export function ConnectedShell({
     session?.route,
 
     session?.source,
+    router,
   ]);
 
   return (
@@ -192,7 +185,7 @@ export function ConnectedShell({
           </div>
         ) : null}
 
-        <nav aria-label="Navigation espace connecté">
+        <nav className="connected-desktop-nav" aria-label="Navigation espace connecté">
           {links.map(([label, href]) => (
             <Link
               className={active === label ? "active" : ""}
@@ -204,36 +197,33 @@ export function ConnectedShell({
           ))}
         </nav>
 
-        {session ? (
-          <div className="connected-sidebar-actions">
-            <button
-              className="secondary-button"
-              type="button"
-              onClick={() => demoWorkspaceActions.reset()}
-            >
-              Réinitialiser l&apos;espace
-            </button>
+        <details className="connected-mobile-nav">
+          <summary><span>{active}</span><span>Menu</span></summary>
+          <nav aria-label="Navigation espace connecté">
+            {links.map(([label, href]) => (
+              <Link className={active === label ? "active" : ""} href={href} key={href}>
+                {label}
+              </Link>
+            ))}
+          </nav>
+          {session ? <ConnectedAccountActions active={active} onSignOut={handleSignOut} /> : null}
+        </details>
 
-            <button
-              className="ghost-button"
-              type="button"
-              onClick={() => {
-                const supabase = createSupabaseBrowserClient();
-
-                void supabase.auth.signOut();
-
-                clearDemoSession();
-
-                router.push("/login");
-              }}
-            >
-              Déconnexion
-            </button>
-          </div>
-        ) : null}
+        {session ? <div className="connected-desktop-actions"><ConnectedAccountActions active={active} onSignOut={handleSignOut} /></div> : null}
       </aside>
 
-      {children}
+      {verified && !sessionError ? children : <main className="workspace-main"><p role={sessionError ? "alert" : "status"}>{sessionError || "Vérification de votre session…"}</p></main>}
+    </div>
+  );
+}
+
+function ConnectedAccountActions({ active, onSignOut }: { active: string; onSignOut: () => void }) {
+  return (
+    <div className="connected-sidebar-actions">
+      {active !== "Articles" ? <button className="secondary-button" type="button" onClick={() => {
+        if (window.confirm("Réinitialiser les données de cet espace ?")) demoWorkspaceActions.reset();
+      }}>Réinitialiser l&apos;espace</button> : null}
+      <button className="ghost-button" type="button" onClick={onSignOut}>Déconnexion</button>
     </div>
   );
 }
@@ -252,20 +242,22 @@ export function useRoleAccess(
   const currentRole = getWorkspaceKindFromRoleLabel(session.roleLabel);
 
   const currentRoute = getDefaultWorkspaceRoute(currentRole);
+  const needsPetSitterActivation = expectedRole === "petSitter" &&
+    session.enabledRoles?.includes("petSitter") &&
+    !isPetSitterProfilePublished(session);
 
   return (
     <ConnectedShell role={session.roleLabel} active="Tableau de bord">
       <main className="workspace-main">
         <section className="workspace-card workspace-empty-state">
-          <p className="section-kicker">Accès non actif</p>
+          <p className="section-kicker">{needsPetSitterActivation ? "Profil à activer" : "Accès non actif"}</p>
 
-          <h1>{getWorkspaceAccessTitle(expectedRole)}</h1>
+          <h1>{needsPetSitterActivation ? "Terminez votre profil pet-sitter" : getWorkspaceAccessTitle(expectedRole)}</h1>
 
           <p>
-            Votre session actuelle est un espace {session.roleLabel}. Pour
-            garder une séparation claire des rôles, MamiPet ne mélange pas les
-            données propriétaire, pet-sitter et administration dans le même
-            dashboard.
+            {needsPetSitterActivation
+              ? "Choisissez vos gardes et terminez les étapes de validation pour accéder à votre espace."
+              : `Ce compte utilise actuellement l’espace ${session.roleLabel}. Activez le rôle requis pour continuer.`}
           </p>
 
           {expectedRole !== "admin" ? (
@@ -285,14 +277,14 @@ export function useRoleAccess(
               }}
             >
               {expectedRole === "petSitter"
-                ? "Passer les tests pet-sitter"
+                ? "Configurer mon profil"
                 : "Activer ce rôle sur mon compte"}
             </button>
           ) : null}
 
-          <ButtonLink href={currentRoute} variant="secondary">
-            Revenir à mon espace
-          </ButtonLink>
+          {currentRoute !== getDefaultWorkspaceRoute(expectedRole) ? (
+            <ButtonLink href={currentRoute} variant="secondary">Revenir à mon espace</ButtonLink>
+          ) : null}
         </section>
       </main>
     </ConnectedShell>
@@ -311,7 +303,7 @@ function getConnectedLinks(
   const enabledRoles = session?.enabledRoles ?? [];
 
   if (workspaceKind === "admin") {
-    return [["Tableau de bord", "/admin/dashboard"]];
+    return [["Tableau de bord", "/admin/dashboard"], ["Articles", "/admin/blog"]];
   }
 
   if (workspaceKind === "petSitter") {

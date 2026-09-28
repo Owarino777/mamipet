@@ -8,16 +8,16 @@
 .connected-sidebar nav a {
   min-height: 40px;
   padding: 10px 14px;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   color: var(--muted);
-  font-weight: 850;
+  font-weight: 650;
   white-space: nowrap;
 }
 
 .connected-sidebar nav a.active {
-  background: var(--green);
-  color: white;
-  box-shadow: 0 10px 22px rgb(49 91 72 / 18%);
+  background: var(--green-soft);
+  color: var(--green);
+  box-shadow: none;
 }
 
 .connected-sidebar-actions {
@@ -31,7 +31,7 @@
 
 .workspace-main,
 .booking-workspace {
-  width: min(100%, 1520px);
+  width: min(100%, 1360px);
   margin: 0 auto;
   padding: clamp(20px, 4vw, 42px);
 }

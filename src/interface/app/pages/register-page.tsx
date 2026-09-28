@@ -161,8 +161,7 @@ export function RegisterPage() {
       >
         {isFocusedPanel ? null : (
           <h1 id="register-title">
-            Rejoindre
-            <span>en tant que...</span>
+            Créer un compte
           </h1>
         )}
 
@@ -186,7 +185,7 @@ export function RegisterPage() {
               }}
               onClick={() => selectRole("petSitter")}
             >
-              Petsitter
+              Pet-sitter
             </button>
 
             <button

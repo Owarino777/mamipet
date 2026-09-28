@@ -1,7 +1,7 @@
 
 .workspace-card {
-  padding: 18px;
-  background: linear-gradient(180deg, white, var(--surface-soft));
+  padding: clamp(18px, 2vw, 26px);
+  background: var(--surface);
 }
 
 .workspace-grid--hero {
@@ -26,9 +26,10 @@
   gap: 10px;
   align-items: start;
   padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: rgb(255 255 255 / 62%);
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
 }
 
 .journey-list__item>span {

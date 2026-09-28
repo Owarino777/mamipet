@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 // Styles par domaine fonctionnel — séparés selon SRP / Clean Architecture
 import "./styles/shell.css";
@@ -12,6 +11,8 @@ import "./styles/register.css";
 import "./styles/pet-sitter-setup.css";
 import "./styles/pet-sitter-tests.css";
 import { getSiteUrl, siteDescription, siteName } from "@/shared/config/site";
+
+const isPreviewDeployment = process.env.VERCEL_ENV === "preview";
 
 export const metadata: Metadata = {
   metadataBase: getSiteUrl(),
@@ -33,13 +34,9 @@ export const metadata: Metadata = {
   authors: [{ name: siteName }],
   creator: siteName,
   publisher: siteName,
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     title: `${siteName} | Garde d'animaux de confiance`,
     description: siteDescription,
-    url: "/",
     siteName,
     locale: "fr_FR",
     type: "website",
@@ -50,10 +47,10 @@ export const metadata: Metadata = {
     description: siteDescription,
   },
   robots: {
-    index: true,
+    index: !isPreviewDeployment,
     follow: true,
     googleBot: {
-      index: true,
+      index: !isPreviewDeployment,
       follow: true,
       "max-image-preview": "large",
       "max-snippet": -1,

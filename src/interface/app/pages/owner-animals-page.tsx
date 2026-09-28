@@ -18,8 +18,7 @@ import {
 import { PetMiniCard } from "@/interface/app/connected/workspace-components";
 import { getErrorMessage } from "@/interface/app/connected/workspace-formatters";
 
-const defaultPetImageUrl =
-  "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=82";
+const defaultPetImageUrl = "/figma/register-pet-left.avif";
 
 export function OwnerAnimalsPage() {
   const workspace = useDemoWorkspace();
@@ -43,9 +42,8 @@ export function OwnerAnimalsPage() {
           <div>
             <p className="section-kicker">Animaux</p>
 
-            <h1>
-              Les besoins de chaque animal restent visibles au bon moment.
-            </h1>
+            <h1>Mes animaux</h1>
+            <p className="workspace-lead">Retrouvez leurs besoins et consignes avant chaque garde.</p>
           </div>
 
           <button
@@ -115,12 +113,12 @@ export function OwnerAnimalsPage() {
           >
             <label>
               Nom
-              <input name="name" placeholder="Ex. Nala" />
+              <input name="name" placeholder="Ex. Nala" required />
             </label>
 
             <label>
               Espèce
-              <input name="species" placeholder="Ex. chien, chat, lapin..." />
+              <input name="species" placeholder="Ex. chien, chat, lapin..." required />
             </label>
 
             <label>
@@ -147,7 +145,7 @@ export function OwnerAnimalsPage() {
 
                   if (file.size > 900_000) {
                     setStatusMessage(
-                      "Image trop lourde pour la démo locale. Utilisez une image de moins de 900 Ko.",
+                      "Image trop lourde. Choisissez une image de moins de 900 Ko.",
                     );
 
                     event.target.value = "";
@@ -170,13 +168,13 @@ export function OwnerAnimalsPage() {
               />
             </label>
 
-            <label>
-              URL Unsplash optionnelle
-              <input
-                name="imageUrl"
-                placeholder="Ex. https://images.unsplash.com/..."
-              />
-            </label>
+            <details className="pet-image-source">
+              <summary>Utiliser une photo Unsplash</summary>
+              <label>
+                Adresse de l’image
+                <input name="imageUrl" type="url" placeholder="https://images.unsplash.com/..." />
+              </label>
+            </details>
 
             <div className="pet-image-preview" aria-label="Aperçu de la photo">
               <Image

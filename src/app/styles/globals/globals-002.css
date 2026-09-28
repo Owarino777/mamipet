@@ -12,7 +12,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid rgb(79 107 69 / 45%);
+  outline: 3px solid rgb(47 93 207 / 58%);
 }
 
 h1,
@@ -32,13 +32,13 @@ h3 {
 }
 
 h1 {
-  font-size: clamp(2.55rem, 12vw, 4rem);
-  line-height: 0.98;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.12;
 }
 
 h2 {
-  font-size: clamp(1.75rem, 7vw, 2.65rem);
-  line-height: 1.08;
+  font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+  line-height: 1.18;
 }
 
 h3 {

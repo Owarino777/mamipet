@@ -6,6 +6,29 @@
   background: var(--green-soft);
 }
 
+.pet-visual__fallback {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  color: var(--muted);
+}
+
+.pet-visual__fallback span {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--brand-gradient);
+  color: #fff;
+  font-weight: 800;
+}
+
+.pet-visual__fallback small { font-size: .78rem; }
+
 .map-preview {
   position: relative;
   min-height: 320px;

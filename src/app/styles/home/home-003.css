@@ -22,9 +22,9 @@
 .search-bar-panel,
 .workspace-card {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 
 .hero-search-card {

@@ -8,16 +8,17 @@ import { AuthBackButton } from "@/interface/shared/auth-back-button";
 import { createSupabaseBrowserClient } from "@/shared/supabase/browser-client";
 import { navigateBack } from "@/interface/app/connected/navigation";
 import {
-  completeLocalDevFixtureLogin,
   completeLocalLogin,
   resolveDashboardRoute,
 } from "@/interface/app/connected/workspace-session";
 import { getErrorMessage } from "@/interface/app/connected/workspace-formatters";
+import { safeReturnPath } from "@/shared/auth/safe-return-path";
+import { PasswordRecoveryForm } from "./password-recovery-form";
 
 export function LoginPage() {
   const router = useRouter();
 
-  const [mode, setMode] = useState<"choice" | "login">("choice");
+  const [mode, setMode] = useState<"login" | "recovery">("login");
 
   const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -26,13 +27,11 @@ export function LoginPage() {
   return (
     <main className="login-screen">
       <AuthBackButton onClick={() => navigateBack(router, "/")} />
-      <div className="login-device-notch" aria-hidden="true" />
-      <section className="login-panel" aria-labelledby="login-title">
+      <section className="login-panel" aria-label="Accès au compte MamiPet">
         <Link
           className="login-logo"
           href="/"
           aria-label="Accueil MamiPet"
-          id="login-title"
         >
           <Image
             alt=""
@@ -43,40 +42,13 @@ export function LoginPage() {
           />
         </Link>
 
-        <div
-          className={
-            mode === "choice"
-              ? "login-action-card"
-              : "login-action-card login-action-card--form"
-          }
-        >
-          {mode === "choice" ? (
-            <>
-              <Link className="login-primary-action" href="/register">
-                S&rsquo;inscrire
-              </Link>
-
-              <button
-                className="login-secondary-action"
-                type="button"
-                onClick={() => {
-                  setLoginError(null);
-
-                  setMode("login");
-                }}
-              >
-                Se Connecter
-              </button>
-
-              <button className="login-forgot-action" type="button">
-                Mot de passe oublié ?
-              </button>
-            </>
-          ) : (
+        <div className="login-action-card login-action-card--form">
+          {mode === "recovery" ? <PasswordRecoveryForm onBack={() => setMode("login")} /> : (
             <form
               className="login-form"
               onSubmit={async (event) => {
                 event.preventDefault();
+                if (isSubmitting) return;
 
                 const formData = new FormData(event.currentTarget);
 
@@ -106,17 +78,6 @@ export function LoginPage() {
                   });
 
                   if (error) {
-                    const fixtureRoute = completeLocalDevFixtureLogin({
-                      email,
-                      password,
-                    });
-
-                    if (fixtureRoute) {
-                      router.push(fixtureRoute);
-
-                      return;
-                    }
-
                     setLoginError(error.message);
 
                     return;
@@ -134,27 +95,18 @@ export function LoginPage() {
                     route: dashboardRoute,
                   });
 
-                  router.push(dashboardRoute);
+                  router.push(safeReturnPath(new URL(window.location.href).searchParams.get("next"), dashboardRoute));
+                  router.refresh();
 
                   return;
                 } catch (error) {
-                  const fixtureRoute = completeLocalDevFixtureLogin({
-                    email,
-                    password,
-                  });
-
-                  if (fixtureRoute) {
-                    router.push(fixtureRoute);
-
-                    return;
-                  }
-
                   setLoginError(getErrorMessage(error));
                 } finally {
                   setIsSubmitting(false);
                 }
               }}
             >
+              <h1 id="login-title">Connexion</h1>
               <label>
                 Email
                 <input
@@ -162,6 +114,7 @@ export function LoginPage() {
                   name="email"
                   placeholder="Ex. camille@example.com"
                   type="email"
+                  required
                 />
               </label>
 
@@ -172,6 +125,7 @@ export function LoginPage() {
                   name="password"
                   placeholder="Ex. votre mot de passe"
                   type="password"
+                  required
                 />
               </label>
 
@@ -184,22 +138,21 @@ export function LoginPage() {
               </button>
 
               {loginError ? (
-                <p className="workspace-status">{loginError}</p>
+                <p className="workspace-status" role="alert">{loginError}</p>
               ) : null}
 
-              <button
-                className="login-forgot-action"
-                type="button"
-                onClick={() => setMode("choice")}
-              >
-                Retour
-              </button>
+              <div className="login-form-links">
+                <button
+                  className="login-forgot-action"
+                  type="button"
+                  onClick={() => setMode("recovery")}
+                >
+                  Mot de passe oublié ?
+                </button>
+                <Link href="/register">Créer un compte</Link>
+              </div>
             </form>
           )}
-
-          <Link className="login-close-action" href="/" aria-label="Fermer">
-            <span aria-hidden="true" />
-          </Link>
         </div>
       </section>
     </main>

@@ -241,8 +241,9 @@ function mirrorBookingToWorkspaceKeys(
   pets: DemoPet[],
   targetKeys: string[],
 ) {
+  if (readDemoSession()?.source !== "fixture") return;
   const currentKey = getCurrentWorkspaceStorageKey();
-  const keysToUpdate = targetKeys.filter((targetKey) => targetKey !== currentKey);
+  const keysToUpdate = targetKeys.filter((targetKey) => targetKey !== currentKey && targetKey.startsWith(`${workspaceStorageKeyPrefix}:fixture:`));
 
   for (const targetKey of keysToUpdate) {
     const existingState = readWorkspaceStateFromKey(targetKey);
@@ -260,6 +261,7 @@ function mirrorBookingToWorkspaceKeys(
 
 function syncIncomingPetSitterBookingsForCurrentSession() {
   const session = readDemoSession();
+  if (session?.source !== "fixture") return;
   const petSitterId = getPetSitterProfileIdFromSession(session);
 
   if (!petSitterId) {
@@ -295,6 +297,7 @@ function syncIncomingPetSitterBookingsForCurrentSession() {
 }
 
 function syncExistingBookingUpdatesForCurrentSession() {
+  if (readDemoSession()?.source !== "fixture") return;
   const currentKey = getCurrentWorkspaceStorageKey();
   const initialState = readWorkspaceStateFromKey(currentKey);
   const knownBookingIds = new Set(
@@ -333,7 +336,7 @@ function getAllWorkspaceStorageKeys(): string[] {
   for (let index = 0; index < window.localStorage.length; index += 1) {
     const storageKey = window.localStorage.key(index);
 
-    if (storageKey?.startsWith(`${workspaceStorageKeyPrefix}:`)) {
+    if (storageKey?.startsWith(`${workspaceStorageKeyPrefix}:fixture:`)) {
       storageKeys.push(storageKey);
     }
   }

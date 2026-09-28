@@ -1,38 +1,45 @@
 
 @media (min-width: 760px) {
   .pet-sitter-setup-frame {
-    padding: 4.5rem 2rem;
+    padding: 5.5rem 2rem 3rem;
   }
 
   .pet-sitter-setup-card {
-    width: 34rem;
-    gap: 2.25rem;
-    padding: 3.25rem 4.8rem 3.05rem;
-    border-radius: 1.35rem;
+    width: min(100%, 58rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 3.5rem;
+    padding: 2.5rem 3rem;
+    border-radius: var(--radius-panel);
   }
 
+  .pet-sitter-setup-intro,
+  .pet-sitter-setup-error,
+  .pet-sitter-setup-submit { grid-column: 1 / -1; }
+
+  .pet-sitter-setup-submit { justify-self: end; }
+
   .pet-sitter-setup-group {
-    gap: 1.45rem;
+    gap: 1rem;
   }
 
   .pet-sitter-setup-group legend {
-    font-size: 1.08rem;
-    line-height: 1.08;
+    font-size: 1.15rem;
+    line-height: 1.25;
   }
 
   .pet-sitter-setup-options,
   .pet-sitter-setup-column {
-    gap: 0.86rem;
+    gap: 0.25rem;
   }
 
   .pet-sitter-setup-options--animals {
-    gap: 0.86rem 3.2rem;
+    gap: 0.25rem 1.5rem;
   }
 
   .pet-sitter-setup-check {
-    gap: 0.85rem;
-    font-size: 0.9rem;
-    white-space: nowrap;
+    gap: 0.75rem;
+    font-size: 0.91rem;
+    white-space: normal;
   }
 
   .pet-sitter-setup-check input {
@@ -42,8 +49,8 @@
 
   .pet-sitter-setup-submit {
     min-width: 12rem;
-    min-height: 2.85rem;
-    font-size: 1rem;
+    min-height: var(--control-height);
+    font-size: 0.94rem;
   }
 
   .register-screen {

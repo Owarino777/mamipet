@@ -461,18 +461,7 @@ export function PetSitterPayoutPanel({
         </span>
       </div>
 
-      <ul
-        className="payout-checklist"
-        aria-label="Statut du compte de versement"
-      >
-        <li className="payout-checklist__done">Identité MamiPet vérifiée</li>
-        <li>Compte bénéficiaire non connecté</li>
-        <li>Coordonnées bancaires manquantes</li>
-      </ul>
-
-      <button className="secondary-button" type="button" disabled>
-        Connecter le compte bancaire
-      </button>
+      <p className="workspace-muted-note">Montants de test. Aucun virement réel n’est effectué.</p>
     </article>
   );
 }
@@ -502,13 +491,18 @@ export function PetMiniCard({
   href?: string;
   pet: DemoPet;
 }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const fallbackImage = pet.species.toLowerCase().includes("chat")
+    ? "/figma/assessment-cat.svg"
+    : "/figma/assessment-dog.svg";
   const content = (
     <>
       <Image
-        src={pet.image}
+        src={imageFailed ? fallbackImage : pet.image}
         alt={`${pet.name}, ${pet.species}`}
         width={104}
         height={104}
+        onError={() => setImageFailed(true)}
       />
 
       <div>
@@ -576,6 +570,12 @@ export function AdminList({
   return (
     <article className="workspace-card admin-list">
       <h2>{title}</h2>
+
+      {items.length === 0 ? (
+        <p className="admin-list__empty">
+          {collection === "documents" ? "Aucun document en attente." : "Aucun signalement ouvert."}
+        </p>
+      ) : null}
 
       {items.map((row) => (
         <div className="admin-row" key={row.id}>

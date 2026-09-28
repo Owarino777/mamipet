@@ -54,11 +54,12 @@
 .secondary-button,
 .ghost-button {
   display: inline-flex;
-  min-height: 44px;
+  min-height: var(--control-height);
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-radius: 14px;
-  font-weight: 900;
+  border-radius: var(--radius-control);
+  font-size: 0.94rem;
+  font-weight: 700;
   white-space: nowrap;
 }

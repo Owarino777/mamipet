@@ -1,17 +1,17 @@
 
 .primary-button {
   padding: 0 24px;
-  background: linear-gradient(135deg, var(--coral), #ff9fbf);
+  background: var(--green);
   color: white;
-  box-shadow: 0 12px 28px rgb(255 127 168 / 28%);
+  box-shadow: none;
   transition:
     box-shadow 160ms ease,
     transform 160ms ease;
 }
 
 .primary-button:hover {
-  box-shadow: 0 14px 30px rgb(238 102 91 / 28%);
-  transform: translateY(-1px);
+  background: var(--green-deep);
+  box-shadow: var(--shadow-soft);
 }
 
 .primary-button:disabled {
@@ -20,15 +20,15 @@
 }
 
 .primary-button--small {
-  min-height: 38px;
+  min-height: 40px;
   padding: 0 16px;
   font-size: 0.9rem;
 }
 
 .secondary-button {
   padding: 0 20px;
-  border: 1px solid #b8c8f8;
-  background: var(--green-soft);
+  border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--green);
 }
 

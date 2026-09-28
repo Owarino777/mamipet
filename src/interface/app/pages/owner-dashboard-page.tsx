@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -14,7 +13,6 @@ import { getBookingStatusLabel } from "@/interface/shared/demo-workspace-state";
 import { formatEuro, formatRating } from "@/interface/shared/format";
 import {
   ButtonLink,
-  CareCapabilityTag,
   SensitiveDataNotice,
   TrustBadge,
 } from "@/interface/shared/product-ui";
@@ -67,38 +65,9 @@ export function OwnerDashboardPage() {
       return;
     }
 
-    const booking = workspace.bookings.find(
-      (candidate) => candidate.id === bookingId,
-    );
-
-    if (checkoutStatus === "success") {
-      if (booking?.status === "accepted") {
-        demoWorkspaceActions.payBooking(bookingId);
-        window.setTimeout(() =>
-          setCheckoutMessage(
-            "Paiement Stripe test validé. Le contrat récapitulatif est généré.",
-          ),
-        );
-      } else if (booking?.status === "paid") {
-        window.setTimeout(() =>
-          setCheckoutMessage("Cette réservation est déjà marquée comme payée."),
-        );
-      } else {
-        window.setTimeout(() =>
-          setCheckoutMessage(
-            "Paiement Stripe reçu, mais la réservation n’est plus en état payable.",
-          ),
-        );
-      }
-    }
-
-    if (checkoutStatus === "cancelled") {
-      window.setTimeout(() =>
-        setCheckoutMessage(
-          "Paiement Stripe annulé. La réservation reste acceptée.",
-        ),
-      );
-    }
+    window.setTimeout(() => setCheckoutMessage(
+      "Un retour de paiement ne confirme pas une transaction. Aucun statut de réservation n’a été modifié.",
+    ));
 
     router.replace("/dashboard", { scroll: false });
   }, [router, workspace.bookings]);
@@ -117,7 +86,7 @@ export function OwnerDashboardPage() {
               fallbackName="Olivia"
             />
 
-            <h1>Vos gardes et animaux sont à jour.</h1>
+            <h1>Votre espace</h1>
           </div>
 
           <ButtonLink href="/reservations/new">Nouvelle réservation</ButtonLink>
@@ -170,7 +139,7 @@ export function OwnerDashboardPage() {
                 <BookingActionPanel booking={nextBooking} />
               </>
             ) : (
-                <ButtonLink href="/owner/search" variant="secondary">
+                <ButtonLink href="/pet-sitters" variant="secondary">
                   Trouver un pet-sitter
                 </ButtonLink>
             )}
@@ -204,46 +173,36 @@ export function OwnerDashboardPage() {
         </section>
 
         <section className="workspace-grid">
-          <BookingDocumentsPanel
-            bookings={workspace.bookings}
-            petById={petById}
-          />
+          {workspace.bookings.length > 0 ? <BookingDocumentsPanel bookings={workspace.bookings} petById={petById} /> : null}
 
-          <BookingHistoryList
-            bookings={workspace.bookings}
-            petById={petById}
-          />
+          {workspace.bookings.length > 0 ? <BookingHistoryList bookings={workspace.bookings} petById={petById} /> : null}
 
           <article className="workspace-card">
-            <h2>Pet-sitters adaptés</h2>
+            <div className="card-heading-row">
+              <h2>Pet-sitters à découvrir</h2>
+              <Link href="/pet-sitters">Voir la recherche</Link>
+            </div>
 
-            <div className="recommendation-row">
-              {demoPetSitters.slice(0, 6).map((profile) => (
+            <div className="recommendation-list">
+              {demoPetSitters.slice(0, 3).map((profile) => (
                 <Link
-                  className="mini-sitter-card"
+                  className="recommendation-item"
                   href={`/pet-sitters/${profile.id}`}
                   key={profile.id}
                 >
-                  <Image
-                    src={profile.imageUrl}
-                    alt={profile.imageAlt}
-                    fill
-                    sizes="180px"
-                  />
-
-                  <span>
+                  <strong>
                     {profile.firstName} {profile.lastInitial}
-                  </span>
-
-                  <small>
+                  </strong>
+                  <span>
                     {formatRating(profile.rating)} / 5 · {profile.city}
-                  </small>
+                  </span>
+                  <span>Dès {formatEuro(profile.basePriceCents)} / {profile.priceUnit}</span>
                 </Link>
               ))}
             </div>
           </article>
 
-          <article className="workspace-card">
+          {workspace.pets.length > 0 ? <article className="workspace-card">
             <h2>Dossier médical</h2>
 
             <SensitiveDataNotice />
@@ -266,31 +225,17 @@ export function OwnerDashboardPage() {
                 </button>
               ))}
 
-              {incompleteMedicalPets.length === 0 ? (
-                <TrustBadge label="Tous les dossiers sont complets" />
-              ) : null}
-
               <ButtonLink href="/owner/animals" variant="secondary">
                 Gérer les dossiers
               </ButtonLink>
             </div>
-          </article>
+          </article> : null}
 
-          <article className="workspace-card">
+          {completedBookingToReview ? <article className="workspace-card">
             <h2>Avis à déposer</h2>
 
-            {completedBookingToReview ? (
-              <ReviewForm booking={completedBookingToReview} />
-            ) : (
-              <>
-                <p>Aucun avis en attente pour le moment.</p>
-
-                <ButtonLink href="/dashboard" variant="secondary">
-                  Voir l&apos;historique
-                </ButtonLink>
-              </>
-            )}
-          </article>
+            <ReviewForm booking={completedBookingToReview} />
+          </article> : null}
         </section>
       </main>
     </ConnectedShell>

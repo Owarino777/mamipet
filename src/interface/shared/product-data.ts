@@ -40,9 +40,8 @@ export type PublicPetSitter = {
 
 export const trustProofs = [
   "Identité vérifiée",
-  "Avis contrôlés",
-  "Assurance modélisée",
-  "Réservation sécurisée",
+  "Avis visibles",
+  "Besoins spécifiques",
 ];
 
 const identityBadge: ReferenceTag = {

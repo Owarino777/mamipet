@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { demoPetSitters } from "@/interface/shared/product-data";
@@ -40,9 +39,9 @@ export function BookingFlowPage() {
 
   const [requestStatus, setRequestStatus] = useState<string | null>(null);
 
-  const [startDate, setStartDate] = useState("2026-05-24");
+  const [startDate, setStartDate] = useState(getLocalToday);
 
-  const [endDate, setEndDate] = useState("2026-05-26");
+  const [endDate, setEndDate] = useState(getLocalToday);
 
   const [careType, setCareType] = useState("Garde chez le pet-sitter");
 
@@ -68,7 +67,7 @@ export function BookingFlowPage() {
       ? calculatePaymentBreakdown(estimatedTotalCents)
       : null;
 
-  const hasInvalidDates = endDate < startDate;
+  const hasInvalidDates = !startDate || !endDate || startDate < getLocalToday() || endDate < startDate;
 
   const canSubmitRequest = selectedPets.length > 0 && !hasInvalidDates;
 
@@ -110,14 +109,13 @@ export function BookingFlowPage() {
 
               <h1>
                 {isGeneralRequest
-                  ? "Publiez une annonce claire pour les pet-sitters."
-                  : `Préparez une demande claire pour ${sitter?.firstName}.`}
+                  ? "Publier une annonce"
+                  : `Demande à ${sitter?.firstName}`}
               </h1>
 
               <p>
-                Les informations sensibles servent uniquement à vérifier la
-                faisabilité de la garde. Le paiement test sera proposé après
-                acceptation par un pet-sitter.
+                Précisez les dates, la garde et les besoins de vos animaux.
+                Aucun paiement avant acceptation.
               </p>
             </div>
 
@@ -165,6 +163,7 @@ export function BookingFlowPage() {
                 Début
                 <input
                   type="date"
+                  min={getLocalToday()}
                   value={startDate}
                   onChange={(event) => {
                     setStartDate(event.target.value);
@@ -178,6 +177,7 @@ export function BookingFlowPage() {
                 Fin
                 <input
                   type="date"
+                  min={startDate || getLocalToday()}
                   value={endDate}
                   onChange={(event) => {
                     setEndDate(event.target.value);
@@ -243,8 +243,7 @@ export function BookingFlowPage() {
 
             {hasInvalidDates ? (
               <p className="workspace-status workspace-status--warning">
-                La date de fin doit être identique ou postérieure à la date de
-                début.
+                Choisissez des dates valides à partir d’aujourd’hui.
               </p>
             ) : null}
 
@@ -253,19 +252,6 @@ export function BookingFlowPage() {
 
           <aside className="workspace-card booking-summary-card">
             <h2>Récapitulatif</h2>
-
-            {sitter ? (
-              <Image
-                src={sitter.imageUrl}
-                alt={sitter.imageAlt}
-                width={96}
-                height={96}
-              />
-            ) : (
-              <span className="booking-summary-card__marketplace-icon" aria-hidden="true">
-                +
-              </span>
-            )}
 
             <p>
               {sitter
@@ -377,4 +363,10 @@ export function BookingFlowPage() {
       </main>
     </ConnectedShell>
   );
+}
+
+function getLocalToday(): string {
+  const now = new Date();
+  const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+  return localDate.toISOString().slice(0, 10);
 }

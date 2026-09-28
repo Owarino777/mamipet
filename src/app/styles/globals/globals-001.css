@@ -15,8 +15,13 @@
   --danger: #b42318;
   --success: #2f6b3f;
   --shadow: 0 18px 44px rgb(49 74 149 / 14%);
-  --font-title: "Baloo 2", "Fredoka", "Trebuchet MS", "Segoe UI", sans-serif;
-  --font-ui: "Nunito", "Quicksand", "Segoe UI", system-ui, sans-serif;
+  --shadow-soft: 0 8px 24px rgb(35 57 112 / 7%);
+  --radius-control: 10px;
+  --radius-panel: 12px;
+  --control-height: 44px;
+  --content-max: 1200px;
+  --font-title: "Trebuchet MS", "Segoe UI", sans-serif;
+  --font-ui: "Segoe UI", "Nunito", system-ui, sans-serif;
 }
 
 * {
@@ -31,15 +36,11 @@ html {
 body {
   min-height: 100%;
   margin: 0;
-  background:
-    radial-gradient(circle at 10% 10%, rgb(255 204 229 / 34%), transparent 30%),
-    radial-gradient(circle at 88% 8%, rgb(190 221 255 / 38%), transparent 32%),
-    var(--page);
+  background: var(--page);
   color: var(--text);
   font-family: var(--font-ui);
 }
 
-body,
 button,
 input,
 select,

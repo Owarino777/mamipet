@@ -9,6 +9,7 @@ import {
   AdminList,
   MetricCard,
 } from "@/interface/app/connected/workspace-components";
+import Link from "next/link";
 
 export function AdminDashboardPage() {
   const workspace = useDemoWorkspace();
@@ -36,20 +37,36 @@ export function AdminDashboardPage() {
       <main className="workspace-main">
         <div className="workspace-heading">
           <div>
-            <p className="section-kicker">Back-office</p>
+            <p className="section-kicker">Administration</p>
 
-            <h1>Validation, modération et suivi des actions sensibles.</h1>
+            <h1>Vue d’ensemble</h1>
+            <p className="workspace-lead">
+              Vérifications, signalements et articles à traiter.
+            </p>
           </div>
         </div>
 
-        <section className="workspace-grid workspace-grid--four">
+        <section className="admin-quick-actions" aria-label="Actions administrateur">
+          <Link className="admin-quick-action" href="/admin/blog">
+            <strong>Gérer le journal</strong>
+            <span>Créer, relire et publier les articles.</span>
+          </Link>
+          <a className="admin-quick-action" href="#moderation">
+            <strong>Traiter les signalements</strong>
+            <span>Revoir les tickets ouverts et leurs décisions.</span>
+          </a>
+          <a className="admin-quick-action" href="#documents">
+            <strong>Vérifier les documents</strong>
+            <span>Valider les justificatifs en attente.</span>
+          </a>
+        </section>
+
+        <section className="workspace-grid workspace-grid--three">
           <MetricCard
             title="Documents"
             value={String(pendingDocuments.length)}
             detail="À valider"
           />
-
-          <MetricCard title="Profils" value="5" detail="En attente" />
 
           <MetricCard
             title="Signalements"
@@ -65,17 +82,21 @@ export function AdminDashboardPage() {
         </section>
 
         <section className="workspace-grid">
-          <AdminList
+          <div id="documents">
+            <AdminList
             collection="documents"
             title="Documents en attente"
             items={workspace.documents}
-          />
+            />
+          </div>
 
-          <AdminList
+          <div id="moderation">
+            <AdminList
             collection="reports"
             title="Signalements ouverts"
             items={workspace.reports}
-          />
+            />
+          </div>
         </section>
       </main>
     </ConnectedShell>

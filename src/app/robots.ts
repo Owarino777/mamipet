@@ -8,12 +8,15 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/pet-sitters", "/register"],
+        allow: ["/", "/pet-sitters", "/blog"],
         disallow: [
           "/admin/",
           "/api/",
           "/dashboard",
           "/login",
+          "/register",
+          "/reset-password",
+          "/auth/",
           "/owner/",
           "/pet-sitter/",
           "/reservations/",

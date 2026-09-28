@@ -21,7 +21,8 @@ type ApiFailure = {
   } | null;
 };
 
-const devFixturePassword = "Mamipet2026!";
+// This public demo-only fallback is never passed to Supabase Auth.
+const localDevFixturePassword = "mamipet-local-fixture-only";
 
 const devFixtureLogins: Record<
   string,
@@ -138,10 +139,7 @@ export async function resolveSessionProfile(
   });
 
   if (!response.ok) {
-    return {
-      activeRole: preferredRole,
-      enabledRoles: [preferredRole],
-    };
+    throw new Error("Impossible de vérifier les droits du compte. Réessayez après reconnexion.");
   }
 
   const payload = (await response.json()) as {
@@ -182,7 +180,7 @@ function getEnabledRolesFromApi(
     | undefined,
 ): WorkspaceKind[] {
   if (!data) {
-    return ["owner"];
+    throw new Error("Le serveur n’a pas renvoyé les droits du compte.");
   }
 
   if (data.roles.admin || data.isAdmin) {
@@ -199,7 +197,7 @@ function getEnabledRolesFromApi(
     roles.push("petSitter");
   }
 
-  return roles.length > 0 ? roles : ["owner"];
+  return roles;
 }
 
 export function completeLocalRegistration(input: {
@@ -255,14 +253,21 @@ export function completeLocalDevFixtureLogin(input: {
   email: string;
   password: string;
 }): string | null {
-  if (process.env.NODE_ENV === "production") {
+  if (
+    process.env.NODE_ENV !== "development" ||
+    typeof window === "undefined" ||
+    !["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname)
+  ) {
     return null;
   }
 
+  const fixturePassword =
+    process.env.NEXT_PUBLIC_MAMIPET_DEV_FIXTURE_PASSWORD?.trim() ||
+    localDevFixturePassword;
   const email = input.email.toLowerCase();
   const fixture = devFixtureLogins[email];
 
-  if (!fixture || input.password !== devFixturePassword) {
+  if (!fixture || input.password !== fixturePassword) {
     return null;
   }
 
@@ -411,7 +416,7 @@ export async function resolveDashboardRoute(): Promise<string> {
   });
 
   if (!response.ok) {
-    return "/dashboard";
+    throw new Error("Impossible de vérifier votre compte. Réessayez.");
   }
 
   const payload = (await response.json()) as {

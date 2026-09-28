@@ -21,10 +21,11 @@ export async function PATCH(request: Request, context: CompleteReservationRouteC
       throw new ConflictError("Only paid reservations can be completed.");
     }
 
-    const { error } = await supabase
-      .from("reservation")
-      .update({ statut_reservation: "completed" })
-      .eq("id_reservation", reservationId);
+    const { error } = await supabase.rpc("transition_reservation", {
+      p_id_reservation: reservationId,
+      p_action: "complete",
+      p_reason: null,
+    });
 
     throwIfSupabaseError(error, "Unable to complete reservation.");
 

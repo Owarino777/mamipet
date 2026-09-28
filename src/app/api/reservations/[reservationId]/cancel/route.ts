@@ -24,13 +24,11 @@ export async function PATCH(request: Request, context: ReservationActionContext)
       throw new ConflictError("This reservation cannot be cancelled from its current status.");
     }
 
-    const { error } = await supabase
-      .from("reservation")
-      .update({
-        statut_reservation: "cancelled",
-        motif_annulation: input.reason,
-      })
-      .eq("id_reservation", reservationId);
+    const { error } = await supabase.rpc("transition_reservation", {
+      p_id_reservation: reservationId,
+      p_action: "cancel",
+      p_reason: input.reason,
+    });
 
     throwIfSupabaseError(error, "Unable to cancel reservation.");
 

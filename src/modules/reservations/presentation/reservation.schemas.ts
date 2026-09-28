@@ -17,6 +17,9 @@ export const createReservationSchema = z.object({
   insuranceLevel: z.enum(insuranceLevels),
   agreedPriceCents: z.number().int().positive(),
   instructions: z.string().trim().max(4000).nullable().optional(),
+}).refine((input) => input.agreedPriceCents >= input.animalIds.length, {
+  message: "Price must allow at least one cent per animal.",
+  path: ["agreedPriceCents"],
 });
 
 export const refuseReservationSchema = z.object({

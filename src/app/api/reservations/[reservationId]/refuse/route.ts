@@ -30,14 +30,11 @@ export async function PATCH(request: Request, context: ReservationActionContext)
       throw new ConflictError("Only awaiting reservations can be refused.");
     }
 
-    const { error } = await supabase
-      .from("reservation")
-      .update({
-        statut_reservation: "refused",
-        motif_refus: input.reason,
-        date_reponse: new Date().toISOString(),
-      })
-      .eq("id_reservation", reservationId);
+    const { error } = await supabase.rpc("transition_reservation", {
+      p_id_reservation: reservationId,
+      p_action: "refuse",
+      p_reason: input.reason,
+    });
 
     throwIfSupabaseError(error, "Unable to refuse reservation.");
 

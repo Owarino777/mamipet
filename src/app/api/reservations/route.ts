@@ -51,7 +51,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const pricePerAnimalCents = Math.round(input.agreedPriceCents / input.animalIds.length);
+    const basePriceCents = Math.floor(input.agreedPriceCents / input.animalIds.length);
+    const remainderCents = input.agreedPriceCents % input.animalIds.length;
     const reservation = Reservation.create({
       id: randomUUID(),
       ownerProfileId: ownerProfile.id,
@@ -62,46 +63,28 @@ export async function POST(request: Request) {
       endDate: new Date(input.endAt),
       insuranceLevel: input.insuranceLevel,
       agreedPriceCents: input.agreedPriceCents,
-      animals: input.animalIds.map((animalId) => ({
+      animals: input.animalIds.map((animalId, index) => ({
         animalId,
         ownerProfileId: ownerProfile.id,
-        priceCents: pricePerAnimalCents,
+        priceCents: basePriceCents + (index < remainderCents ? 1 : 0),
       })),
       instructions: input.instructions ?? null,
     });
 
-    const { error: reservationError } = await supabase.from("reservation").insert({
-      id_reservation: reservation.id,
-      id_profil_proprietaire: reservation.ownerProfileId,
-      id_profil_pet_sitter: reservation.petSitterProfileId,
-      id_lieu_garde: reservation.careLocationId,
-      id_format_garde: reservation.careFormatId,
-      date_debut_reservation: reservation.startDate.toISOString(),
-      date_fin_reservation: reservation.endDate.toISOString(),
-      statut_reservation: reservation.status,
-      niveau_assurance_applique: reservation.insuranceLevel,
-      tarif_convenu: reservation.agreedPriceCents / 100,
-      taux_commission_plateforme: reservation.platformCommissionRate,
-      consignes_reservation: reservation.instructions,
+    const { error: reservationError } = await supabase.rpc("create_reservation_with_animals", {
+      p_id_reservation: reservation.id,
+      p_id_profil_proprietaire: reservation.ownerProfileId,
+      p_id_profil_pet_sitter: reservation.petSitterProfileId,
+      p_id_lieu_garde: reservation.careLocationId,
+      p_id_format_garde: reservation.careFormatId,
+      p_date_debut: reservation.startDate.toISOString(),
+      p_date_fin: reservation.endDate.toISOString(),
+      p_niveau_assurance: reservation.insuranceLevel,
+      p_tarif_centimes: reservation.agreedPriceCents,
+      p_consignes: reservation.instructions,
+      p_animaux: input.animalIds,
     });
-
     throwIfSupabaseError(reservationError, "Unable to create reservation.");
-
-    const { error: reservationAnimalsError } = await supabase
-      .from("reservation_animal")
-      .insert(
-        reservation.animals.map((animal) => ({
-          id_reservation: reservation.id,
-          id_animal: animal.animalId,
-          id_profil_proprietaire: reservation.ownerProfileId,
-          tarif_animal: animal.priceCents / 100,
-        })),
-      );
-
-    throwIfSupabaseError(
-      reservationAnimalsError,
-      "Unable to attach animals to reservation.",
-    );
 
     const created = await readReservation(supabase, reservation.id);
     const paymentPreview = calculatePaymentBreakdown(input.agreedPriceCents);

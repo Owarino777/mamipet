@@ -1,7 +1,6 @@
 import { requireAuthenticatedUser } from "@/shared/auth/current-user";
 import { jsonError, jsonOk } from "@/shared/http/route-response";
 import { throwIfSupabaseError } from "@/shared/supabase/errors";
-import { ensureAccount } from "@/modules/identity-access/application/ensure-account";
 
 type OwnerProfileRow = {
   id_profil_proprietaire: string;
@@ -13,22 +12,21 @@ type PetSitterProfileRow = {
 
 export async function GET(request: Request) {
   try {
-    const { supabase, user } = await requireAuthenticatedUser(request);
-    const account = await ensureAccount(supabase, user);
+    const { supabase, user, account } = await requireAuthenticatedUser(request);
 
-    const { data: ownerProfile, error: ownerError } = await supabase
+    const [ownerResult, sitterResult] = await Promise.all([supabase
       .from("profil_proprietaire")
       .select("id_profil_proprietaire")
       .eq("id_compte", user.id)
-      .maybeSingle();
-
-    throwIfSupabaseError(ownerError, "Unable to read owner profile.");
-
-    const { data: petSitterProfile, error: petSitterError } = await supabase
+      .maybeSingle(), supabase
       .from("profil_pet_sitter")
       .select("id_profil_pet_sitter")
       .eq("id_compte", user.id)
-      .maybeSingle();
+      .maybeSingle()]);
+
+    const { data: ownerProfile, error: ownerError } = ownerResult;
+    const { data: petSitterProfile, error: petSitterError } = sitterResult;
+    throwIfSupabaseError(ownerError, "Unable to read owner profile.");
 
     throwIfSupabaseError(petSitterError, "Unable to read pet-sitter profile.");
 

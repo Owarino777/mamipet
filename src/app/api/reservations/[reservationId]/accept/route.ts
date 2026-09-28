@@ -29,26 +29,10 @@ export async function PATCH(request: Request, context: ReservationActionContext)
       throw new ConflictError("Only awaiting reservations can be accepted.");
     }
 
-    const responseAt = new Date().toISOString();
-    const { error: updateError } = await supabase
-      .from("reservation")
-      .update({
-        statut_reservation: "accepted",
-        date_reponse: responseAt,
-      })
-      .eq("id_reservation", reservationId);
-
-    throwIfSupabaseError(updateError, "Unable to accept reservation.");
-
-    const { error: availabilityError } = await supabase.from("disponibilite").insert({
-      id_profil_pet_sitter: petSitterProfile.id,
-      id_reservation: reservationId,
-      date_debut_disponibilite: reservation.date_debut_reservation,
-      date_fin_disponibilite: reservation.date_fin_reservation,
-      statut_disponibilite: "blocked_reservation",
+    const { error } = await supabase.rpc("accept_reservation_and_block_slot", {
+      p_id_reservation: reservationId,
     });
-
-    throwIfSupabaseError(availabilityError, "Unable to block accepted slot.");
+    throwIfSupabaseError(error, "Unable to accept reservation.");
 
     const updated = await readReservation(supabase, reservationId);
 

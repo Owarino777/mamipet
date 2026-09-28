@@ -7,7 +7,9 @@ export function jsonOk<TData>(
   init: ResponseInit = {},
   meta: Record<string, unknown> = {},
 ): Response {
-  return Response.json(ok(data, meta), init);
+  const headers = new Headers(init.headers);
+  if (!headers.has("Cache-Control")) headers.set("Cache-Control", "private, no-store");
+  return Response.json(ok(data, meta), { ...init, headers });
 }
 
 export function jsonCreated<TData>(data: TData): Response {
@@ -16,24 +18,26 @@ export function jsonCreated<TData>(data: TData): Response {
 
 export function jsonError(error: unknown): Response {
   if (error instanceof HttpError) {
-    return Response.json(fail(error.code, error.message, error.details), {
+    const isServerError = error.status >= 500;
+    return Response.json(fail(
+      error.code,
+      isServerError ? "An unexpected server error occurred." : error.message,
+      isServerError ? undefined : error.details,
+    ), {
       status: error.status,
+      headers: { "Cache-Control": "private, no-store" },
     });
   }
 
   if (error instanceof DomainError) {
     return Response.json(fail(error.code, error.message), {
       status: 422,
-    });
-  }
-
-  if (error instanceof Error) {
-    return Response.json(fail("INTERNAL_SERVER_ERROR", error.message), {
-      status: 500,
+      headers: { "Cache-Control": "private, no-store" },
     });
   }
 
   return Response.json(fail("INTERNAL_SERVER_ERROR", "Unexpected error."), {
     status: 500,
+    headers: { "Cache-Control": "private, no-store" },
   });
 }
